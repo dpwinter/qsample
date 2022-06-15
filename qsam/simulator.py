@@ -3,16 +3,7 @@
 __all__ = ['Simulator']
 
 # Cell
-# export
-from fastcore.basics import patch
-
-# Cell
 class Simulator:
     """Interface for quantum state simulation"""
     def __init__(self, num_qubits):
         self.n_qubits = num_qubits
-
-# Cell
-@patch
-def say(self:Simulator, hi):
-    return f'hi {hi}'

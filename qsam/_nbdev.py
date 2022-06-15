@@ -2,8 +2,7 @@
 
 __all__ = ["index", "modules", "custom_doc_links", "git_url"]
 
-index = {"Simulator": "01_simulator.ipynb",
-         "Simulator.say": "01_simulator.ipynb"}
+index = {"Simulator": "01_simulator.ipynb"}
 
 modules = ["simulator.py"]
 
