@@ -2,6 +2,7 @@
   "qsam": {
     "Overview": "/",
     "Tools": "tools.html",
-    "Simulator": "simulator.html"
+    "Simulator": "simulator.html",
+    "Circuit": "circuit.html"
   }
 }
