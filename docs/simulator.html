@@ -77,7 +77,7 @@ nb_path: "01_simulator.ipynb"
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>In order to run a state simulation, i.e. propagation of an initial state through a quantum circuit, we iterate over the <code>ticks</code> of a circuit and <strong>apply gates</strong> on the specified qubits. Each simulator implements a certain set of gates we can call.</p>
+<p>In order to run a state simulation, i.e. propagation of an initial state through a quantum circuit, we iterate over the <code>ticks</code> of a circuit and apply gates on the specified qubits. Each simulator implements a certain set of gates we can call. However, the user is not expected to call the <code>_apply_gate</code> method but to use the <a href="/qsam/simulator.html#run"><code>run</code></a> method on entire <code>circuit</code>s instead.</p>
 
 </div>
 </div>
