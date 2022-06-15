@@ -10,8 +10,8 @@ entries:
       title: Overview
       url: /
     - output: web,pdf
-      title: core
-      url: core.html
+      title: Simulator
+      url: simulator.html
     output: web
     title: qsam
   output: web
