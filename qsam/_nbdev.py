@@ -2,9 +2,12 @@
 
 __all__ = ["index", "modules", "custom_doc_links", "git_url"]
 
-index = {"Simulator": "01_simulator.ipynb"}
+index = {"patch": "00_tools.ipynb",
+         "Simulator": "01_simulator.ipynb",
+         "say": "01_simulator.ipynb"}
 
-modules = ["simulator.py"]
+modules = ["tools.py",
+           "simulator.py"]
 
 doc_url = "https://dpwinter.github.io/qsam/"
 

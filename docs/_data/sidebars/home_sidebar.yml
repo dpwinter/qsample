@@ -10,6 +10,9 @@ entries:
       title: Overview
       url: /
     - output: web,pdf
+      title: Tools for library creation in nbdev
+      url: tools.html
+    - output: web,pdf
       title: Simulator
       url: simulator.html
     output: web
