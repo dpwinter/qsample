@@ -6,8 +6,8 @@ title: Simulator
 keywords: fastai
 sidebar: home_sidebar
 
-summary: "Defines a unified interface for working with quantum state simulators (for example Stabilizer or statevector simulators). "
-description: "Defines a unified interface for working with quantum state simulators (for example Stabilizer or statevector simulators). "
+summary: "Defines a unified interface for working with quantum state simulators."
+description: "Defines a unified interface for working with quantum state simulators."
 nb_path: "01_simulator.ipynb"
 ---
 <!--
@@ -82,6 +82,13 @@ nb_path: "01_simulator.ipynb"
 </div>
 </div>
 </div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    {% endraw %}
+
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Thus, we can only run gates which are implemented:</p>
@@ -155,7 +162,7 @@ nb_path: "01_simulator.ipynb"
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>..we get no error. Now, in order to simulate the (new) state after a complete circuit application, we apply each tick sequentially in the <a href="/qsam/simulator.html#run"><code>run</code></a> method. This method is the main interface to the simulator for a user. Additionally, the <a href="/qsam/simulator.html#run"><code>run</code></a> method allows to pass an <code>fault_circuit</code> which is a "blank" copy of <code>circuit</code>, i.e. it has the same number of ticks and qubits, only that it has fault gates at specified positions. Fault gates are just regular gates which are applied at the end of a tick.</p>
+<p>..we get no error. Now, in order to simulate the (new) state after a complete circuit application, we apply each tick sequentially in the <a href="/qsam/simulator.html#run"><code>run</code></a> method. This method is the main interface to the simulator for a user. Additionally, the <a href="/qsam/simulator.html#run"><code>run</code></a> method allows to pass a <code>fault_circuit</code> which is a "blank" copy of <code>circuit</code>, i.e. it has the same number of ticks and qubits, only that it has fault gates at specified positions. Fault gates are just regular gates which are applied at the end of a tick.</p>
 
 </div>
 </div>
@@ -171,7 +178,7 @@ nb_path: "01_simulator.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="run" class="doc_header"><code>run</code><a href="https://github.com/dpwinter/qsam/tree/master/qsam/simulator.py#L24" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>run</code>(<strong><code>circuit</code></strong>, <strong><code>fault_circuit</code></strong>=<em><code>None</code></em>)</p>
+<h4 id="run" class="doc_header"><code>run</code><a href="https://github.com/dpwinter/qsam/tree/master/qsam/simulator.py#L23" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>run</code>(<strong><code>circuit</code></strong>, <strong><code>fault_circuit</code></strong>=<em><code>None</code></em>)</p>
 </blockquote>
 <p>Apply gates in <code>circuit</code> sequentially to current state.
 If <code>fault_circuit</code> is specified apply fault gates after each tick.</p>

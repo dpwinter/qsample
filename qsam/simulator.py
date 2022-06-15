@@ -12,7 +12,6 @@ class Simulator:
         self.n_qubits = num_qubits
 
 # Cell
-#export
 @patch(Simulator)
 def _apply_gate(self, gate_symbol, qubits):
     """Apply a gate to the `qubits` of the current state."""
