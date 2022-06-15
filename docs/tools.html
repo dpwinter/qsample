@@ -1,6 +1,6 @@
 ---
 
-title: Tools for library creation in nbdev
+title: Tools
 
 
 keywords: fastai
@@ -31,7 +31,7 @@ nb_path: "00_tools.ipynb"
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>This library is object-oriented, thus there are quiete a few classes which need to be defined. In order to illustrate the methods of each class in more detail we want to split them up in several cells instead of writing them all in a single cell. The <a href="/qsam/tools.html#patch"><code>patch</code></a> decorator precisely accomplishes this:</p>
+<p>This library is object-oriented, thus there are quite a few classes which need to be defined. In order to illustrate the methods of each class in more detail we want to split them up in several cells instead of writing them all in a single cell. The <a href="/qsam/tools.html#patch"><code>patch</code></a> decorator precisely accomplishes this:</p>
 
 </div>
 </div>
@@ -69,7 +69,7 @@ nb_path: "00_tools.ipynb"
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>We can see how it works:</p>
+<p>We can now insert any function into any class by decorating a function with <code>@patch</code> and passing the class we want to patch along. We can see that the function is correctly recognized as a new class function.</p>
 
 </div>
 </div>
@@ -84,42 +84,12 @@ nb_path: "00_tools.ipynb"
 <div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">A</span><span class="p">:</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">greeting</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">greeting</span> <span class="o">=</span> <span class="n">greeting</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="nd">@patch</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+        
+<span class="nd">@patch</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">greet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">greeting</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">name</span>
-</pre></div>
 
-    </div>
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">a</span> <span class="o">=</span> <span class="n">A</span><span class="p">(</span><span class="s1">&#39;Hi&#39;</span><span class="p">)</span>
+<span class="n">a</span> <span class="o">=</span> <span class="n">A</span><span class="p">(</span><span class="s1">&#39;Hi&#39;</span><span class="p">)</span>
 <span class="k">assert</span> <span class="n">a</span><span class="o">.</span><span class="n">greet</span><span class="p">(</span><span class="s1">&#39;Joe&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;Hi Joe&#39;</span>
 </pre></div>
 

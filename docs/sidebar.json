@@ -1,7 +1,7 @@
 {
   "qsam": {
     "Overview": "/",
-    "Tools for library creation in nbdev": "tools.html",
+    "Tools": "tools.html",
     "Simulator": "simulator.html"
   }
 }

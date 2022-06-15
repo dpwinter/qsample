@@ -6,8 +6,8 @@ title: Simulator
 keywords: fastai
 sidebar: home_sidebar
 
-summary: "Defines unified interface to generic simulators."
-description: "Defines unified interface to generic simulators."
+summary: "Defines a unified interface for working with quantum state simulators (for example Stabilizer or statevector simulators). "
+description: "Defines a unified interface for working with quantum state simulators (for example Stabilizer or statevector simulators). "
 nb_path: "01_simulator.ipynb"
 ---
 <!--
@@ -38,7 +38,7 @@ nb_path: "01_simulator.ipynb"
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>from fastcore.basics import patch</p>
+<p>We always need to specify the number of qubits to specify a state. All qubits are initialized in the $|00..0\rangle$ state for all simulators.</p>
 
 </div>
 </div>
@@ -75,37 +75,20 @@ nb_path: "01_simulator.ipynb"
 </div>
     {% endraw %}
 
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h4 id="say" class="doc_header"><code>say</code><a href="https://github.com/dpwinter/qsam/tree/master/qsam/simulator.py#L15" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>say</code>(<strong><code>hi</code></strong>)</p>
-</blockquote>
-
-</div>
-
-</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>In order to run a state simulation, i.e. propagation of an initial state through a quantum circuit, we iterate over the <code>ticks</code> of a circuit and <strong>apply gates</strong> on the specified qubits. Each simulator implements a certain set of gates we can call.</p>
 
 </div>
 </div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Thus, we can only run gates which are implemented:</p>
 
 </div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
 </div>
-    {% endraw %}
-
+</div>
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -113,8 +96,11 @@ nb_path: "01_simulator.ipynb"
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">s</span> <span class="o">=</span> <span class="n">Simulator</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
-<span class="n">s</span><span class="o">.</span><span class="n">say</span><span class="p">(</span><span class="s1">&#39;jo&#39;</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">s</span> <span class="o">=</span> <span class="n">Simulator</span><span class="p">(</span><span class="n">num_qubits</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">_apply_gate</span><span class="p">(</span><span class="s2">&quot;X&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> 
+<span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -126,10 +112,70 @@ nb_path: "01_simulator.ipynb"
 
 <div class="output_area">
 
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>&#39;Simulator&#39; object has no attribute &#39;x&#39;
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>As expected, we get an AttributeError. However, when we implement this gate in the simulator..</p>
+
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nd">@patch</span><span class="p">(</span><span class="n">Simulator</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">x</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">qubit</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+<span class="n">s</span> <span class="o">=</span> <span class="n">Simulator</span><span class="p">(</span><span class="n">num_qubits</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">s</span><span class="o">.</span><span class="n">_apply_gate</span><span class="p">(</span><span class="s2">&quot;X&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> 
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>..we get no error. Now, in order to simulate the (new) state after a complete circuit application, we apply each tick sequentially in the <a href="/qsam/simulator.html#run"><code>run</code></a> method. This method is the main interface to the simulator for a user. Additionally, the <a href="/qsam/simulator.html#run"><code>run</code></a> method allows to pass an <code>fault_circuit</code> which is a "blank" copy of <code>circuit</code>, i.e. it has the same number of ticks and qubits, only that it has fault gates at specified positions. Fault gates are just regular gates which are applied at the end of a tick.</p>
+
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
 
 
-<div class="output_text output_subarea output_execute_result">
-<pre>&#39;hi jo&#39;</pre>
+<div class="output_markdown rendered_html output_subarea ">
+<h4 id="run" class="doc_header"><code>run</code><a href="https://github.com/dpwinter/qsam/tree/master/qsam/simulator.py#L24" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>run</code>(<strong><code>circuit</code></strong>, <strong><code>fault_circuit</code></strong>=<em><code>None</code></em>)</p>
+</blockquote>
+<p>Apply gates in <code>circuit</code> sequentially to current state.
+If <code>fault_circuit</code> is specified apply fault gates after each tick.</p>
+
 </div>
 
 </div>
@@ -140,6 +186,20 @@ nb_path: "01_simulator.ipynb"
 </div>
     {% endraw %}
 
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    {% endraw %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The <a href="/qsam/simulator.html#run"><code>run</code></a> method will return a list of all measurements (if any) per tick.</p>
+
+</div>
+</div>
+</div>
 </div>
 
 

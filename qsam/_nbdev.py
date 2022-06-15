@@ -4,7 +4,7 @@ __all__ = ["index", "modules", "custom_doc_links", "git_url"]
 
 index = {"patch": "00_tools.ipynb",
          "Simulator": "01_simulator.ipynb",
-         "say": "01_simulator.ipynb"}
+         "run": "01_simulator.ipynb"}
 
 modules = ["tools.py",
            "simulator.py"]
