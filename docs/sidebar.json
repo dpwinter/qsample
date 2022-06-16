@@ -1,7 +1,7 @@
 {
   "qsam": {
     "Overview": "/",
-    "Tools": "tools.html",
+    "Nbtools": "nbtools.html",
     "Simulator": "simulator.html",
     "Circuit": "circuit.html"
   }

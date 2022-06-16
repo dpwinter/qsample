@@ -2,15 +2,15 @@
 
 __all__ = ["index", "modules", "custom_doc_links", "git_url"]
 
-index = {"patch": "00_tools.ipynb",
+index = {"patch": "00_nbtools.ipynb",
          "Simulator": "01_simulator.ipynb",
-         "run": "01_simulator.ipynb",
          "Circuit": "02_circuit.ipynb",
          "unpack": "02_circuit.ipynb",
          "Circuit.qubits": "02_circuit.ipynb",
-         "Circuit.n_qubits": "02_circuit.ipynb"}
+         "Circuit.n_qubits": "02_circuit.ipynb",
+         "partition": "02_circuit.ipynb"}
 
-modules = ["tools.py",
+modules = ["nbtools.py",
            "simulator.py",
            "circuit.py"]
 

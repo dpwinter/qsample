@@ -2,7 +2,7 @@ repository: dpwinter/qsam
 output: web
 topnav_title: qsam
 site_title: qsam
-company_name: Don Winter
+company_name: -
 description: Sample error correction circuits and protocols
 # Set to false to disable KaTeX math
 use_math: true

@@ -10,8 +10,8 @@ entries:
       title: Overview
       url: /
     - output: web,pdf
-      title: Tools
-      url: tools.html
+      title: Nbtools
+      url: nbtools.html
     - output: web,pdf
       title: Simulator
       url: simulator.html
