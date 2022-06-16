@@ -6,7 +6,9 @@ index = {"patch": "00_nbtools.ipynb",
          "unpack": "01_circtools.ipynb",
          "partition": "01_circtools.ipynb",
          "Circuit": "02_circuit.ipynb",
-         "Simulator": "03_simulator.ipynb"}
+         "Simulator": "03_simulator.ipynb",
+         "CHP": "04_chp_simulator.ipynb",
+         "pauli_product_phase": "04_chp_simulator.ipynb"}
 
 modules = ["nbtools.py",
            "circtools.py",
