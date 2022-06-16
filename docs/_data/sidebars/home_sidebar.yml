@@ -10,10 +10,10 @@ entries:
       title: Overview
       url: /
     - output: web,pdf
-      title: nbtools
+      title: Notebook tools
       url: nbtools.html
     - output: web,pdf
-      title: circtools
+      title: Circuit tools
       url: circtools.html
     - output: web,pdf
       title: Circuit
