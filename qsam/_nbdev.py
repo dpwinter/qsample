@@ -3,16 +3,15 @@
 __all__ = ["index", "modules", "custom_doc_links", "git_url"]
 
 index = {"patch": "00_nbtools.ipynb",
-         "Simulator": "01_simulator.ipynb",
+         "unpack": "01_circtools.ipynb",
+         "partition": "01_circtools.ipynb",
          "Circuit": "02_circuit.ipynb",
-         "unpack": "02_circuit.ipynb",
-         "Circuit.qubits": "02_circuit.ipynb",
-         "Circuit.n_qubits": "02_circuit.ipynb",
-         "partition": "02_circuit.ipynb"}
+         "Simulator": "03_simulator.ipynb"}
 
 modules = ["nbtools.py",
-           "simulator.py",
-           "circuit.py"]
+           "circtools.py",
+           "circuit.py",
+           "simulator.py"]
 
 doc_url = "https://dpwinter.github.io/qsam/"
 

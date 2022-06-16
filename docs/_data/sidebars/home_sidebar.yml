@@ -10,14 +10,17 @@ entries:
       title: Overview
       url: /
     - output: web,pdf
-      title: Nbtools
+      title: nbtools
       url: nbtools.html
     - output: web,pdf
-      title: Simulator
-      url: simulator.html
+      title: circtools
+      url: circtools.html
     - output: web,pdf
       title: Circuit
       url: circuit.html
+    - output: web,pdf
+      title: Simulator
+      url: simulator.html
     output: web
     title: qsam
   output: web

@@ -1,8 +1,9 @@
 {
   "qsam": {
     "Overview": "/",
-    "Nbtools": "nbtools.html",
-    "Simulator": "simulator.html",
-    "Circuit": "circuit.html"
+    "nbtools": "nbtools.html",
+    "circtools": "circtools.html",
+    "Circuit": "circuit.html",
+    "Simulator": "simulator.html"
   }
 }
