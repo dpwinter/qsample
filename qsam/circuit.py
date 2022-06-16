@@ -5,7 +5,6 @@ __all__ = ['Circuit']
 # Cell
 from .nbtools import patch
 from collections.abc import MutableSequence
-# from functools import cached_property
 from .circtools import unpack
 
 # Cell
@@ -39,7 +38,6 @@ class Circuit(MutableSequence):
     def __repr__(self):
         return self.__str__()
 
-    # @cached_property
     @property
     def _qubits(self):
         """Set of qubits used in circuit"""

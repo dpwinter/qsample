@@ -8,12 +8,12 @@ from .nbtools import patch
 # Cell
 class Simulator:
     """Interface for quantum state simulation"""
-    def __init__(self, num_qubits):
-        self.n_qubits = num_qubits
+    def __init__(self, n_qubits):
+        self.n_qubits = n_qubits
 
     def _apply_gate(self, gate_symbol, qubits):
         """Apply a gate to the `qubits` of the current state."""
-        gate = getattr(self, gate_symbol.lower())
+        gate = getattr(self, gate_symbol.upper())
         args = (qubits,) if type(qubits)==int else qubits
         return gate(*args)
 

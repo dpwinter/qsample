@@ -21,6 +21,12 @@ entries:
     - output: web,pdf
       title: Simulator
       url: simulator.html
+    - output: web,pdf
+      title: CHP Simulator
+      url: chp_simulator.html
+    - output: web,pdf
+      title: Fault generators
+      url: fault_generators.html
     output: web
     title: qsam
   output: web

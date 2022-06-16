@@ -11,7 +11,9 @@ index = {"patch": "00_nbtools.ipynb",
 modules = ["nbtools.py",
            "circtools.py",
            "circuit.py",
-           "simulator.py"]
+           "simulator.py",
+           "chp_simulator.py",
+           "fault_generators.py"]
 
 doc_url = "https://dpwinter.github.io/qsam/"
 

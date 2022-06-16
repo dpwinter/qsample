@@ -4,6 +4,8 @@
     "nbtools": "nbtools.html",
     "circtools": "circtools.html",
     "Circuit": "circuit.html",
-    "Simulator": "simulator.html"
+    "Simulator": "simulator.html",
+    "CHP Simulator": "chp_simulator.html",
+    "Fault generators": "fault_generators.html"
   }
 }
