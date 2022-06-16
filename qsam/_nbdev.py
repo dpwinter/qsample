@@ -8,14 +8,35 @@ index = {"patch": "00_nbtools.ipynb",
          "Circuit": "02_circuit.ipynb",
          "Simulator": "03_simulator.ipynb",
          "CHP": "04_chp_simulator.ipynb",
-         "pauli_product_phase": "04_chp_simulator.ipynb"}
+         "pauli_product_phase": "04_chp_simulator.ipynb",
+         "Depolar": "05_fault_generators.ipynb",
+         "ONE_QUBIT_FAULTS": "05_fault_generators.ipynb",
+         "TWO_QUBIT_FAULTS": "05_fault_generators.ipynb",
+         "combination": "06_samptools.ipynb",
+         "binomial": "06_samptools.ipynb",
+         "Wilson_std": "06_samptools.ipynb",
+         "Wilson_var": "06_samptools.ipynb",
+         "Wald_var": "06_samptools.ipynb",
+         "Wald_std": "06_samptools.ipynb",
+         "std_sum": "06_samptools.ipynb",
+         "weight_cutoff": "06_samptools.ipynb",
+         "balanced_SS_selector": "06_samptools.ipynb",
+         "ERV_SS_selector": "06_samptools.ipynb",
+         "ONE_QUBIT_GATES": "07_samplers.ipynb",
+         "TWO_QUBIT_GATES": "07_samplers.ipynb",
+         "GATE_GROUPS": "07_samplers.ipynb",
+         "Sampler": "07_samplers.ipynb",
+         "DirectSampler": "07_samplers.ipynb",
+         "SubsetSampler": "07_samplers.ipynb"}
 
 modules = ["nbtools.py",
            "circtools.py",
            "circuit.py",
            "simulator.py",
            "chp_simulator.py",
-           "fault_generators.py"]
+           "fault_generators.py",
+           "samptools.py",
+           "samplers.py"]
 
 doc_url = "https://dpwinter.github.io/qsam/"
 

@@ -21,21 +21,15 @@ class Simulator:
         """Apply gates in `circuit` sequentially to current state.
         If `fault_circuit` is specified apply fault gates at end of each tick."""
         measurements = []
-        for tick_index, tick in enumerate(circuit):
-            if type(tick) == list:
-                for sub_tick in tick:
-                    res = self._apply_gate(*sub_tick)
-                    if res: measurements.append( (tick_index,res) )
-            elif type(tick) == tuple:
-                res = self._apply_gate(*tick)
-                if res: measurements.append( (tick_index,res) )
+        for tick_index in range(circuit.n_ticks):
 
-            if fault_circuit:
-                fault_tick = fault_circuit[tick_index]
-                if fault_tick:
-                    if type(fault_tick) == list:
-                        for sub_fault_tick in fault_tick:
-                            self._apply_gate(*sub_fault_tick)
-                    elif type(fault_tick) == tuple:
-                        self._apply_gate(*fault_tick)
+            for gate, qubits in circuit[tick_index].items():
+                for qubit in qubits:
+                    res = self._apply_gate(gate, qubit)
+                    if res: measurements.append((tick_index,res))
+
+            for f_gate, f_qubits in fault_circuit[tick_index].items():
+                for f_qubit in f_qubits:
+                    self._apply_gate(f_gate, f_qubit)
+
         return measurements

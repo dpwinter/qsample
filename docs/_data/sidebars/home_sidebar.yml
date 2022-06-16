@@ -27,6 +27,12 @@ entries:
     - output: web,pdf
       title: Fault generators
       url: fault_generators.html
+    - output: web,pdf
+      title: Sample tools
+      url: samptools.html
+    - output: web,pdf
+      title: Samplers
+      url: samplers.html
     output: web
     title: qsam
   output: web
