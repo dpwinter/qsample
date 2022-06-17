@@ -309,7 +309,23 @@ nb_path: "06_samplers.ipynb"
 <span class="n">p2</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">p1</span>
 <span class="n">err_params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;p1&#39;</span><span class="p">:</span> <span class="n">p1</span><span class="p">,</span> <span class="s1">&#39;p2&#39;</span><span class="p">:</span> <span class="n">p2</span><span class="p">}</span>
 <span class="n">sam</span> <span class="o">=</span> <span class="n">DirectSampler</span><span class="p">(</span><span class="n">ghz</span><span class="p">,</span> <span class="n">err_params</span><span class="p">)</span>
-<span class="n">p_L</span><span class="p">,</span> <span class="n">std</span> <span class="o">=</span> <span class="n">sam</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">p_L</span><span class="p">,</span> <span class="n">std</span> <span class="o">=</span> <span class="n">sam</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">p_L</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">yerr</span><span class="o">=</span><span class="n">std</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Direct MC&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="s1">&#39;k:&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">xscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>

@@ -16,11 +16,11 @@ entries:
       title: Circuit
       url: circuit.html
     - output: web,pdf
-      title: Simulator
-      url: simulator.html
-    - output: web,pdf
       title: CHP Simulator
-      url: chp_simulator.html
+      url: simulators.chp.html
+    - output: web,pdf
+      title: Simulator
+      url: simulators.simulator.html
     - output: web,pdf
       title: Fault generators
       url: fault_generators.html

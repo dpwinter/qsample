@@ -3,8 +3,8 @@
     "Overview": "/",
     "Notebook tools": "nbtools.html",
     "Circuit": "circuit.html",
-    "Simulator": "simulator.html",
-    "CHP Simulator": "chp_simulator.html",
+    "CHP Simulator": "simulators.chp.html",
+    "Simulator": "simulators.simulator.html",
     "Fault generators": "fault_generators.html",
     "Math": "math.html",
     "Samplers": "samplers.html"

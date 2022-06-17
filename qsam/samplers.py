@@ -7,7 +7,7 @@ __all__ = ['ONE_QUBIT_GATES', 'TWO_QUBIT_GATES', 'GATE_GROUPS', 'Sampler', 'Dire
 # Cell
 import qsam.math as math
 from .circuit import partition
-from .chp_simulator import CHP
+from .simulators.chp import CHP
 from .fault_generators import Depolar
 
 import numpy as np
