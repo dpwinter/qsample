@@ -3,13 +3,13 @@
 __all__ = ['CHP', 'pauli_product_phase']
 
 # Cell
-from .nbtools import patch
+from .simulator import Simulator
 import numpy as np
 import random
 
 # Cell
 
-class CHP:
+class CHP(Simulator):
     """A simple stabilizer simulator"""
 
     def __init__(self, n_qubits):
@@ -72,19 +72,19 @@ class CHP:
             if self._x[j, i] and j != q and j != q + self.n_qubits:
                 self._row_mult(i, q)
 
-        return (i, self._r[q + self.n_qubits])
+        return self._r[q + self.n_qubits]
 
     def _measure_determined(self, i):
         self._table[-1, :] = 0
         for j in range(self.n_qubits):
             if self._x[j, i]:
                 self._row_mult(-1, j + self.n_qubits)
-        return (i, self._r[-1])
+        return self._r[-1]
 
     def _row_product_sign(self, i, k):
         pauli_phases = sum( pauli_product_phase(self._x[i, j], self._z[i, j], self._x[k, j], self._z[k,j]) for j in range(self.n_qubits) )
         p = (pauli_phases >> 1) & 1
-        return bool(self._r[i] ^ self.r_[k] ^ p)
+        return bool(self._r[i] ^ self._r[k] ^ p)
 
     def _row_mult(self, i, k):
         self._r[i] = self._row_product_sign(i, k)

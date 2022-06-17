@@ -4,6 +4,7 @@ __all__ = ['ONE_QUBIT_GATES', 'TWO_QUBIT_GATES', 'GATE_GROUPS', 'Sampler', 'Dire
 
 # Cell
 import qsam.samptools as math
+import qsam.circtools as ct
 from .chp_simulator import CHP
 from .fault_generators import Depolar
 
@@ -25,7 +26,7 @@ class Sampler:
     def __init__(self, circuit, err_params):
         self.circuit = circuit
         self.n_qubits = circuit.n_qubits
-        self.partitions = [circuit.partition(GATE_GROUPS[g]) for g in err_params.keys()]
+        self.partitions = [ct.partition(circuit, GATE_GROUPS[g]) for g in err_params.keys()]
         self.p_phys_mat = np.vstack(list(err_params.values())).T # p_phy_range x partitions
 
     def _sample(self, err_gen=None, p_phys=None):
@@ -68,7 +69,7 @@ class SubsetSampler(Sampler):
         self.err_gen = Depolar(choose_fn=choose_fn, n_ticks=circuit.n_ticks)
 
     def _monte_carlo(self, w_vecs, n_samples, SS_sel_fn):
-        # Generate 1D list of subset failure rates per weight vector combi
+        """Generate 1D list of subset failure rates per weight vector combi"""
         cnts      = np.zeros((len(w_vecs))) + 1 # one virtual sample to avoid div0
         fail_cnts = np.zeros((len(w_vecs)))
         idx = 0 # Needed for Metropolis SS selector (if chosen)
@@ -83,7 +84,7 @@ class SubsetSampler(Sampler):
         return fail_cnts, cnts - 1 # remove virtual sample
 
     def _find_weights(self, p_max, delta_max):
-        # Find w_max vector for delta_max at p_max
+        """Find w_max vector for delta_max at p_max"""
         assert len(p_max) == len(delta_max) == len(self.partitions)
         w_cutoff = np.zeros_like(p_max, dtype=int)
         for i in range(len(w_cutoff)):
@@ -93,14 +94,14 @@ class SubsetSampler(Sampler):
         return w_vecs
 
     def _calc_binomial_weights(self, w_vecs):
-        # Calculate 3D tensor of binom. coefs for each partition
+        """Calculate 3D tensor of binom. coefs for each partition"""
         partition_lens = np.array([len(p) for p in self.partitions])
         Aws = np.array([math.binom(w_vec, partition_lens, self.p_phys_mat) for w_vec in w_vecs])
         Aws = np.product(Aws, axis=-1) # get list of Aw for each partition SS combination
         return Aws
 
     def _calc_stats(self, Aws, pws, n_samples, var=math.Wilson_var):
-        # Calculate failure rates and std
+        """Calculate failure rates and std"""
         p_L_low = np.sum(Aws * pws, axis=0)
         p_L_up = p_L_low + 1 - np.sum(Aws, axis=0)
         std = math.std_sum(Aws, pws, n_samples, var)

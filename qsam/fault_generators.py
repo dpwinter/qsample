@@ -21,17 +21,19 @@ class Depolar:
         self.choose = choose_fn
 
     def generate(self, partitions, p_phys):
-        fault_circuit = Circuit([dict()] * self.n_ticks)
+        fault_circuit = Circuit([{} for _ in range(self.n_ticks)])
         for faults in [self.choose(p,p_phy) for p,p_phy in zip(partitions,p_phys)]:
             for (tick_index, qubit) in faults:
                 if type(qubit) == int:
                     f_gate = np.random.choice(ONE_QUBIT_FAULTS)
-                    default = fault_circuit[tick_index].get(f_gate, {})
-                    fault_circuit[tick][f_gate] = default.add(qubit)
+                    qb_set = fault_circuit[tick_index].get(f_gate, set())
+                    qb_set.add(qubit)
+                    fault_circuit[tick_index][f_gate] = qb_set
                 elif type(qubit) == tuple:
                     f_gates = TWO_QUBIT_FAULTS[np.random.choice(len(TWO_QUBIT_FAULTS))]
                     for f_gate, qubit_i in zip(f_gates, qubit):
                         if f_gate != "I":
-                            default = fault_circuit[tick_index].get(f_gate, {})
-                            fault_circuit[tick][f_gate] = default.add(qubit_i)
+                            qb_set = fault_circuit[tick_index].get(f_gate, set())
+                            qb_set.add(qubit_i)
+                            fault_circuit[tick_index][f_gate] = qb_set
         return fault_circuit

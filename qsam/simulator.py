@@ -13,7 +13,7 @@ class Simulator:
 
     def _apply_gate(self, gate_symbol, qubits):
         """Apply a gate to the `qubits` of the current state."""
-        gate = getattr(self, gate_symbol.upper())
+        gate = getattr(self, gate_symbol)
         args = (qubits,) if type(qubits)==int else qubits
         return gate(*args)
 
