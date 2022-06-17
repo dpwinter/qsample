@@ -2,12 +2,11 @@
   "qsam": {
     "Overview": "/",
     "Notebook tools": "nbtools.html",
-    "Circuit tools": "circtools.html",
     "Circuit": "circuit.html",
     "Simulator": "simulator.html",
     "CHP Simulator": "chp_simulator.html",
     "Fault generators": "fault_generators.html",
-    "Sample tools": "samptools.html",
+    "Math": "math.html",
     "Samplers": "samplers.html"
   }
 }

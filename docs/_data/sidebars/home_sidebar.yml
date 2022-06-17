@@ -13,9 +13,6 @@ entries:
       title: Notebook tools
       url: nbtools.html
     - output: web,pdf
-      title: Circuit tools
-      url: circtools.html
-    - output: web,pdf
       title: Circuit
       url: circuit.html
     - output: web,pdf
@@ -28,8 +25,8 @@ entries:
       title: Fault generators
       url: fault_generators.html
     - output: web,pdf
-      title: Sample tools
-      url: samptools.html
+      title: Math
+      url: math.html
     - output: web,pdf
       title: Samplers
       url: samplers.html
