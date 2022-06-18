@@ -6,8 +6,8 @@ title: CHP Simulator
 keywords: fastai
 sidebar: home_sidebar
 
-summary: "Implementation of the Aarenson/Gottesman CHP stabilizer simulator (ref: https://arxiv.org/pdf/quant-ph/0406196.pdf). This simulator updates the stabilizer generators which stabilize a n-qubit state initially in the $|00..0 \rangle$ state after each gate application. It implements the fundamental gates CNOT, Hadamard and Phase (S-gate) from which all other gates of the Clifford group can be generated. This simulator, most notably, cannot handle any continuous rotation or other gates outside the Clifford group thus it is only applicable for simulating stabilizer circuits. This implementation is based on the work of @Strilanc (ref: https://github.com/Strilanc/python-chp-stabilizer-simulator)."
-description: "Implementation of the Aarenson/Gottesman CHP stabilizer simulator (ref: https://arxiv.org/pdf/quant-ph/0406196.pdf). This simulator updates the stabilizer generators which stabilize a n-qubit state initially in the $|00..0 \rangle$ state after each gate application. It implements the fundamental gates CNOT, Hadamard and Phase (S-gate) from which all other gates of the Clifford group can be generated. This simulator, most notably, cannot handle any continuous rotation or other gates outside the Clifford group thus it is only applicable for simulating stabilizer circuits. This implementation is based on the work of @Strilanc (ref: https://github.com/Strilanc/python-chp-stabilizer-simulator)."
+summary: "Implementation of the Aarenson/Gottesman CHP stabilizer simulator"
+description: "Implementation of the Aarenson/Gottesman CHP stabilizer simulator"
 nb_path: "03b_simulators.chp.ipynb"
 ---
 <!--
@@ -29,6 +29,13 @@ nb_path: "03b_simulators.chp.ipynb"
 </div>
     {% endraw %}
 
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>This simulator updates the stabilizer generators which stabilize a n-qubit state initially in the $|00..0 \rangle$ state after each gate application. It implements the fundamental gates CNOT, Hadamard and Phase (S-gate) from which all other gates of the Clifford group can be generated. This simulator, most notably, cannot handle any continuous rotation or other gates outside the Clifford group thus it is only applicable for simulating stabilizer circuits. This implementation is based on the work of @Strilanc (ref: <a href="https://github.com/Strilanc/python-chp-stabilizer-simulator">https://github.com/Strilanc/python-chp-stabilizer-simulator</a>).</p>
+
+</div>
+</div>
+</div>
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -47,9 +54,41 @@ nb_path: "03b_simulators.chp.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="CHP" class="doc_header"><code>class</code> <code>CHP</code><a href="https://github.com/dpwinter/qsam/tree/master/qsam/simulators/chp.py#L12" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>CHP</code>(<strong><code>n_qubits</code></strong>) :: <a href="/qsam/simulators.simulator.html#Simulator"><code>Simulator</code></a></p>
+<h2 id="CHP" class="doc_header"><code>class</code> <code>CHP</code><a href="https://github.com/dpwinter/qsam/tree/master/qsam/simulators/chp.py#L20" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>CHP</code>(<strong><code>n_qubits</code></strong>) :: <a href="/qsam/simulators.simulator.html#Simulator"><code>Simulator</code></a></p>
 </blockquote>
-<p>A simple stabilizer simulator</p>
+<p>A simple CHP stabilizer simulator</p>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h4 id="CHP.CNOT" class="doc_header"><code>CHP.CNOT</code><a href="https://github.com/dpwinter/qsam/tree/master/qsam/simulators/chp.py#L49" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>CHP.CNOT</code>(<strong><code>c</code></strong>, <strong><code>t</code></strong>)</p>
+</blockquote>
+<p>CNOT gate</p>
 
 </div>
 
@@ -72,8 +111,9 @@ nb_path: "03b_simulators.chp.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="pauli_product_phase" class="doc_header"><code>pauli_product_phase</code><a href="https://github.com/dpwinter/qsam/tree/master/qsam/simulators/chp.py#L97" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>pauli_product_phase</code>(<strong><code>x1</code></strong>, <strong><code>z1</code></strong>, <strong><code>x2</code></strong>, <strong><code>z2</code></strong>)</p>
+<h4 id="CHP.H" class="doc_header"><code>CHP.H</code><a href="https://github.com/dpwinter/qsam/tree/master/qsam/simulators/chp.py#L58" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>CHP.H</code>(<strong><code>i</code></strong>)</p>
 </blockquote>
+<p>Hadamard gate</p>
 
 </div>
 
@@ -88,6 +128,124 @@ nb_path: "03b_simulators.chp.ipynb"
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h4 id="CHP.S" class="doc_header"><code>CHP.S</code><a href="https://github.com/dpwinter/qsam/tree/master/qsam/simulators/chp.py#L66" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>CHP.S</code>(<strong><code>i</code></strong>)</p>
+</blockquote>
+<p>Phase gate</p>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h4 id="CHP.X" class="doc_header"><code>CHP.X</code><a href="https://github.com/dpwinter/qsam/tree/master/qsam/simulators/chp.py#L35" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>CHP.X</code>(<strong><code>i</code></strong>)</p>
+</blockquote>
+<p>X gate</p>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h4 id="CHP.Y" class="doc_header"><code>CHP.Y</code><a href="https://github.com/dpwinter/qsam/tree/master/qsam/simulators/chp.py#L41" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>CHP.Y</code>(<strong><code>i</code></strong>)</p>
+</blockquote>
+<p>Y gate</p>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h4 id="CHP.Z" class="doc_header"><code>CHP.Z</code><a href="https://github.com/dpwinter/qsam/tree/master/qsam/simulators/chp.py#L30" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>CHP.Z</code>(<strong><code>i</code></strong>)</p>
+</blockquote>
+<p>Z gate</p>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h4 id="CHP.measure" class="doc_header"><code>CHP.measure</code><a href="https://github.com/dpwinter/qsam/tree/master/qsam/simulators/chp.py#L72" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>CHP.measure</code>(<strong><code>i</code></strong>)</p>
+</blockquote>
+<p>Factory function for measurements</p>
+
+</div>
+
+</div>
+
+</div>
+</div>
 
 </div>
     {% endraw %}

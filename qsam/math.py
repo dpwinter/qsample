@@ -39,5 +39,4 @@ def Wald_std(p, N):
 # Cell
 def std_sum(Aws, pws, n_samples, var=Wilson_var):
     """Standard deviation due to Gaussian error propagation of p_L."""
-    # return np.sqrt( np.sum( Aws[1:]**2 * var(pws[1:],n_samples), axis=0 ) )
     return np.sqrt( np.sum( Aws**2 * var(pws,n_samples), axis=0 ) )
