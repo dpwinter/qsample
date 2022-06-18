@@ -10,6 +10,9 @@ entries:
       title: Overview
       url: /
     - output: web,pdf
+      title: Math
+      url: math.html
+    - output: web,pdf
       title: Circuit
       url: circuit.html
     - output: web,pdf
@@ -24,9 +27,6 @@ entries:
     - output: web,pdf
       title: Fault generators
       url: fault_generators.html
-    - output: web,pdf
-      title: Math
-      url: math.html
     - output: web,pdf
       title: Samplers
       url: samplers.html

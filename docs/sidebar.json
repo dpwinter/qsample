@@ -1,12 +1,12 @@
 {
   "qsam": {
     "Overview": "/",
+    "Math": "math.html",
     "Circuit": "circuit.html",
     "Protocol": "protocol.html",
     "Simulator": "simulators.simulator.html",
     "CHP Simulator": "simulators.chp.html",
     "Fault generators": "fault_generators.html",
-    "Math": "math.html",
     "Samplers": "samplers.html"
   }
 }
