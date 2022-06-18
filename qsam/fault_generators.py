@@ -21,9 +21,9 @@ class Depolar:
 
     def generate(self, partitions, params, sampler_type):
 
-        if sampler_type == "DirectSampler":
+        if "DirectSampler" in sampler_type:
             faults = [fault for partition, p in zip(partitions, params) for fault in partition if np.random.random() < p ]
-        elif sampler_type == "SubsetSampler":
+        elif "SubsetSampler" in sampler_type:
             faults = [partition[idx] for partition, weight in zip(partitions,params) for idx in np.random.choice(len(partition),weight,replace=False)]
         else:
             raise Exception(f"Sampler type {sampler_type} not implemented")

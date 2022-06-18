@@ -119,6 +119,7 @@ class SubsetSampler(Sampler):
         else:
             raise Exception(f"Cannot process setup parameters {w_params}.")
 
+        # Not ideal: Calculate Aws for all w_vecs and later for w_vecs with exclusion.
         w_upto_w_maxs = [tuple(range(w_max+1)) for w_max in w_max_vec] # tuples of ranges upto w_max
         w_vecs = list(it.product( *w_upto_w_maxs )) # all weight vector combinations
         self.Aws_upper = 1 - np.sum(calc_subset_occurances(self.partitions, w_vecs, self.p_phys_mat), axis=0) # calc. upper bound for binomal weights
