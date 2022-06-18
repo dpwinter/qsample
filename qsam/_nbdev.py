@@ -2,13 +2,12 @@
 
 __all__ = ["index", "modules", "custom_doc_links", "git_url"]
 
-index = {"patch": "00_nbtools.ipynb",
-         "Circuit": "01_circuit.ipynb",
+index = {"Circuit": "01_circuit.ipynb",
          "unpack": "01_circuit.ipynb",
          "partition": "01_circuit.ipynb",
-         "CHP": "02_simulators.chp.ipynb",
-         "pauli_product_phase": "02_simulators.chp.ipynb",
-         "Simulator": "02_simulators.simulator.ipynb",
+         "Simulator": "03a_simulators.simulator.ipynb",
+         "CHP": "03b_simulators.chp.ipynb",
+         "pauli_product_phase": "03b_simulators.chp.ipynb",
          "Depolar": "04_fault_generators.ipynb",
          "ONE_QUBIT_FAULTS": "04_fault_generators.ipynb",
          "TWO_QUBIT_FAULTS": "04_fault_generators.ipynb",
@@ -27,15 +26,12 @@ index = {"patch": "00_nbtools.ipynb",
          "uniform_select": "06_samplers.ipynb",
          "ERV_select": "06_samplers.ipynb",
          "calc_w_max": "06_samplers.ipynb",
-         "calc_partition_weight_vecs": "06_samplers.ipynb",
          "calc_subset_occurances": "06_samplers.ipynb",
-         "calc_statistics": "06_samplers.ipynb",
          "SubsetSampler": "06_samplers.ipynb"}
 
-modules = ["nbtools.py",
-           "circuit.py",
-           "simulators/chp.py",
+modules = ["circuit.py",
            "simulators/simulator.py",
+           "simulators/chp.py",
            "fault_generators.py",
            "math.py",
            "samplers.py"]

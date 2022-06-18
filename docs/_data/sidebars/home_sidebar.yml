@@ -10,17 +10,17 @@ entries:
       title: Overview
       url: /
     - output: web,pdf
-      title: Notebook tools
-      url: nbtools.html
-    - output: web,pdf
       title: Circuit
       url: circuit.html
     - output: web,pdf
-      title: CHP Simulator
-      url: simulators.chp.html
+      title: Protocol
+      url: protocol.html
     - output: web,pdf
       title: Simulator
       url: simulators.simulator.html
+    - output: web,pdf
+      title: CHP Simulator
+      url: simulators.chp.html
     - output: web,pdf
       title: Fault generators
       url: fault_generators.html

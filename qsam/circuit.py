@@ -3,7 +3,6 @@
 __all__ = ['Circuit', 'unpack', 'partition']
 
 # Cell
-from .nbtools import patch
 from collections.abc import MutableSequence
 
 # Cell
@@ -12,7 +11,7 @@ class Circuit(MutableSequence):
 
     def __init__(self, ticks=None, failures=None):
         self._ticks = ticks if ticks else []
-        self.failures = failures if failures else {}
+        self.failures = failures if failures else {} # THIS SHOULD GO INTO PROTOCOL FOR DSS
 
     def __getitem__(self, tick_index):
         return self._ticks[tick_index]
