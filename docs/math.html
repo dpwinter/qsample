@@ -49,7 +49,7 @@ nb_path: "05_math.ipynb"
 <div class="output_markdown rendered_html output_subarea ">
 <h4 id="comb" class="doc_header"><code>comb</code><a href="https://github.com/dpwinter/qsam/tree/master/qsam/math.py#L10" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>comb</code>(<strong><code>n</code></strong>, <strong><code>k</code></strong>)</p>
 </blockquote>
-<p>Vectorized function to calculate a combination</p>
+<p>Vectorized combination</p>
 
 </div>
 
@@ -81,7 +81,7 @@ nb_path: "05_math.ipynb"
 <div class="output_markdown rendered_html output_subarea ">
 <h4 id="binom" class="doc_header"><code>binom</code><a href="https://github.com/dpwinter/qsam/tree/master/qsam/math.py#L15" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>binom</code>(<strong><code>k</code></strong>, <strong><code>n</code></strong>, <strong><code>p</code></strong>)</p>
 </blockquote>
-<p>Vectorized function to calculate binomial function</p>
+<p>Vectorized binomial function</p>
 
 </div>
 
@@ -113,7 +113,7 @@ nb_path: "05_math.ipynb"
 <div class="output_markdown rendered_html output_subarea ">
 <h4 id="Wilson_std" class="doc_header"><code>Wilson_std</code><a href="https://github.com/dpwinter/qsam/tree/master/qsam/math.py#L20" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>Wilson_std</code>(<strong><code>p</code></strong>, <strong><code>N</code></strong>, <strong><code>z</code></strong>=<em><code>1.96</code></em>)</p>
 </blockquote>
-<p>Wilson estimator of std of binomial distribution</p>
+<p>Wilson estimator of binomial standard deviation</p>
 
 </div>
 
@@ -138,6 +138,7 @@ nb_path: "05_math.ipynb"
 <div class="output_markdown rendered_html output_subarea ">
 <h4 id="Wilson_var" class="doc_header"><code>Wilson_var</code><a href="https://github.com/dpwinter/qsam/tree/master/qsam/math.py#L26" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>Wilson_var</code>(<strong><code>p</code></strong>, <strong><code>N</code></strong>)</p>
 </blockquote>
+<p>Wilson estimator of binomial variance</p>
 
 </div>
 
@@ -167,9 +168,9 @@ nb_path: "05_math.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="Wald_var" class="doc_header"><code>Wald_var</code><a href="https://github.com/dpwinter/qsam/tree/master/qsam/math.py#L30" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>Wald_var</code>(<strong><code>p</code></strong>, <strong><code>N</code></strong>)</p>
+<h4 id="Wald_var" class="doc_header"><code>Wald_var</code><a href="https://github.com/dpwinter/qsam/tree/master/qsam/math.py#L31" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>Wald_var</code>(<strong><code>p</code></strong>, <strong><code>N</code></strong>)</p>
 </blockquote>
-<p>Wald variance estimator (known issues, better use Wilson)</p>
+<p>Wald estimator of binomial variance (known issues, better use Wilson)</p>
 
 </div>
 
@@ -192,8 +193,9 @@ nb_path: "05_math.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="Wald_std" class="doc_header"><code>Wald_std</code><a href="https://github.com/dpwinter/qsam/tree/master/qsam/math.py#L34" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>Wald_std</code>(<strong><code>p</code></strong>, <strong><code>N</code></strong>)</p>
+<h4 id="Wald_std" class="doc_header"><code>Wald_std</code><a href="https://github.com/dpwinter/qsam/tree/master/qsam/math.py#L35" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>Wald_std</code>(<strong><code>p</code></strong>, <strong><code>N</code></strong>)</p>
 </blockquote>
+<p>Wald estimator of binomial standard deviation</p>
 
 </div>
 
@@ -223,10 +225,9 @@ nb_path: "05_math.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="std_sum" class="doc_header"><code>std_sum</code><a href="https://github.com/dpwinter/qsam/tree/master/qsam/math.py#L38" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>std_sum</code>(<strong><code>Aws</code></strong>, <strong><code>pws</code></strong>, <strong><code>n_samples</code></strong>, <strong><code>var</code></strong>=<em><code>Wilson_var</code></em>)</p>
+<h4 id="std_sum" class="doc_header"><code>std_sum</code><a href="https://github.com/dpwinter/qsam/tree/master/qsam/math.py#L40" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>std_sum</code>(<strong><code>Aws</code></strong>, <strong><code>pws</code></strong>, <strong><code>n_samples</code></strong>, <strong><code>var</code></strong>=<em><code>Wilson_var</code></em>)</p>
 </blockquote>
-<p>Calculate standard deviation according to Gaussian error propagation
-applied to p_L: V_L = sum_i (dp_L/dp_i)^2 * V_i</p>
+<p>Standard deviation due to Gaussian error propagation of p_L.</p>
 
 </div>
 
@@ -247,7 +248,7 @@ applied to p_L: V_L = sum_i (dp_L/dp_i)^2 * V_i</p>
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p><strong>TODO</strong> Test and example</p>
+<p>The logical variance for single and multi-parameter case is $$V_L = \sum_{\vec{w}=\vec{0}}^{\vec{w}_{max}}{\big(\frac{\partial p_L}{\partial p_{\vec{w}}}\big)^2 V_{\vec{w}}}$$</p>
 
 </div>
 </div>
