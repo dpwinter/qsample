@@ -132,15 +132,20 @@ class SubsetSampler(Sampler):
         print(f"Setup sampling of partitions {list(err_params.keys())} with maximum fault weights {w_max_vec} and excluded weights {w_exclude}.")
 
 
-    def run(self, n_samples=100, var=math.Wilson_var):
+    def run(self, n_samples=100, var=math.Wilson_var, p_phy_select=None):
 
         print(f"Start sampling of {n_samples} samples using {self.subset_select_fn.__name__} as subset selector.")
 
         cnts      = np.zeros((len(self.w_vecs))) + 1 # one virtual sample to avoid div0
         fail_cnts = np.zeros((len(self.w_vecs)))
 
+        if p_phy_select:
+            Aw_select = calc_subset_occurances(self.partitions, self.w_vecs, np.array(p_phy_select))
+        else:
+            Aw_select = np.sum(self.Aws, axis=1)
+
         for i in range(n_samples):
-            idx = self.subset_select_fn(cnts, fail_cnts, Aw=np.sum(self.Aws,axis=1)) # TODO: Aw for ERV should be first selected Aw, not sum
+            idx = self.subset_select_fn(cnts, fail_cnts, Aw=Aw_select) # TODO: Aw for ERV should be first selected Aw, not sum
             w_vec = self.w_vecs[idx]
             msmt = self._sample(w_vec)
             fail_cnts[idx] += self._check_logical_failure(msmt)
