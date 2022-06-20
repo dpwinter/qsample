@@ -151,6 +151,7 @@ class SubsetSampler(Sampler):
         p_L_up = p_L_low + self.Aws_upper
         std = math.std_sum(self.Aws, pws, n_samples, var)
 
-        print(f"Finished sampling. Subset error rates: {pws.T}")
+        print(f"Finished sampling. Subset error rates:")
+        print({w:tuple(np.round(p,3)) for w,p in zip(self.w_vecs,pws)})
 
         return p_L_up, p_L_low, std
