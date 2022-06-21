@@ -21,7 +21,7 @@ def Wilson_std(p, N, z=1.96):
     """Wilson estimator of binomial standard deviation"""
     wilson_max = (p + z**2/(2*N) + z*np.sqrt(p*(1-p)/N+z**2/(4*N**2)))/(1+z**2/N)
     wilson_min = (p + z**2/(2*N) - z*np.sqrt(p*(1-p)/N+z**2/(4*N**2)))/(1+z**2/N)
-    return wilson_max - wilson_min
+    return (wilson_max - wilson_min) / 2 # assume symmetric C.I. => take std as half.
 
 def Wilson_var(p, N):
     """Wilson estimator of binomial variance"""
