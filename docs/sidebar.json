@@ -7,6 +7,7 @@
     "Simulator": "simulators.simulator.html",
     "CHP Simulator": "simulators.chp.html",
     "Fault generators": "fault_generators.html",
-    "Samplers": "samplers.html"
+    "Samplers": "samplers.html",
+    "Tutorial": "tutorial.html"
   }
 }

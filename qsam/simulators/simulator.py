@@ -19,7 +19,6 @@ class Simulator:
         """Apply gates in `circuit` sequentially to current state.
         If `fault_circuit` is specified apply fault gates at end of each tick."""
 
-        msmt_locs = []
         msmt_res = []
         for tick_index in range(circuit.n_ticks):
 
@@ -27,11 +26,10 @@ class Simulator:
                 for qubit in qubits:
                     res = self._apply_gate(gate, qubit)
                     if res==0 or res==1:
-                        msmt_locs.append( (tick_index,qubit) )
                         msmt_res.append( res )
 
             for f_gate, f_qubits in fault_circuit[tick_index].items():
                 for f_qubit in f_qubits:
                     self._apply_gate(f_gate, f_qubit)
 
-        return {tuple(msmt_locs) : ''.join(map(str, msmt_res))}
+        return ''.join(map(str,msmt_res))
