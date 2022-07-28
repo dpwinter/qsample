@@ -43,7 +43,7 @@ class Circuit(MutableSequence):
         return set(unpack(self._ticks))
 
     @property
-    @lru_cache
+    @lru_cache(maxsize=1)
     def n_qubits(self):
         """Number of qubits used in circuit"""
         return len(self._qubits)
