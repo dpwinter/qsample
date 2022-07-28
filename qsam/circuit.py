@@ -4,7 +4,7 @@ __all__ = ['Circuit', 'unpack', 'partition', 'freeze', 'make_hash']
 
 # Cell
 from collections.abc import MutableSequence
-from functools import cached_property
+from functools import lru_cache
 
 # Cell
 class Circuit(MutableSequence):
@@ -42,7 +42,8 @@ class Circuit(MutableSequence):
         """Set of qubits used in circuit"""
         return set(unpack(self._ticks))
 
-    @cached_property
+    @property
+    @lru_cache
     def n_qubits(self):
         """Number of qubits used in circuit"""
         return len(self._qubits)
