@@ -1,4 +1,4 @@
-# qsam - quantum circuit sampling
+# qsam - quantum protocol sampling
 > A collection of quantum sampling algorithms
 
 
