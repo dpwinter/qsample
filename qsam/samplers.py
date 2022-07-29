@@ -150,17 +150,18 @@ class SubsetSampler(Sampler):
             p_L_low += prod_acc
 
         # p_L_up
-#         delta = 1
-#         for path in fail_paths:
-#             prod_acc = 1
-#             for i in range(1,len(path)-1):
-#                 node, _ = path[i]
-#                 succ_node = unpack_node(path[i])
-#                 circuit_hash = self.protocol.circuit_hash(node)
-#                 for w_idx in range(len(w_vecs[circuit_hash])):
-#                     prod
-
-#         p_L_up = p_L_low + delta
+        circuit_fail_paths = list(nx.all_simple_paths(self.protocol, 'START', 'EXIT'))
+        Aws_wo_excl, w_vecs_wo_excl = self.analytics(w_max, {})
+        p_L_up = 0
+        for path in circuit_fail_paths:
+            prod_acc = 1
+            for i in range(1,len(path)-1):
+                node, succ_node = path[i:i+2]
+                circuit_hash = self.protocol.circuit_hash(node)
+                pw = np.sum([Aws[circuit_hash][w] * pws[node][succ_node][w] for w in range(len(w_vecs[circuit_hash]))], axis=0)
+                deltas = 1 - np.sum([Aws_wo_excl[circuit_hash][w] for w in range(len(w_vecs_wo_excl[circuit_hash]))], axis=0)
+                prod_acc *= (pw + deltas)
+            p_L_up += prod_acc
 
         # v_L
         v_L = 0
@@ -181,4 +182,4 @@ class SubsetSampler(Sampler):
                 vws = var(pws[node1][succ_node1][weight1], visited_cnts[node1][weight1])
                 v_L += vws * Aws[circuit_hash1][weight1]**2 * prod_acc**2
 
-        return p_L_low, np.sqrt(v_L)
+        return p_L_up, p_L_low, np.sqrt(v_L)
