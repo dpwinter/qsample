@@ -138,30 +138,22 @@ class SubsetSampler(Sampler):
         pws = {n: {succ: tcnts / visited_cnts[n] for succ,tcnts in ntrans.items()} for n,ntrans in transition_cnts.items()}
         unpack_node = lambda n: n if not isinstance(n,(tuple,list,set)) else n[0]
 
-        # p_L_low
-        p_L_low = 0
-        for path in fail_paths:
-            prod_acc = 1
-            for i in range(1,len(path)-1):
-                node, weight = path[i]
-                succ_node = unpack_node(path[i+1])
-                circuit_hash = self.protocol.circuit_hash(node)
-                prod_acc *= Aws[circuit_hash][weight] * pws[node][succ_node][weight]
-            p_L_low += prod_acc
-
-        # p_L_up
+        # p_L
         circuit_fail_paths = list(nx.all_simple_paths(self.protocol, 'START', 'EXIT'))
         Aws_wo_excl, w_vecs_wo_excl = self.analytics(w_max, {})
-        p_L_up = 0
+        p_L_up, p_L_low = 0, 0
         for path in circuit_fail_paths:
-            prod_acc = 1
+            p_L_up_prod_acc = 1
+            p_L_low_prod_acc = 1
             for i in range(1,len(path)-1):
                 node, succ_node = path[i:i+2]
                 circuit_hash = self.protocol.circuit_hash(node)
                 pw = np.sum([Aws[circuit_hash][w] * pws[node][succ_node][w] for w in range(len(w_vecs[circuit_hash]))], axis=0)
                 deltas = 1 - np.sum([Aws_wo_excl[circuit_hash][w] for w in range(len(w_vecs_wo_excl[circuit_hash]))], axis=0)
-                prod_acc *= (pw + deltas)
-            p_L_up += prod_acc
+                p_L_low_prod_acc *= pw
+                p_L_up_prod_acc *= (pw + deltas)
+            p_L_up += p_L_up_prod_acc
+            p_L_low += p_L_low_prod_acc
 
         # v_L
         v_L = 0
