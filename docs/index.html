@@ -148,11 +148,26 @@ nb_path: "index.ipynb"
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">qsam.samplers</span> <span class="kn">import</span> <span class="n">Sampler</span>
-
-<span class="n">p1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">10</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">p1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">10</span><span class="p">)</span>
 <span class="n">p2</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">p1</span>
 <span class="n">err_params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;p1&#39;</span><span class="p">:</span> <span class="n">p1</span><span class="p">,</span> <span class="s1">&#39;p2&#39;</span><span class="p">:</span> <span class="n">p2</span><span class="p">}</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">qsam.samplers</span> <span class="kn">import</span> <span class="n">Sampler</span>
 
 <span class="n">sam</span> <span class="o">=</span> <span class="n">Sampler</span><span class="p">(</span><span class="n">ghz3</span><span class="p">,</span> <span class="n">err_params</span><span class="p">)</span>
 <span class="n">p_L</span><span class="p">,</span> <span class="n">std</span> <span class="o">=</span> <span class="n">sam</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="mi">30000</span><span class="p">)</span>
@@ -205,10 +220,6 @@ nb_path: "index.ipynb"
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">qsam.samplers</span> <span class="kn">import</span> <span class="n">SubsetSampler</span>
-
-<span class="n">p1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">10</span><span class="p">)</span>
-<span class="n">p2</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">p1</span>
-<span class="n">err_params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;p1&#39;</span><span class="p">:</span> <span class="n">p1</span><span class="p">,</span> <span class="s1">&#39;p2&#39;</span><span class="p">:</span> <span class="n">p2</span><span class="p">}</span>
 
 <span class="n">sam</span> <span class="o">=</span> <span class="n">SubsetSampler</span><span class="p">(</span><span class="n">ghz3</span><span class="p">,</span> <span class="n">err_params</span><span class="p">)</span>
 <span class="n">p_L_up</span><span class="p">,</span> <span class="n">p_L_low</span><span class="p">,</span> <span class="n">ss_std</span> <span class="o">=</span> <span class="n">sam</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="mi">3000</span><span class="p">,</span> <span class="n">w_max</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>

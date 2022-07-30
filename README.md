@@ -49,12 +49,14 @@ draw_protocol(ghz3)
 Now, we are ready to sample. Let's define some error parameters, instantiate a `Sampler` object and start sampling.
 
 ```python
-#slow
-from qsam.samplers import Sampler
-
 p1 = np.logspace(-3,0,10)
 p2 = 0.5 * p1
 err_params = {'p1': p1, 'p2': p2}
+```
+
+```python
+#slow
+from qsam.samplers import Sampler
 
 sam = Sampler(ghz3, err_params)
 p_L, std = sam.run(n_samples=30000)
@@ -62,7 +64,7 @@ p_L, std = sam.run(n_samples=30000)
 
 
     
-![png](docs/images/output_9_0.png)
+![png](docs/images/output_10_0.png)
     
 
 
@@ -70,12 +72,7 @@ We can see that for large physical error rates the direct sampler performs good 
 
 ```python
 #slow
-
 from qsam.samplers import SubsetSampler
-
-p1 = np.logspace(-3,0,10)
-p2 = 0.5 * p1
-err_params = {'p1': p1, 'p2': p2}
 
 sam = SubsetSampler(ghz3, err_params)
 p_L_up, p_L_low, ss_std = sam.run(n_samples=3000, w_max=[1,3])
@@ -83,6 +80,6 @@ p_L_up, p_L_low, ss_std = sam.run(n_samples=3000, w_max=[1,3])
 
 
     
-![png](docs/images/output_12_0.png)
+![png](docs/images/output_13_0.png)
     
 
