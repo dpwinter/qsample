@@ -75,7 +75,7 @@ We can see that for large physical error rates the direct sampler performs good 
 from qsam.samplers import SubsetSampler
 
 sam = SubsetSampler(ghz3, err_params)
-p_L_up, p_L_low, ss_std = sam.run(n_samples=3000, w_max=[1,3])
+p_L_up, p_L_low, ss_std = sam.run(n_samples=10000, w_max=[1,3])
 ```
 
 

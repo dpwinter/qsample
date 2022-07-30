@@ -107,8 +107,6 @@ class SubsetSampler(Sampler):
         visited_cnts     = map_dict(d, lambda _,c_hash: np.zeros(len(w_vecs[c_hash])))
         transition_cnts = map_dict(d, lambda node,c_hash: {s: np.zeros(len(w_vecs[c_hash])) for s in self.protocol.successors(node)})
 
-        sample_graph = nx.DiGraph() # graph holding all fail paths
-
         for _ in range(n_samples):
             hist = [] # track all (node,weight)s for a protocol run
             p_it = iterate(self.protocol)
@@ -116,9 +114,6 @@ class SubsetSampler(Sampler):
 
             while node:
                 if node == "EXIT":
-                    nodes = ["START"] + hist + ["EXIT"]
-                    for i in range(len(nodes)-1): # add fail path
-                        sample_graph.add_edge(nodes[i], nodes[i+1])
                     break
                 else:
                     circuit_hash = self.protocol.circuit_hash(node)
@@ -134,15 +129,14 @@ class SubsetSampler(Sampler):
 
         # Calculate statistics
 
-        fail_paths = list(nx.all_simple_paths(sample_graph, 'START', 'EXIT'))
         pws = {n: {succ: tcnts / visited_cnts[n] for succ,tcnts in ntrans.items()} for n,ntrans in transition_cnts.items()}
         unpack_node = lambda n: n if not isinstance(n,(tuple,list,set)) else n[0]
 
         # p_L
-        circuit_fail_paths = list(nx.all_simple_paths(self.protocol, 'START', 'EXIT'))
+        fail_paths = list(nx.all_simple_paths(self.protocol, 'START', 'EXIT'))
         Aws_wo_excl, w_vecs_wo_excl = self.analytics(w_max, {})
         p_L_up, p_L_low = 0, 0
-        for path in circuit_fail_paths:
+        for path in fail_paths:
             p_L_up_prod_acc = 1
             p_L_low_prod_acc = 1
             for i in range(1,len(path)-1):
@@ -155,23 +149,26 @@ class SubsetSampler(Sampler):
             p_L_up += p_L_up_prod_acc
             p_L_low += p_L_low_prod_acc
 
-        # v_L ### CAN ALSO BE EXPRESSED IN TERMS OF CIRCUIT_FAIL_PATH?
+        # v_L
         v_L = 0
-        for path in fail_paths:
-            for i in range(1,len(path)-1):
-                node1, weight1 = path[i]
-                succ_node1 = unpack_node(path[i+1])
-                circuit_hash1 = self.protocol.circuit_hash(node1)
+        for n1, p_to in pws.items(): # for every node in pws
+            c_hash = self.protocol.circuit_hash(n1)
+            for succ_node, ps in p_to.items(): # get the pws
+                for w_idx, pw in enumerate(ps): # get pw per node
 
-                prod_acc = 1
-                for j in range(1,len(path)-1):
-                    node2, weight2 = path[j]
-                    succ_node2 = unpack_node(path[j+1])
-                    circuit_hash2 = self.protocol.circuit_hash(node2)
-                    if (node1,weight1) != (node2,weight2):
-                        prod_acc *= Aws[circuit_hash2][weight2] * pws[node2][succ_node2][weight2]
+                    vw = var(pw, visited_cnts[n1][w_idx]) # calc. V[pw]
+                    Aw = Aws[c_hash][w_idx] # calc. Aw for a single node
 
-                vws = var(pws[node1][succ_node1][weight1], visited_cnts[node1][weight1])
-                v_L += vws * Aws[circuit_hash1][weight1]**2 * prod_acc**2
+                    sum_acc = 0 # sum over all fail paths
+                    for path in fail_paths:
+                        prod_acc = 1
+                        for i in range(1,len(path)-1): # all nodes in a fail path
+                            n2, n2_succ = path[i:i+2]
+                            if n1 != n2:
+                                c_hash2 = self.protocol.circuit_hash(n2)
+                                prod_acc *= np.sum([Aws[c_hash2][w] * pws[n2][n2_succ][w] for w in range(len(w_vecs[c_hash2]))], axis=0)
+                        sum_acc += prod_acc
+
+                    v_L += vw * Aw**2 * sum_acc**2
 
         return p_L_up, p_L_low, np.sqrt(v_L)
