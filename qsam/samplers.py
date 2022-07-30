@@ -155,7 +155,7 @@ class SubsetSampler(Sampler):
             p_L_up += p_L_up_prod_acc
             p_L_low += p_L_low_prod_acc
 
-        # v_L
+        # v_L ### CAN ALSO BE EXPRESSED IN TERMS OF CIRCUIT_FAIL_PATH?
         v_L = 0
         for path in fail_paths:
             for i in range(1,len(path)-1):
