@@ -132,18 +132,6 @@ nb_path: "00_math.ipynb"
 </div>
     {% endraw %}
 
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>We arrive at the Wilson var from :</p>
-<ul>
-<li><code>wilson_max = (p + z**2/(2*N) + z*np.sqrt(p*(1-p)/N+z**2/(4*N**2)))/(1+z**2/N)</code></li>
-<li><code>wilson_min = (p + z**2/(2*N) - z*np.sqrt(p*(1-p)/N+z**2/(4*N**2)))/(1+z**2/N)</code></li>
-<li><code>return (wilson_max - wilson_min) / 2 # assume symmetric C.I. =&gt; take std as half.</code></li>
-</ul>
-
-</div>
-</div>
-</div>
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
