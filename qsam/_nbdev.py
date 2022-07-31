@@ -28,9 +28,9 @@ index = {"comb": "00_math.ipynb",
          "GATE_GROUPS": "05_samplers.ipynb",
          "map_dict": "05_samplers.ipynb",
          "Sampler": "05_samplers.ipynb",
-         "calc_w_max": "05_samplers.ipynb",
          "calc_subset_occurances": "05_samplers.ipynb",
-         "SubsetSampler": "05_samplers.ipynb"}
+         "SubsetSampler": "05_samplers.ipynb",
+         "calc_w_max": "05_samplers.ipynb"}
 
 modules = ["math.py",
            "circuit.py",

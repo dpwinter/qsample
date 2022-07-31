@@ -113,7 +113,7 @@ nb_path: "00_math.ipynb"
 <div class="output_markdown rendered_html output_subarea ">
 <h4 id="Wilson_var" class="doc_header"><code>Wilson_var</code><a href="https://github.com/dpwinter/qsam/tree/master/qsam/math.py#L20" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>Wilson_var</code>(<strong><code>p</code></strong>, <strong><code>N</code></strong>, <strong><code>z</code></strong>=<em><code>1.96</code></em>)</p>
 </blockquote>
-<p>Wilson estimator of binomial standard deviation</p>
+<p>Wilson estimator of binomial variance</p>
 
 </div>
 
@@ -132,6 +132,18 @@ nb_path: "00_math.ipynb"
 </div>
     {% endraw %}
 
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We arrive at the Wilson var from :</p>
+<ul>
+<li><code>wilson_max = (p + z**2/(2*N) + z*np.sqrt(p*(1-p)/N+z**2/(4*N**2)))/(1+z**2/N)</code></li>
+<li><code>wilson_min = (p + z**2/(2*N) - z*np.sqrt(p*(1-p)/N+z**2/(4*N**2)))/(1+z**2/N)</code></li>
+<li><code>return (wilson_max - wilson_min) / 2 # assume symmetric C.I. =&gt; take std as half.</code></li>
+</ul>
+
+</div>
+</div>
+</div>
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -143,7 +155,7 @@ nb_path: "00_math.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="Wald_var" class="doc_header"><code>Wald_var</code><a href="https://github.com/dpwinter/qsam/tree/master/qsam/math.py#L32" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>Wald_var</code>(<strong><code>p</code></strong>, <strong><code>N</code></strong>)</p>
+<h4 id="Wald_var" class="doc_header"><code>Wald_var</code><a href="https://github.com/dpwinter/qsam/tree/master/qsam/math.py#L25" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>Wald_var</code>(<strong><code>p</code></strong>, <strong><code>N</code></strong>)</p>
 </blockquote>
 <p>Wald estimator of binomial variance (known issues, better use Wilson)</p>
 
@@ -175,7 +187,7 @@ nb_path: "00_math.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="std_sum" class="doc_header"><code>std_sum</code><a href="https://github.com/dpwinter/qsam/tree/master/qsam/math.py#L41" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>std_sum</code>(<strong><code>Aws</code></strong>, <strong><code>pws</code></strong>, <strong><code>n_samples</code></strong>, <strong><code>var</code></strong>=<em><code>Wilson_var</code></em>)</p>
+<h4 id="std_sum" class="doc_header"><code>std_sum</code><a href="https://github.com/dpwinter/qsam/tree/master/qsam/math.py#L30" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>std_sum</code>(<strong><code>Aws</code></strong>, <strong><code>pws</code></strong>, <strong><code>n_samples</code></strong>, <strong><code>var</code></strong>=<em><code>Wilson_var</code></em>)</p>
 </blockquote>
 <p>Standard deviation due to Gaussian error propagation of p_L.</p>
 
