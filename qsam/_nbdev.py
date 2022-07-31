@@ -4,10 +4,8 @@ __all__ = ["index", "modules", "custom_doc_links", "git_url"]
 
 index = {"comb": "00_math.ipynb",
          "binom": "00_math.ipynb",
-         "Wilson_std": "00_math.ipynb",
          "Wilson_var": "00_math.ipynb",
          "Wald_var": "00_math.ipynb",
-         "Wald_std": "00_math.ipynb",
          "std_sum": "00_math.ipynb",
          "Circuit": "01_circuit.ipynb",
          "unpack": "01_circuit.ipynb",
