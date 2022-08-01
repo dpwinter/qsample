@@ -63,7 +63,6 @@ class Sampler:
         return p_L, std
 
 # Cell
-#export
 def calc_subset_occurances(partitions, partition_w_vecs, p_phy_per_partition):
     """Return (weight)x(p_phys) (parition) subset occurance matrix transforming a p_SS vector to a p_L vector"""
 

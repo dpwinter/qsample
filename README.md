@@ -1,5 +1,5 @@
 # qsam - quantum protocol sampling
-> Efficient sampling of logical failure rates from quantum error correction protocols.
+> Efficient and user-friendly sampling of quantum protocols.
 
 
 ## Install
@@ -7,8 +7,6 @@
 `pip install qsam`... not yet, soon to come
 
 ## How to use
-
-> Basic creation of circuits, protocols and usage of the samplers.
 
 Consider the *Repeat-until-success* protocol to prepare the GHZ state $|GHZ\rangle=\frac{1}{\sqrt{2}}(|0000\rangle+|1111\rangle)$ on qubits 0-3. Qubit 4 is a ancillary flag qubit which we measure as `0` if the preparation was successful, i.e. the GHZ-state has been prepared upto max. 1 error and `1` if the preparation was unsuccessful, i.e. the output state is erroneous by an error weight larger than 1. In this case we want to repeat the preparation for a maximium of 3 times. If for the 3rd iteration we measure again a `1` we want to count a **logical error**. The circuit looks like this:
 
