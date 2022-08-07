@@ -31,9 +31,9 @@ ghz3 = Protocol()
 ghz3.add_nodes_from(['ghz1','ghz2','ghz3'], circuits=ghz)
 
 ghz3.add_edge('START', 'ghz1', check='True')
-ghz3.add_edge('ghz1', 'ghz2', check='`ghz1`==1')
-ghz3.add_edge('ghz2', 'ghz3', check='`ghz2`==1')
-ghz3.add_edge('ghz3', 'EXIT', check='`ghz3`==1')
+ghz3.add_edge('ghz1', 'ghz2', check='ghz1==1')
+ghz3.add_edge('ghz2', 'ghz3', check='ghz2==1')
+ghz3.add_edge('ghz3', 'EXIT', check='ghz3==1')
 
 draw_protocol(ghz3)
 ```

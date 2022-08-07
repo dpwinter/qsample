@@ -32,4 +32,4 @@ class Simulator:
                 for f_qubit in f_qubits:
                     self._apply_gate(f_gate, f_qubit)
 
-        return ''.join(map(str,msmt_res))
+        return int(''.join(map(str,msmt_res)), 2)
