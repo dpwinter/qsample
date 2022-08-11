@@ -57,7 +57,7 @@ class Circuit(MutableSequence):
 def unpack(seq):
     """Generator for all qubits defined in a (sub)circuit"""
 
-    if isinstance(seq, (tuple,set,list)):
+    if isinstance(seq, (tuple,set,list,Circuit)):
         yield from (x for y in seq for x in unpack(y))
     elif isinstance(seq, dict):
         yield from (x for v in seq.values() for y in v for x in unpack(y))

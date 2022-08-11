@@ -13,7 +13,8 @@ Consider the *Repeat-until-success* protocol to prepare the GHZ state $|GHZ\rang
 ```python
 from qsam.circuit import Circuit
 
-ghz = Circuit([ {"H": {0}},
+ghz = Circuit([ {"init": {0,1,2,3,4}},
+                {"H": {0}},
                 {"CNOT": {(0,1)}},
                 {"CNOT": {(1,2)}},
                 {"CNOT": {(2,3)}},
@@ -31,9 +32,9 @@ ghz3 = Protocol()
 ghz3.add_nodes_from(['ghz1','ghz2','ghz3'], circuits=ghz)
 
 ghz3.add_edge('START', 'ghz1', check='True')
-ghz3.add_edge('ghz1', 'ghz2', check='ghz1==1')
-ghz3.add_edge('ghz2', 'ghz3', check='ghz2==1')
-ghz3.add_edge('ghz3', 'EXIT', check='ghz3==1')
+ghz3.add_edge('ghz1', 'ghz2', check='ghz1[-1]==1')
+ghz3.add_edge('ghz2', 'ghz3', check='ghz2[-1]==1')
+ghz3.add_edge('ghz3', 'EXIT', check='ghz3[-1]==1')
 
 draw_protocol(ghz3)
 ```
@@ -47,17 +48,17 @@ draw_protocol(ghz3)
 Now, we are ready to sample. Let's define some error parameters, instantiate a `Sampler` object and start sampling.
 
 ```python
-p1 = np.logspace(-3,0,10)
-p2 = 0.5 * p1
-err_params = {'p1': p1, 'p2': p2}
+sample_range = np.logspace(-3,0,10)
+err_params = {'p1': 1, 'p2': 0.5}
 ```
 
 ```python
 #slow
 from qsam.samplers import Sampler
+from qsam.simulators.chp import CHP
 
-sam = Sampler(ghz3, err_params)
-p_L, std = sam.run(n_samples=30000)
+sam = Sampler(ghz3, CHP)
+p_L, std = sam.run(1000, sample_range, err_params)
 ```
 
 
@@ -68,16 +69,18 @@ p_L, std = sam.run(n_samples=30000)
 
 We can see that for large physical error rates the direct sampler performs good but gets worse for lower rates. In this region we benefit a lot by using the subset sampler. The only extra thing we need to specify is the weight cutoff per partition (which is used for equally for each circuit in the protocol). We can immediately see the benefit of subset sampling at low error rates:
 
+**UNDER CONSTRUCTION, PLEASE DON'T USE SUBSET SAMPLER AT THE MOMENT.**
+
 ```python
 #slow
 from qsam.samplers import SubsetSampler
 
 sam = SubsetSampler(ghz3, err_params)
-p_L_up, p_L_low, ss_std = sam.run(n_samples=10000, w_max=[1,3])
+p_L_up, p_L_low, ss_std = sam.run(n_samples=1000, w_max=[1,3])
 ```
 
 
     
-![png](docs/images/output_13_0.png)
+![png](docs/images/output_14_0.png)
     
 

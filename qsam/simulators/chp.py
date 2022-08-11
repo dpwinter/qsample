@@ -27,6 +27,14 @@ class CHP(Simulator):
         self._z = self._table[:, self.n_qubits:-1] # Z stab. gens
         self._r = self._table[:, -1] # glob. phase
 
+    def init(self, i):
+        m = self.measure(i)
+        if m == 1: self.X(i)
+
+    def I(self, i):
+        """Identity gate"""
+        pass
+
     def Z(self, i):
         """Z gate"""
         self.S(i)
@@ -46,15 +54,6 @@ class CHP(Simulator):
         self.X(i)
         self.S(i)
 
-    def CNOT(self, c, t):
-        """CNOT gate"""
-        # XI -> XX, IX -> IX, XX -> XI
-        # ZI -> ZI, IZ -> ZZ, ZZ -> IZ
-        # YI -> YX, IY -> ZY, YY -> -ZX
-        self._r ^= self._x[:, c] & self._z[:, t] & (self._x[:, t] ^ self._z[:, c] ^ True)
-        self._x[:, t] ^= self._x[:, c] # X propagation
-        self._z[:, c] ^= self._z[:, t] # Z propagation
-
     def H(self, i):
         """Hadamard gate"""
          # X -> Z, Z -> X, Y -> -Y
@@ -68,6 +67,15 @@ class CHP(Simulator):
         # X -> Y, Z -> Z, Y -> -X
         self._r ^= self._x[:, i] & self._z[:, i]
         self._z[:, i] ^= self._x[:, i]
+
+    def CNOT(self, c, t):
+        """CNOT gate"""
+        # XI -> XX, IX -> IX, XX -> XI
+        # ZI -> ZI, IZ -> ZZ, ZZ -> IZ
+        # YI -> YX, IY -> ZY, YY -> -ZX
+        self._r ^= self._x[:, c] & self._z[:, t] & (self._x[:, t] ^ self._z[:, c] ^ True)
+        self._x[:, t] ^= self._x[:, c] # X propagation
+        self._z[:, c] ^= self._z[:, t] # Z propagation
 
     def measure(self, i):
         """Factory function for measurements"""
