@@ -82,8 +82,7 @@ class CHP(Simulator):
         for q in range(self.n_qubits):
             if self._x[q + self.n_qubits, i]:
                 return int(self._measure_random(i, q)) # X destabilizes qubit i
-            else:
-                return int(self._measure_determined(i)) # only Z destabilizes qubit i
+        return int(self._measure_determined(i)) # only Z destabilizes qubit i
 
     def _measure_random(self, i, q, bias=0.5):
         self._table[q, :] = self._table[q + self.n_qubits, :]
