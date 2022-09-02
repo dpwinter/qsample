@@ -6,9 +6,6 @@ __all__ = ['Simulator']
 class Simulator:
     """Interface for quantum state simulation"""
 
-    def __init__(self, n_qubits):
-        self.n_qubits = n_qubits
-
     def _apply_gate(self, gate_symbol, qubits):
         """Apply a gate to the `qubits` of the current state."""
         gate = getattr(self, gate_symbol)
@@ -25,8 +22,9 @@ class Simulator:
             for gate, qubits in circuit[tick_index].items():
                 for qubit in qubits:
                     res = self._apply_gate(gate, qubit)
-                    if res==0 or res==1:
-                        msmt_res.append( res )
+                    # if res==0 or res==1:
+                    if res is not None:
+                        msmt_res.append( int(res.value) )
 
             for f_gate, f_qubits in fault_circuit[tick_index].items():
                 for f_qubit in f_qubits:
