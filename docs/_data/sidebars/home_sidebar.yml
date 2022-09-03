@@ -19,8 +19,8 @@ entries:
       title: Protocol
       url: protocol.html
     - output: web,pdf
-      title: Simulator
-      url: simulators.simulator.html
+      title: Mixin
+      url: simulators.mixin.html
     - output: web,pdf
       title: CHP Simulator
       url: simulators.chp.html

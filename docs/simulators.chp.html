@@ -31,11 +31,7 @@ nb_path: "03b_simulators.chp.ipynb"
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<ul>
-<li>Original paper <a href="https://arxiv.org/pdf/quant-ph/0406196.pdf">https://arxiv.org/pdf/quant-ph/0406196.pdf</a><br></li>
-</ul>
-<p>This simulator updates the stabilizer generators of an n-qubit state (initially in $|00..0 \rangle$) after each gate application. It implements the fundamental gates CNOT, Hadamard and Phase (S-gate) from which all other gates of the Clifford group can be generated. The foundation of this simulator follows the above mentioned paper very closely and was originally written by Craig Gidney. The implementation is well tested and comes with a lot of nice tests written by the original author. [1]</p>
-<p>[1] <a href="https://github.com/Strilanc/python-chp-stabilizer-simulator">https://github.com/Strilanc/python-chp-stabilizer-simulator</a></p>
+<p>This simulator updates the stabilizer generators of an n-qubit state (initially in $|00..0 \rangle$) after each gate application. It implements the fundamental gates CNOT, Hadamard and Phase (S-gate) from which all other gates of the Clifford group can be generated. The foundation of this simulator follows the Gottesman/Aarenson paper closely and was originally written by Craig Gidney. The implementation is well tested and comes with a lot of nice tests written by the original author.</p>
 
 </div>
 </div>
@@ -58,7 +54,7 @@ nb_path: "03b_simulators.chp.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="ChpSimulator" class="doc_header"><code>class</code> <code>ChpSimulator</code><a href="https://github.com/dpwinter/qsam/tree/master/qsam/simulators/chp.py#L80" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ChpSimulator</code>(<strong><code>num_qubits</code></strong>) :: <a href="/qsam/simulators.simulator.html#Simulator"><code>Simulator</code></a></p>
+<h2 id="ChpSimulator" class="doc_header"><code>class</code> <code>ChpSimulator</code><a href="https://github.com/dpwinter/qsam/tree/master/qsam/simulators/chp.py#L79" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ChpSimulator</code>(<strong><code>num_qubits</code></strong>) :: <a href="/qsam/simulators.mixin.html#CircuitRunner"><code>CircuitRunner</code></a></p>
 </blockquote>
 <p>The bare minimum needed for the CHP simulation.</p>
 <p>Reference:
@@ -88,33 +84,14 @@ nb_path: "03b_simulators.chp.ipynb"
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Following are tests of the implementation authored by Craig Gidney.</p>
+<p>Following are tests of the implementation.</p>
 
 </div>
 </div>
 </div>
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">collections</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Set</span>
-<span class="kn">import</span> <span class="nn">itertools</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Test the phase of a Pauli product $\sigma_i \sigma_j$. Output is in powers of i, i.e. $i^k=\{-i,1,i\}$ for $\{-1,0,1\}$.</p>
+<p>Test the phase of a Pauli product $\sigma_i \sigma_j$. Output is in powers of i, i.e. $i^k=\{-i,1,i\}$ for $k=\{-1,0,1\}$:</p>
 
 </div>
 </div>
@@ -156,7 +133,7 @@ nb_path: "03b_simulators.chp.ipynb"
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Test that one qubit is initialized in $|0\rangle$.</p>
+<p>Test that one qubit is initialized in $|0\rangle$:</p>
 
 </div>
 </div>
@@ -184,7 +161,7 @@ nb_path: "03b_simulators.chp.ipynb"
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Test $\langle 0|XZX|0\rangle=1$</p>
+<p>Test measure $X|0\rangle$ in $Z$ always determined (-1):</p>
 
 </div>
 </div>
@@ -216,7 +193,7 @@ nb_path: "03b_simulators.chp.ipynb"
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Test that two qubits are initialized in $|00\rangle$.</p>
+<p>Test that two qubits are initialized in $|00\rangle$:</p>
 
 </div>
 </div>
@@ -245,7 +222,7 @@ nb_path: "03b_simulators.chp.ipynb"
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Test $|\langle 0_A 0_B|X_AZ_AZ_BX_A|0_A0_B\rangle|^2=1$.</p>
+<p>Test measure $X_AX_B|0_A0_B\rangle$ in $Z_AZ_B$ always determined (-1):</p>
 
 </div>
 </div>
@@ -278,7 +255,7 @@ nb_path: "03b_simulators.chp.ipynb"
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Test  $\frac{1}{2} (\langle 0_A0_B|+\langle 1_A1_B|) Z_A (|0_A0_B\rangle+|1_A1_B\rangle)= \langle -_B| Z_B | -_B \rangle$.</p>
+<p>Test measure $\frac{1}{\sqrt{2}}(|0_A0_B\rangle+|1_A1_B\rangle)$ in $Z_B$ always undetermined (i.e. random) but measure $Z_A$ on post-measurement state must give same result and be determined, as the first measurement collapsed state to either $|0_A\rangle$ or $|1_A\rangle$:</p>
 
 </div>
 </div>
@@ -312,7 +289,7 @@ nb_path: "03b_simulators.chp.ipynb"
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>And some more involved tests:</p>
+<p>Test measure $|\psi\rangle=\frac{1}{2}(|00\rangle+|11\rangle+i|01\rangle+i|10\rangle)$ in $Z_B$ always undetermined. If result is +1 (i.e. $|0_B\rangle$) applying one phase, if result is -1 applying 3 phases brings state to $|+\rangle$, s.t. $H|+\rangle=|0\rangle$ and subseqeunt measurement should always be determined:</p>
 
 </div>
 </div>
@@ -349,6 +326,13 @@ nb_path: "03b_simulators.chp.ipynb"
 </div>
     {% endraw %}
 
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Test input $|\psi\rangle=\frac{1}{2}(|00\rangle+|10\rangle+i|01\rangle+i|11\rangle)$, after phase kickback $|\psi^{\prime}\rangle=\frac{1}{2}(|00\rangle+i|10\rangle+i|01\rangle-|11\rangle)$, before measurement $\psi^{\prime\prime}=|1\rangle \otimes |+^{\prime}\rangle$ with $|\pm^{\prime}\rangle$ being the $Y$-Pauli eigenstates. Thus measure $Z_A$ is determined with post-measurement state $|+^{\prime}$ which becomes $H_BS_B|+^{\prime}=|1_B\rangle$ s.t. measuring $Z_B$ is also determined:</p>
+
+</div>
+</div>
+</div>
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -390,6 +374,13 @@ nb_path: "03b_simulators.chp.ipynb"
 </div>
     {% endraw %}
 
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Test if stabilizer gens and destabilizer gens are transformed correctly. Stabilizers and destabilizers together generate the Pauli group $P_n$ for $n$ qubits at all times. The stabilizers and destabilizers for an initial state of $|0\rangle^{\otimes n}$ are $\{Z_i: i=1,..,n\}$ and $\{X_i: i=1,..,n\}$, respectively. The <code>__repr__</code> string of the simulator outputs the current destabilizers followed by the stabilizers. Thus, we'd expect $ZII\rightarrow XIX$, $IZI\rightarrow IXX$, $IIZ\rightarrow YYZ$ for the stabilizer generators and $XII\rightarrow -YII$, $IXI\rightarrow -IYI$ and $IIX\rightarrow IIX$ for the destabilizer generators in the first assert, and so on:</p>
+
+</div>
+</div>
+</div>
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -460,6 +451,13 @@ nb_path: "03b_simulators.chp.ipynb"
 </div>
     {% endraw %}
 
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The following 3 tests accomplish magic state distillation from 9 (5) qubits to a single one and probe different properties of this process:</p>
+
+</div>
+</div>
+</div>
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">

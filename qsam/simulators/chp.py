@@ -3,7 +3,7 @@
 __all__ = ['pauli_product_phase', 'MeasureResult', 'ChpSimulator']
 
 # Cell
-from .simulator import Simulator
+from .mixin import CircuitRunner
 from typing import Union, Any
 import numpy as np
 import random
@@ -76,8 +76,7 @@ class MeasureResult:
             self.determined)
 
 # Cell
-
-class ChpSimulator(Simulator):
+class ChpSimulator(CircuitRunner):
     """The bare minimum needed for the CHP simulation.
 
     Reference:
