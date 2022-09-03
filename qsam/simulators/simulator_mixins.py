@@ -9,7 +9,7 @@ class CircuitRunnerMixin:
     def _apply_gate(self, gate_symbol, qubits):
         """Apply a gate to the `qubits` of the current state."""
 
-        gate = getattr(self, gate_symbolol)
+        gate = getattr(self, gate_symbol)
         args = (qubits,) if type(qubits)==int else qubits
         return gate(*args)
 
