@@ -19,8 +19,8 @@ entries:
       title: Protocol
       url: protocol.html
     - output: web,pdf
-      title: Mixin
-      url: simulators.mixin.html
+      title: SimulatorMixins
+      url: simulators.simulator_mixins.html
     - output: web,pdf
       title: CHP Simulator
       url: simulators.chp.html
@@ -28,8 +28,11 @@ entries:
       title: Fault generators
       url: fault_generators.html
     - output: web,pdf
-      title: Samplers
-      url: samplers.html
+      title: Circuit Samplers
+      url: samplers.circuit_samplers.html
+    - output: web,pdf
+      title: Protocol Samplers
+      url: samplers.protocol_samplers.html
     output: web
     title: qsam
   output: web

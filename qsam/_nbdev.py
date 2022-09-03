@@ -17,30 +17,30 @@ index = {"comb": "00_math.ipynb",
          "iterate": "02_protocol.ipynb",
          "save_protocol": "02_protocol.ipynb",
          "load_protocol": "02_protocol.ipynb",
-         "CircuitRunner": "03a_simulators.mixin.ipynb",
+         "CircuitRunnerMixin": "03a_simulators.simulator_mixins.ipynb",
          "pauli_product_phase": "03b_simulators.chp.ipynb",
          "MeasureResult": "03b_simulators.chp.ipynb",
          "ChpSimulator": "03b_simulators.chp.ipynb",
          "Depolar": "04_fault_generators.ipynb",
          "ONE_QUBIT_FAULTS": "04_fault_generators.ipynb",
          "TWO_QUBIT_FAULTS": "04_fault_generators.ipynb",
-         "ONE_QUBIT_GATES": "05_samplers.ipynb",
-         "TWO_QUBIT_GATES": "05_samplers.ipynb",
-         "MEAS_GATES": "05_samplers.ipynb",
-         "GATE_GROUPS": "05_samplers.ipynb",
-         "Sampler": "05_samplers.ipynb",
-         "calc_subset_occurances": "05_samplers.ipynb",
-         "remap": "05_samplers.ipynb",
-         "SubsetSampler": "05_samplers.ipynb",
-         "calc_w_max": "05_samplers.ipynb"}
+         "ONE_QUBIT_GATES": "05b_samplers.protocol_samplers.ipynb",
+         "TWO_QUBIT_GATES": "05b_samplers.protocol_samplers.ipynb",
+         "GATE_GROUPS": "05b_samplers.protocol_samplers.ipynb",
+         "Sampler": "05b_samplers.protocol_samplers.ipynb",
+         "SubsetSampler": "05b_samplers.protocol_samplers.ipynb",
+         "calc_w_max": "05b_samplers.protocol_samplers.ipynb",
+         "calc_subset_occurances": "05b_samplers.protocol_samplers.ipynb",
+         "remap": "05b_samplers.protocol_samplers.ipynb"}
 
 modules = ["math.py",
            "circuit.py",
            "protocol.py",
-           "simulators/mixin.py",
+           "simulators/simulator_mixins.py",
            "simulators/chp.py",
            "fault_generators.py",
-           "samplers.py"]
+           "samplers/circuit_samplers.py",
+           "samplers/protocol_samplers.py"]
 
 doc_url = "https://dpwinter.github.io/qsam/"
 
