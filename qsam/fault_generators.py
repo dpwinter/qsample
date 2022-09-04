@@ -23,7 +23,7 @@ class Depolar:
     @staticmethod
     def faults_from_weights(partitions, ws):
         """Select fault locs by random choice of w elements per partition"""
-        return [par[i] for par,w in zip(partitions, ws) for i in np.random.choice(len(par),w,replace=False)]
+        return [par[i] for par,w in zip(partitions,ws) for i in np.random.choice(len(par),w,replace=False)]
 
     @staticmethod
     def gen_circuit(n_ticks, faults=[]):

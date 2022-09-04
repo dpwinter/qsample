@@ -1,6 +1,6 @@
 ---
 
-title: SimulatorMixins
+title: Simulator Mixins
 
 
 keywords: fastai
@@ -98,7 +98,7 @@ nb_path: "03a_simulators.simulator_mixins.ipynb"
 
 <span class="n">test_sim</span> <span class="o">=</span> <span class="n">TestSim</span><span class="p">()</span>
 <span class="n">res</span> <span class="o">=</span> <span class="n">test_sim</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">circuit</span><span class="p">)</span> <span class="c1"># TestSim knows how to run() a circuit</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">bin</span><span class="p">(</span><span class="n">res</span><span class="p">))</span>
 </pre></div>
 
     </div>
@@ -111,7 +111,7 @@ nb_path: "03a_simulators.simulator_mixins.ipynb"
 <div class="output_area">
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>101
+<pre>0b101
 </pre>
 </div>
 </div>

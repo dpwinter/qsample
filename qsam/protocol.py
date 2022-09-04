@@ -36,7 +36,7 @@ class Protocol(nx.DiGraph):
     def circuit_from_node(self, node):
         circuit_hash = self.circuit_hash(node)
         circuit = self._circuits[circuit_hash]
-        return circuit
+        return circuit_hash, circuit
 
     def circuit_hash(self, node):
         return self.nodes(data='circuit_hash')[node]

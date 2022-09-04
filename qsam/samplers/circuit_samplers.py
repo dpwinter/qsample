@@ -84,7 +84,7 @@ class SubsetSampler:
 
         for i in range(n_samples):
             sim = self.simulator(self.n_qubits)
-            ss_idx = cnts.argmin()
+            ss_idx = cnts.argmin() # balanced weight selector
             w_vec = w_vecs[ss_idx]
             faults = Depolar.faults_from_weights(partitions, w_vec)
             fault_circuit = Depolar.gen_circuit(len(self.circuit), faults)
@@ -93,7 +93,8 @@ class SubsetSampler:
                 fail_cnts[ss_idx] += 1
             cnts[ss_idx] += 1
 
-        pws = ( fail_cnts / (cnts - 1) )[:,None]
+        cnts -= 1
+        pws = ( fail_cnts / cnts )[:,None]
 
         w_vecs_inclusive = SubsetSampler.weight_vectors(w_max, {})
         Aws_inclusive = SubsetSampler.subset_occurence(partitions, w_vecs_inclusive, p_phy_per_partition)
@@ -101,7 +102,7 @@ class SubsetSampler:
 
         p_L_low = np.sum(Aws * pws, axis=0)
         p_L_up = p_L_low + Aws_upper
-        std = np.sqrt( np.sum( Aws**2 * var(pws, n_samples), axis=0 ) )
+        std = np.sqrt( np.sum( [Aws[w]**2 * var(pws[w], cnts[w]) for w in range(len(w_vecs))], axis=0 ) )
 
         return p_L_low, p_L_up, std
 

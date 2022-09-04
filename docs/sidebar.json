@@ -4,7 +4,7 @@
     "Math": "math.html",
     "Circuit": "circuit.html",
     "Protocol": "protocol.html",
-    "SimulatorMixins": "simulators.simulator_mixins.html",
+    "Simulator Mixins": "simulators.simulator_mixins.html",
     "CHP Simulator": "simulators.chp.html",
     "Fault generators": "fault_generators.html",
     "Circuit Samplers": "samplers.circuit_samplers.html",
