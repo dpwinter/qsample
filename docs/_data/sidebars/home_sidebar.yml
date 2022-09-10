@@ -33,6 +33,9 @@ entries:
     - output: web,pdf
       title: Protocol Samplers
       url: samplers.protocol_samplers.html
+    - output: web,pdf
+      title: Sampler Mixins
+      url: samplers.sampler_mixins.html
     output: web
     title: qsam
   output: web

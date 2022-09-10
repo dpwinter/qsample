@@ -6,6 +6,7 @@ __all__ = ['ONE_QUBIT_GATES', 'TWO_QUBIT_GATES', 'GATE_GROUPS', 'Sampler', 'Subs
 import qsam.math as math
 from ..circuit import partition, make_hash, unpack
 from ..fault_generators import Depolar
+from .sampler_mixins import SubsetAnalytics
 
 import numpy as np
 import itertools as it
@@ -48,30 +49,13 @@ class Sampler:
 
 # Cell
 
-class SubsetSampler:
+class SubsetSampler(SubsetAnalytics):
     def __init__(self, circuit, simulator):
         self.circuit = circuit
         self.simulator = simulator
         self.n_qubits = circuit.n_qubits
 
-    @staticmethod
-    def subset_occurence(partitions, partition_w_vecs, p_phy_per_partition):
-        """Return (weight)x(p_phys) (parition) subset occurance matrix transforming p_SS vector to p_L vector"""
-        n_partition_elems = np.array([len(p) for p in partitions])
-        Aws = np.array([math.binom(w_vec, n_partition_elems, p_phy_per_partition) for w_vec in partition_w_vecs])
-        Aws = np.product(Aws, axis=-1) # mult Aws for multi-parameter, i.e. multi-partitions
-        return Aws
-
-    @staticmethod
-    def weight_vectors(w_max, w_exclude={}):
-        w_exclude = set((w,) if isinstance(w, int) else w for w in w_exclude)
-        w_maxs = [w_max] if isinstance(w_max, int) else w_max
-
-        w_upto_w_maxs = [tuple(range(w_max+1)) for w_max in w_maxs]
-        w_vecs = list(it.product( *w_upto_w_maxs ))
-        return w_vecs
-
-    def run(self, n_samples, sample_range, err_params, fail_patterns, w_max, w_exclude, var=math.Wilson_var):
+    def run(self, n_samples, sample_range, err_params, fail_patterns, w_max, w_exclude={}, var=math.Wilson_var):
 
         p_phy_per_partition = np.array([[p_phy * mul for p_phy in sample_range] for mul in err_params.values()]).T
         partitions =[partition(self.circuit, GATE_GROUPS[k]) for k in err_params.keys()]
@@ -102,8 +86,8 @@ class SubsetSampler:
 
         p_L_low = np.sum(Aws * pws, axis=0)
         p_L_up = p_L_low + Aws_upper
-        std = np.sqrt( np.sum( [Aws[w]**2 * var(pws[w], cnts[w]) for w in range(len(w_vecs))], axis=0 ) )
 
+        std = np.sqrt( np.sum( [Aws[w]**2 * var(pws[w], cnts[w]) for w in range(len(w_vecs))], axis=0 ) )
         return p_L_low, p_L_up, std
 
 # Cell

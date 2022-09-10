@@ -28,8 +28,9 @@ index = {"comb": "00_math.ipynb",
          "TWO_QUBIT_GATES": "05b_samplers.protocol_samplers.ipynb",
          "GATE_GROUPS": "05b_samplers.protocol_samplers.ipynb",
          "Sampler": "05b_samplers.protocol_samplers.ipynb",
-         "SubsetSampler": "05b_samplers.protocol_samplers.ipynb",
-         "calc_w_max": "05b_samplers.protocol_samplers.ipynb"}
+         "SubsetSampler": "05a_samplers.circuit_samplers.ipynb",
+         "calc_w_max": "05a_samplers.circuit_samplers.ipynb",
+         "SubsetAnalytics": "05c_samplers.sampler_mixins.ipynb"}
 
 modules = ["math.py",
            "circuit.py",
@@ -38,7 +39,8 @@ modules = ["math.py",
            "simulators/chp.py",
            "fault_generators.py",
            "samplers/circuit_samplers.py",
-           "samplers/protocol_samplers.py"]
+           "samplers/protocol_samplers.py",
+           "samplers/sampler_mixins.py"]
 
 doc_url = "https://dpwinter.github.io/qsam/"
 
