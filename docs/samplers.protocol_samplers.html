@@ -186,7 +186,7 @@ nb_path: "05b_samplers.protocol_samplers.ipynb"
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>For the <a href="/qsam/samplers.circuit_samplers.html#SubsetSampler"><code>SubsetSampler</code></a> we want to sample from specific fault-weight-subsets upto a certain maximum weight $w_{max}$. The benefit of this approach is that we can scale each of the resulting failure rates by analytically calculated <code>subset_occurances</code> for each <code>p_phy</code> which then gives us <code>p_L(p_phy)</code> for all <code>p_phy</code> without any additional sampling required. The subset sampler chooses the next fault-weight subset that is used when sampling from the next circuit in the protocol by the minimum sampled subset for a given circuit, which results in a balanced sampling over all subsets for a circuit. Additionally, one can exclude sampling for all circuits in a protocol from certain subsets by specifying a <em>list of ints</em> of <code>w_exclude</code> fault-weights. Overall, this approach of choosing the subsets and defining the weight threshold is not ideal. The dynamic subset sampler includes methods to improve on both of these points.</p>
+<p>For the <a href="/qsam/samplers.protocol_samplers.html#SubsetSampler"><code>SubsetSampler</code></a> we want to sample from specific fault-weight-subsets upto a certain maximum weight $w_{max}$. The benefit of this approach is that we can scale each of the resulting failure rates by analytically calculated <code>subset_occurances</code> for each <code>p_phy</code> which then gives us <code>p_L(p_phy)</code> for all <code>p_phy</code> without any additional sampling required. The subset sampler chooses the next fault-weight subset that is used when sampling from the next circuit in the protocol by the minimum sampled subset for a given circuit, which results in a balanced sampling over all subsets for a circuit. Additionally, one can exclude sampling for all circuits in a protocol from certain subsets by specifying a <em>list of ints</em> of <code>w_exclude</code> fault-weights. Overall, this approach of choosing the subsets and defining the weight threshold is not ideal. The dynamic subset sampler includes methods to improve on both of these points.</p>
 
 </div>
 </div>
@@ -194,140 +194,29 @@ nb_path: "05b_samplers.protocol_samplers.ipynb"
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
-<div class="input">
 
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">SubsetSampler</span><span class="p">(</span><span class="n">SubsetAnalytics</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Subset Sampler of quantum protocols&quot;&quot;&quot;</span>
+</div>
+    {% endraw %}
+
+    {% raw %}
     
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">protocol</span><span class="p">,</span> <span class="n">simulator</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">protocol</span> <span class="o">=</span> <span class="n">protocol</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span> <span class="o">=</span> <span class="n">simulator</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">n_qubits</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">q</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">protocol</span><span class="o">.</span><span class="n">_circuits</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">unpack</span><span class="p">(</span><span class="n">c</span><span class="p">)))</span>
+<div class="cell border-box-sizing code_cell rendered">
 
-    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">,</span> <span class="n">sample_range</span><span class="p">,</span> <span class="n">err_params</span><span class="p">,</span> <span class="n">chi_min</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">,</span> <span class="n">p_max</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">var</span><span class="o">=</span><span class="n">math</span><span class="o">.</span><span class="n">Wilson_var</span><span class="p">,</span> <span class="n">eval_fns</span><span class="o">=</span><span class="p">{}):</span>
-        
-        <span class="n">p_phy_per_partition</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">p_phy</span> <span class="o">*</span> <span class="n">mul</span> <span class="k">for</span> <span class="n">p_phy</span> <span class="ow">in</span> <span class="n">sample_range</span><span class="p">]</span> <span class="k">for</span> <span class="n">mul</span> <span class="ow">in</span> <span class="n">err_params</span><span class="o">.</span><span class="n">values</span><span class="p">()])</span><span class="o">.</span><span class="n">T</span>
-        <span class="n">partitions</span> <span class="o">=</span> <span class="p">{</span><span class="n">circuit_hash</span><span class="p">:</span> <span class="p">[</span><span class="n">partition</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span> <span class="n">GATE_GROUPS</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">err_params</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
-                     <span class="k">for</span> <span class="n">circuit_hash</span><span class="p">,</span> <span class="n">circuit</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">protocol</span><span class="o">.</span><span class="n">_circuits</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
-        
-        <span class="n">w_vecs_all</span> <span class="o">=</span> <span class="p">{</span><span class="n">circuit_hash</span><span class="p">:</span> <span class="n">SubsetSampler</span><span class="o">.</span><span class="n">weight_vectors</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">pars</span><span class="p">])</span> 
-                      <span class="k">for</span> <span class="n">circuit_hash</span><span class="p">,</span> <span class="n">pars</span> <span class="ow">in</span> <span class="n">partitions</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
-        <span class="n">Aws_all_at_p_max</span> <span class="o">=</span> <span class="p">{</span><span class="n">circuit_hash</span><span class="p">:</span> <span class="n">SubsetSampler</span><span class="o">.</span><span class="n">subset_occurence</span><span class="p">(</span><span class="n">partitions</span><span class="p">[</span><span class="n">circuit_hash</span><span class="p">],</span> <span class="n">w_vecs</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">p_max</span><span class="p">))</span>
-                            <span class="k">for</span> <span class="n">circuit_hash</span><span class="p">,</span> <span class="n">w_vecs</span> <span class="ow">in</span> <span class="n">w_vecs_all</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
-        
-        <span class="n">counts</span> <span class="o">=</span>  <span class="n">FlexDict</span><span class="p">()</span>
-        
-        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_samples</span><span class="p">):</span>
-            <span class="n">hist</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="n">chi</span> <span class="o">=</span> <span class="mi">1</span>
-            
-            <span class="n">sim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_qubits</span><span class="p">)</span>
-            <span class="n">p_it</span> <span class="o">=</span> <span class="n">iterate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">protocol</span><span class="p">,</span> <span class="n">eval_fns</span><span class="p">)</span>
-            <span class="n">node</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">p_it</span><span class="p">)</span>
-                        
-            <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-                
-                <span class="n">circuit_hash</span><span class="p">,</span> <span class="n">circuit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">protocol</span><span class="o">.</span><span class="n">circuit_from_node</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
-                
-                <span class="c1"># path cutoff</span>
-                <span class="n">ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">chi</span> <span class="o">*</span> <span class="n">Aws_all_at_p_max</span><span class="p">[</span><span class="n">circuit_hash</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">chi_min</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-                <span class="n">idx</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
-                <span class="n">chi</span> <span class="o">*=</span> <span class="n">Aws_all_at_p_max</span><span class="p">[</span><span class="n">circuit_hash</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span>
-                <span class="n">w_vec</span> <span class="o">=</span> <span class="n">w_vecs_all</span><span class="p">[</span><span class="n">circuit_hash</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span>
-                
-                <span class="n">hist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">node</span><span class="p">,</span><span class="s2">&quot;:&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span><span class="n">w_vec</span><span class="p">))))</span>
-                <span class="n">counts</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">hist</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;N&quot;</span><span class="p">],</span> <span class="mi">1</span><span class="p">,</span> <span class="n">increment</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="output_wrapper">
+<div class="output">
 
-                <span class="n">faults</span> <span class="o">=</span> <span class="n">Depolar</span><span class="o">.</span><span class="n">faults_from_weights</span><span class="p">(</span><span class="n">partitions</span><span class="p">[</span><span class="n">circuit_hash</span><span class="p">],</span> <span class="n">w_vec</span><span class="p">)</span>
-                <span class="n">fault_circuit</span> <span class="o">=</span> <span class="n">Depolar</span><span class="o">.</span><span class="n">gen_circuit</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">circuit</span><span class="p">),</span> <span class="n">faults</span><span class="p">)</span>
-                <span class="n">msmt</span> <span class="o">=</span> <span class="n">sim</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span> <span class="n">fault_circuit</span><span class="p">)</span>
-                <span class="n">node</span> <span class="o">=</span> <span class="n">p_it</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">msmt</span><span class="p">)</span> <span class="c1"># exchange with iterator   </span>
-                
-                <span class="k">if</span> <span class="n">node</span> <span class="o">==</span> <span class="s1">&#39;EXIT&#39;</span><span class="p">:</span>
-                    <span class="n">counts</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">hist</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;EXIT&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">],</span> <span class="mi">1</span><span class="p">,</span> <span class="n">increment</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-                    <span class="k">break</span>
-                <span class="k">elif</span> <span class="n">node</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="n">counts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">hist</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;EXIT&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">]):</span>
-                        <span class="n">counts</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">hist</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;EXIT&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span>
-                    <span class="k">break</span>
-                    
-        <span class="n">all_paths</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">keys</span><span class="p">,</span><span class="n">_</span> <span class="ow">in</span> <span class="n">counts</span><span class="o">.</span><span class="n">flatten</span><span class="p">():</span>
-            <span class="k">if</span> <span class="s2">&quot;EXIT&quot;</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span> <span class="c1"># last p_fail for non-fail paths is always 0</span>
-                <span class="n">path</span> <span class="o">=</span> <span class="p">[]</span>
-                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span> <span class="c1"># calculate p_fail </span>
-                    <span class="n">p</span> <span class="o">=</span> <span class="n">counts</span><span class="p">[</span><span class="n">keys</span><span class="p">[:</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]][</span><span class="s2">&quot;N&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">counts</span><span class="p">[</span><span class="n">keys</span><span class="p">[:</span><span class="n">i</span><span class="p">]][</span><span class="s2">&quot;N&quot;</span><span class="p">]</span>
-                    <span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">keys</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">p</span><span class="p">,</span> <span class="n">counts</span><span class="p">[</span><span class="n">keys</span><span class="p">[:</span><span class="n">i</span><span class="p">]][</span><span class="s2">&quot;N&quot;</span><span class="p">]))</span>    
-                <span class="n">all_paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>       
+<div class="output_area">
 
-        <span class="c1"># p_L_low, p_L_up</span>
-        <span class="n">delta</span> <span class="o">=</span> <span class="mi">1</span>
-        <span class="n">p_L_low</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">all_paths</span><span class="p">:</span>
-            <span class="n">prod_acc</span> <span class="o">=</span> <span class="mi">1</span>
-            <span class="k">for</span> <span class="n">node_ss</span><span class="p">,</span> <span class="n">p_fail</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span>
-                <span class="n">node</span><span class="p">,</span> <span class="n">w_vec_str</span> <span class="o">=</span> <span class="n">node_ss</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
-                <span class="n">c_hash</span><span class="p">,</span> <span class="n">circuit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">protocol</span><span class="o">.</span><span class="n">circuit_from_node</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
-                <span class="n">w_vec</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">w_vec_str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)))</span>
-                <span class="n">prod_acc</span> <span class="o">*=</span> <span class="n">SubsetSampler</span><span class="o">.</span><span class="n">subset_occurence</span><span class="p">(</span><span class="n">partitions</span><span class="p">[</span><span class="n">c_hash</span><span class="p">],</span> <span class="p">[</span><span class="n">w_vec</span><span class="p">],</span> <span class="n">p_phy_per_partition</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
-            <span class="n">p_L_low</span> <span class="o">+=</span> <span class="n">prod_acc</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">([</span><span class="n">p</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span><span class="n">p</span><span class="p">,</span><span class="n">_</span> <span class="ow">in</span> <span class="n">path</span><span class="p">[:]])</span>
-            <span class="n">delta</span> <span class="o">-=</span> <span class="n">prod_acc</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">([</span><span class="n">p</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span><span class="n">p</span><span class="p">,</span><span class="n">_</span> <span class="ow">in</span> <span class="n">path</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]]))</span>
-        <span class="n">p_L_up</span> <span class="o">=</span> <span class="n">p_L_low</span> <span class="o">+</span> <span class="n">delta</span>
-                
-        <span class="c1"># v_L</span>
-<span class="c1">#         v_L = 0</span>
-<span class="c1">#         for path in all_paths:</span>
-<span class="c1">#             if np.sum([tuple(map(int,node_ss.split(&#39;,&#39;)[1].split(&#39;:&#39;))) for node_ss,_,_ in path]) != 0:</span>
-<span class="c1">#                 for node_ss_i, p_fail_i, n_i in path:</span>
-<span class="c1">#                     node, w_vec_str = node_ss_i.split(&#39;,&#39;)</span>
-<span class="c1">#                     c_hash, circuit = self.protocol.circuit_from_node(node)</span>
-<span class="c1">#                     w_vec = tuple(map(int, w_vec_str.split(&quot;:&quot;)))</span>
-<span class="c1">#                     Aw_i = SubsetSampler.subset_occurence(partitions[c_hash], [w_vec], p_phy_per_partition).flatten()</span>
-<span class="c1">#                     prod_acc = 1</span>
-<span class="c1">#                     for node_ss_j, p_fail_j, _ in path:</span>
-<span class="c1">#                         if node_ss_j != node_ss_i:</span>
-<span class="c1">#                             node, w_vec_str = node_ss_j.split(&#39;,&#39;)</span>
-<span class="c1">#                             c_hash, circuit = self.protocol.circuit_from_node(node)</span>
-<span class="c1">#                             w_vec = tuple(map(int, w_vec_str.split(&quot;:&quot;)))</span>
-<span class="c1">#                             Aw_j = SubsetSampler.subset_occurence(partitions[c_hash], [w_vec], p_phy_per_partition).flatten()</span>
-<span class="c1">#                             prod_acc *= Aw_j * p_fail_j</span>
 
-<span class="c1">#                     v_fail_i = var(p_fail_i, n_i)</span>
-<span class="c1">#                     v_L += v_fail_i * Aw_i ** 2 * prod_acc ** 2</span>
-                    
-        
-        <span class="n">v_L</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">all_paths</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">([</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span><span class="n">node_ss</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)))</span> <span class="k">for</span> <span class="n">node_ss</span><span class="p">,</span><span class="n">_</span><span class="p">,</span><span class="n">_</span> <span class="ow">in</span> <span class="n">path</span><span class="p">])</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">node_ss_i</span><span class="p">,</span> <span class="n">p_fail_i</span><span class="p">,</span> <span class="n">n_i</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span>
-                    <span class="n">node</span><span class="p">,</span> <span class="n">w_vec_str</span> <span class="o">=</span> <span class="n">node_ss_i</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
-                    <span class="n">c_hash</span><span class="p">,</span> <span class="n">circuit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">protocol</span><span class="o">.</span><span class="n">circuit_from_node</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
-                    <span class="n">w_vec</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">w_vec_str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)))</span>
-                    <span class="n">Aw_i</span> <span class="o">=</span> <span class="n">SubsetSampler</span><span class="o">.</span><span class="n">subset_occurence</span><span class="p">(</span><span class="n">partitions</span><span class="p">[</span><span class="n">c_hash</span><span class="p">],</span> <span class="p">[</span><span class="n">w_vec</span><span class="p">],</span> <span class="n">p_phy_per_partition</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
-                    <span class="n">v_fail_i</span> <span class="o">=</span> <span class="n">var</span><span class="p">(</span><span class="n">p_fail_i</span><span class="p">,</span> <span class="n">n_i</span><span class="p">)</span>
-                    
-                    <span class="n">sum_acc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">Aw_i</span><span class="p">)</span>
-                    <span class="k">for</span> <span class="n">pathB</span> <span class="ow">in</span> <span class="n">all_paths</span><span class="p">:</span>
-                        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">([</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span><span class="n">node_ss</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)))</span> <span class="k">for</span> <span class="n">node_ss</span><span class="p">,</span><span class="n">_</span><span class="p">,</span><span class="n">_</span> <span class="ow">in</span> <span class="n">pathB</span><span class="p">])</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-                            <span class="n">prod_acc</span> <span class="o">=</span> <span class="mi">1</span>
-                            <span class="k">for</span> <span class="n">node_ss_j</span><span class="p">,</span> <span class="n">p_fail_j</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">pathB</span><span class="p">:</span>
-                                <span class="k">if</span> <span class="n">node_ss_j</span> <span class="o">!=</span> <span class="n">node_ss_i</span><span class="p">:</span>
-                                    <span class="n">node</span><span class="p">,</span> <span class="n">w_vec_str</span> <span class="o">=</span> <span class="n">node_ss_j</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
-                                    <span class="n">c_hash</span><span class="p">,</span> <span class="n">circuit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">protocol</span><span class="o">.</span><span class="n">circuit_from_node</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
-                                    <span class="n">w_vec</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">w_vec_str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)))</span>
-                                    <span class="n">Aw_j</span> <span class="o">=</span> <span class="n">SubsetSampler</span><span class="o">.</span><span class="n">subset_occurence</span><span class="p">(</span><span class="n">partitions</span><span class="p">[</span><span class="n">c_hash</span><span class="p">],</span> <span class="p">[</span><span class="n">w_vec</span><span class="p">],</span> <span class="n">p_phy_per_partition</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
-                                    <span class="n">prod_acc</span> <span class="o">*=</span> <span class="n">Aw_j</span> <span class="o">*</span> <span class="n">p_fail_j</span>
-                            <span class="n">sum_acc</span> <span class="o">+=</span> <span class="n">prod_acc</span>
-                    <span class="n">sum_acc</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">sum_acc</span><span class="o">.</span><span class="n">any</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">sum_acc</span>
-                    
-                    <span class="n">v_L</span> <span class="o">+=</span> <span class="n">v_fail_i</span> <span class="o">*</span> <span class="n">Aw_i</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">sum_acc</span> <span class="o">**</span> <span class="mi">2</span>
+<div class="output_markdown rendered_html output_subarea ">
+<h2 id="SubsetSampler" class="doc_header"><code>class</code> <code>SubsetSampler</code><a href="https://github.com/dpwinter/qsam/tree/master/qsam/samplers/protocol_samplers.py#L67" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>SubsetSampler</code>(<strong><code>protocol</code></strong>, <strong><code>simulator</code></strong>) :: <a href="/qsam/samplers.sampler_mixins.html#SubsetAnalytics"><code>SubsetAnalytics</code></a></p>
+</blockquote>
+<p>Subset Sampler of quantum protocols</p>
 
-        <span class="k">return</span> <span class="n">p_L_low</span><span class="p">,</span> <span class="n">p_L_up</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">v_L</span><span class="p">)</span>
-</pre></div>
+</div>
 
-    </div>
+</div>
+
 </div>
 </div>
 
@@ -384,7 +273,7 @@ nb_path: "05b_samplers.protocol_samplers.ipynb"
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>We can see that the results from both samplers match pretty well. For the <a href="/qsam/samplers.circuit_samplers.html#SubsetSampler"><code>SubsetSampler</code></a> we obtain an upper and a lower bound. The difference is that for the subset sampler we used <strong>a lot</strong> less samples. Not only the <code>n_samples</code> parameter is much lower, but also does the sampling only take place <strong>once</strong> and not for each $p_{phy}$ as for the <a href="/qsam/samplers.protocol_samplers.html#Sampler"><code>Sampler</code></a>. However, the subset sampling approach is still not ideal. One way we can see this is by looking at the still relatively large variance at lower error rates. We can do better by implementing two additional features:</p>
+<p>We can see that the results from both samplers match pretty well. For the <a href="/qsam/samplers.protocol_samplers.html#SubsetSampler"><code>SubsetSampler</code></a> we obtain an upper and a lower bound. The difference is that for the subset sampler we used <strong>a lot</strong> less samples. Not only the <code>n_samples</code> parameter is much lower, but also does the sampling only take place <strong>once</strong> and not for each $p_{phy}$ as for the <a href="/qsam/samplers.protocol_samplers.html#Sampler"><code>Sampler</code></a>. However, the subset sampling approach is still not ideal. One way we can see this is by looking at the still relatively large variance at lower error rates. We can do better by implementing two additional features:</p>
 <ol>
 <li>Including a function to dynamically choose the next circuit's subset weight to sample from such that the global variance $V_L$ is reduced most.</li>
 <li>A method to choose all subset weights for each circuit which we want to include in the sampling process, s.t. its overall occurance is smaller than a user-defined threshold $\chi_{min}$.<br></li>
