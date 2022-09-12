@@ -11,8 +11,6 @@ from .sampler_mixins import SubsetAnalytics
 
 import numpy as np
 from flexdict import FlexDict
-# import itertools as it
-# import networkx as nx
 
 # Cell
 ONE_QUBIT_GATES = {'H', 'X', 'Z'}
@@ -30,7 +28,7 @@ class Sampler:
         self.simulator = simulator
         self.n_qubits = len(set(q for c in protocol._circuits.values() for q in unpack(c)))
 
-    def run(self, n_samples, sample_range, err_params, var=math.Wilson_var, eval_fns=None):
+    def run(self, n_samples, sample_range, err_params, var=math.Wilson_var, eval_fns=None, verbose=False):
 
         fail_cnts = np.zeros(len(sample_range)) # one fail counter per sample point
         partitions = {circuit_hash: [partition(circuit, GATE_GROUPS[k]) for k in err_params.keys()]
@@ -40,7 +38,7 @@ class Sampler:
 
             p_phy = np.array(list(err_params.values())) * sample_pt
 
-            for _ in range(n_samples):
+            for j in range(n_samples):
 
                 sim = self.simulator(self.n_qubits)
                 p_it = iterate(self.protocol, eval_fns)
@@ -57,7 +55,10 @@ class Sampler:
                         faults = Depolar.faults_from_probs(circuit_partitions, p_phy)
                         fault_circuit = Depolar.gen_circuit(len(circuit), faults)
                         msmt = sim.run(circuit, fault_circuit)
+                        _node = node
                         node = p_it.send(msmt)
+                        if verbose:
+                            print(f"Protocol run {j:06d}, Node {_node}, Faults {faults}, Measured {bin(msmt)} -> {node}")
 
         p_L = fail_cnts / n_samples
         std = np.sqrt( var(p_L, n_samples) )
@@ -72,11 +73,109 @@ class SubsetSampler(SubsetAnalytics):
         self.simulator = simulator
         self.n_qubits = len(set(q for c in protocol._circuits.values() for q in unpack(c)))
 
-    def run(self, n_samples, sample_range, err_params, chi_min=1e-2, p_max=0.1, var=math.Wilson_var, eval_fns={}):
+    def log_var(self, counts, partitions, p_phy_per_partition, var):
+        all_paths = SubsetSampler.all_paths_from_counts(counts)
+        v_L = 0
+        for path in all_paths:
+            if np.sum([tuple(map(int,node_ss.split(',')[1].split(':'))) for node_ss,_,_ in path]) != 0:
+                for node_ss_i, p_fail_i, n_i in path:
+                    node, w_vec_str = node_ss_i.split(',')
+                    c_hash, circuit = self.protocol.circuit_from_node(node)
+                    w_vec = tuple(map(int, w_vec_str.split(":")))
+                    Aw_i = SubsetSampler.subset_occurence(partitions[c_hash], [w_vec], p_phy_per_partition).flatten()
+                    v_fail_i = var(p_fail_i, n_i)
 
-        p_phy_per_partition = np.array([[p_phy * mul for p_phy in sample_range] for mul in err_params.values()]).T
+                    prod_acc = 1
+                    for node_ss_j, p_fail_j, _ in path:
+                        if node_ss_j != node_ss_i:
+                            node, w_vec_str = node_ss_j.split(',')
+                            c_hash, circuit = self.protocol.circuit_from_node(node)
+                            w_vec = tuple(map(int, w_vec_str.split(":")))
+                            Aw_j = SubsetSampler.subset_occurence(partitions[c_hash], [w_vec], p_phy_per_partition).flatten()
+                            prod_acc *= Aw_j * p_fail_j
+
+                    v_L += v_fail_i * Aw_i ** 2 * prod_acc ** 2
+
+                    # sum_acc = np.zeros_like(Aw_i)
+                    # for pathB in all_paths:
+                    #     if np.sum([tuple(map(int,node_ss.split(',')[1].split(':'))) for node_ss,_,_ in pathB]) != 0:
+                    #         prod_acc = 1
+                    #         for node_ss_j, p_fail_j, _ in pathB:
+                    #             if node_ss_j != node_ss_i:
+                    #                 node, w_vec_str = node_ss_j.split(',')
+                    #                 c_hash, circuit = self.protocol.circuit_from_node(node)
+                    #                 w_vec = tuple(map(int, w_vec_str.split(":")))
+                    #                 Aw_j = SubsetSampler.subset_occurence(partitions[c_hash], [w_vec], p_phy_per_partition).flatten()
+                    #                 prod_acc *= Aw_j * p_fail_j
+                    #         sum_acc += prod_acc
+                    # sum_acc = 1 if sum_acc.any() == 0 else sum_acc
+
+                    # v_L += v_fail_i * Aw_i ** 2 * sum_acc ** 2
+        return v_L
+
+    def log_rate(self, counts, partitions, p_phy_per_partition):
+        all_paths = SubsetSampler.all_paths_from_counts(counts)
+        delta = 1
+        p_L_low = 0
+        for path in all_paths:
+            Aw_prod_acc = 1
+            for node_ss, p_fail, _ in path:
+                node, w_vec_str = node_ss.split(',')
+                c_hash, circuit = self.protocol.circuit_from_node(node)
+                w_vec = list(map(int, w_vec_str.split(":")))
+                Aw_prod_acc *= SubsetSampler.subset_occurence(partitions[c_hash], [w_vec], p_phy_per_partition).flatten()
+            p_L_low += Aw_prod_acc * np.prod([p for _,p,_ in path])
+            delta -= Aw_prod_acc * (1 if len(path) < 2 else np.prod([p for _,p,_ in path[:-1]]))
+        p_L_up = p_L_low + delta
+        return p_L_low, p_L_up
+
+    @staticmethod
+    def all_paths_from_counts(counts):
+        all_paths = []
+        for keys,_ in counts.flatten():
+            if "EXIT" in keys: # last p_fail for non-fail paths is always 0
+                path = []
+                for i in range(1,len(keys)-1): # calculate p_fail
+                    p = counts[keys[:i+1]]["N"] / counts[keys[:i]]["N"]
+                    path.append((keys[i-1], p, counts[keys[:i]]["N"]))
+                all_paths.append(path)
+        return all_paths
+
+    def ERV(self, counts, hist, node, w_vecs, p_phy, partitions, var):
+        v_L = self.log_var(counts, partitions, p_phy, var)
+        deltas = []
+        aug_counts = FlexDict(counts.copy())
+        aug_counts.set(hist + ["N"], 1, increment=True) # use cutoff error to allow opening new branches
+        for w_vec in w_vecs: # sort w_vecs, return (cut) at w_max (sort list by Aw)
+            aug_hist = hist + ["%s,%s" % (node,":".join(map(str,w_vec)))]
+            p_fail = aug_counts.get(aug_hist + ["N"], default=0) / aug_counts.get(hist + ["N"])
+            aug_counts_plus = FlexDict(aug_counts.copy())
+            aug_counts_plus.set(aug_hist + ["N"], 1, increment=True)
+            V_plus = self.log_var(aug_counts_plus, partitions, p_phy, var)
+            V_minus = self.log_var(aug_counts, partitions, p_phy, var)
+            v_L_aug = p_fail * V_plus + (1-p_fail) * V_minus
+            delta = v_L - v_L_aug
+            deltas.append(delta)
+        return np.argmax(deltas)
+
+    def partitions(self, err_params):
         partitions = {circuit_hash: [partition(circuit, GATE_GROUPS[k]) for k in err_params.keys()]
-                     for circuit_hash, circuit in self.protocol._circuits.items()}
+             for circuit_hash, circuit in self.protocol._circuits.items()}
+        return partitions
+
+    @staticmethod
+    def p_phy_per_partition(sample_range, err_params):
+        return np.array([[p_phy * mul for p_phy in sample_range] for mul in err_params.values()]).T
+
+    def run(self, n_samples, sample_range, err_params, chi_min=1e-2, p_max=0.1, var=math.Wilson_var, eval_fns={}):
+        partitions = self.partitions(err_params)
+        p_phy_per_partition = SubsetSampler.p_phy_per_partition(sample_range, err_params)
+        counts = self.sample(n_samples, chi_min, p_max, partitions, var, eval_fns)
+        p_L_low, p_L_up = self.log_rate(counts, partitions, p_phy_per_partition)
+        v_L = self.log_var(counts, partitions, p_phy_per_partition, var)
+        return p_L_low, p_L_up, np.sqrt(v_L)
+
+    def sample(self, n_samples, chi_min, p_max, partitions, var=math.Wilson_var, eval_fns={}):
 
         w_vecs_all = {circuit_hash: SubsetSampler.weight_vectors([len(p) for p in pars])
                       for circuit_hash, pars in partitions.items()}
@@ -84,8 +183,9 @@ class SubsetSampler(SubsetAnalytics):
                             for circuit_hash, w_vecs in w_vecs_all.items()}
 
         counts =  FlexDict()
+        n_thermal = 20 # Thermalize to prefill counts
 
-        for _ in range(n_samples):
+        for i in range(n_samples):
             hist = []
             chi = 1
 
@@ -99,7 +199,14 @@ class SubsetSampler(SubsetAnalytics):
 
                 # path cutoff
                 ids = np.where(chi * Aws_all_at_p_max[circuit_hash] > chi_min)[0]
-                idx = 0 if len(ids) == 0 else np.random.choice(ids)
+
+                # ERV
+                if i < n_thermal:
+                    idx = 0 if len(ids) == 0 else np.random.choice(ids)
+                else:
+                    w_vecs = [w_vecs_all[circuit_hash][idx] for idx in ids]
+                    idx = 0 if len(w_vecs) < 2 else self.ERV(counts, hist, node, w_vecs, np.array(p_max), partitions, var)
+
                 chi *= Aws_all_at_p_max[circuit_hash][idx]
                 w_vec = w_vecs_all[circuit_hash][idx]
 
@@ -118,76 +225,4 @@ class SubsetSampler(SubsetAnalytics):
                     if not counts.get(hist + ["EXIT", "N"]):
                         counts.set(hist + ["EXIT", "N"], 0)
                     break
-
-        all_paths = []
-        for keys,_ in counts.flatten():
-            if "EXIT" in keys: # last p_fail for non-fail paths is always 0
-                path = []
-                for i in range(1,len(keys)-1): # calculate p_fail
-                    p = counts[keys[:i+1]]["N"] / counts[keys[:i]]["N"]
-                    path.append((keys[i-1], p, counts[keys[:i]]["N"]))
-                all_paths.append(path)
-
-        # p_L_low, p_L_up
-        delta = 1
-        p_L_low = 0
-        for path in all_paths:
-            prod_acc = 1
-            for node_ss, p_fail, _ in path:
-                node, w_vec_str = node_ss.split(',')
-                c_hash, circuit = self.protocol.circuit_from_node(node)
-                w_vec = list(map(int, w_vec_str.split(":")))
-                prod_acc *= SubsetSampler.subset_occurence(partitions[c_hash], [w_vec], p_phy_per_partition).flatten()
-            p_L_low += prod_acc * np.prod([p for _,p,_ in path[:]])
-            delta -= prod_acc * (1 if len(path) < 2 else np.prod([p for _,p,_ in path[:-1]]))
-        p_L_up = p_L_low + delta
-
-        # v_L
-#         v_L = 0
-#         for path in all_paths:
-#             if np.sum([tuple(map(int,node_ss.split(',')[1].split(':'))) for node_ss,_,_ in path]) != 0:
-#                 for node_ss_i, p_fail_i, n_i in path:
-#                     node, w_vec_str = node_ss_i.split(',')
-#                     c_hash, circuit = self.protocol.circuit_from_node(node)
-#                     w_vec = tuple(map(int, w_vec_str.split(":")))
-#                     Aw_i = SubsetSampler.subset_occurence(partitions[c_hash], [w_vec], p_phy_per_partition).flatten()
-#                     prod_acc = 1
-#                     for node_ss_j, p_fail_j, _ in path:
-#                         if node_ss_j != node_ss_i:
-#                             node, w_vec_str = node_ss_j.split(',')
-#                             c_hash, circuit = self.protocol.circuit_from_node(node)
-#                             w_vec = tuple(map(int, w_vec_str.split(":")))
-#                             Aw_j = SubsetSampler.subset_occurence(partitions[c_hash], [w_vec], p_phy_per_partition).flatten()
-#                             prod_acc *= Aw_j * p_fail_j
-
-#                     v_fail_i = var(p_fail_i, n_i)
-#                     v_L += v_fail_i * Aw_i ** 2 * prod_acc ** 2
-
-
-        v_L = 0
-        for path in all_paths:
-            if np.sum([tuple(map(int,node_ss.split(',')[1].split(':'))) for node_ss,_,_ in path]) != 0:
-                for node_ss_i, p_fail_i, n_i in path:
-                    node, w_vec_str = node_ss_i.split(',')
-                    c_hash, circuit = self.protocol.circuit_from_node(node)
-                    w_vec = tuple(map(int, w_vec_str.split(":")))
-                    Aw_i = SubsetSampler.subset_occurence(partitions[c_hash], [w_vec], p_phy_per_partition).flatten()
-                    v_fail_i = var(p_fail_i, n_i)
-
-                    sum_acc = np.zeros_like(Aw_i)
-                    for pathB in all_paths:
-                        if np.sum([tuple(map(int,node_ss.split(',')[1].split(':'))) for node_ss,_,_ in pathB]) != 0:
-                            prod_acc = 1
-                            for node_ss_j, p_fail_j, _ in pathB:
-                                if node_ss_j != node_ss_i:
-                                    node, w_vec_str = node_ss_j.split(',')
-                                    c_hash, circuit = self.protocol.circuit_from_node(node)
-                                    w_vec = tuple(map(int, w_vec_str.split(":")))
-                                    Aw_j = SubsetSampler.subset_occurence(partitions[c_hash], [w_vec], p_phy_per_partition).flatten()
-                                    prod_acc *= Aw_j * p_fail_j
-                            sum_acc += prod_acc
-                    sum_acc = 1 if sum_acc.any() == 0 else sum_acc
-
-                    v_L += v_fail_i * Aw_i ** 2 * sum_acc ** 2
-
-        return p_L_low, p_L_up, np.sqrt(v_L)
+        return counts

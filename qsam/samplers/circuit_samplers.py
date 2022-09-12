@@ -88,6 +88,7 @@ class SubsetSampler(SubsetAnalytics):
         p_L_up = p_L_low + Aws_upper
 
         std = np.sqrt( np.sum( [Aws[w]**2 * var(pws[w], cnts[w]) for w in range(len(w_vecs))], axis=0 ) )
+        print(p_L_up - p_L_low)
         return p_L_low, p_L_up, std
 
 # Cell
