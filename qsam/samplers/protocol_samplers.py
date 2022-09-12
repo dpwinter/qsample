@@ -59,7 +59,8 @@ class Sampler:
                         node = p_it.send(msmt)
                         if verbose:
                             msmt_str = msmt if msmt==None else f'{msmt:07b}'
-                            print(f"Protocol run {j:06d}, Node {_node}, Faults {faults}, Measured {msmt_str}-> {node}")
+                            pauli_faults = [f'Tick {tick} :: {fault_circuit[tick]}' for tick,_ in faults]
+                            print(f"Protocol run {j:06d}, Node {_node}, Faults {pauli_faults}, Measured {msmt_str}-> {node}")
 
         p_L = fail_cnts / n_samples
         std = np.sqrt( var(p_L, n_samples) )
