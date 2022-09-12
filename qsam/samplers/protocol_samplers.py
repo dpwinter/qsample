@@ -58,7 +58,8 @@ class Sampler:
                         _node = node
                         node = p_it.send(msmt)
                         if verbose:
-                            print(f"Protocol run {j:06d}, Node {_node}, Faults {faults}, Measured {bin(msmt)} -> {node}")
+                            msmt_str = msmt if msmt==None else f'{msmt:07b}'
+                            print(f"Protocol run {j:06d}, Node {_node}, Faults {faults}, Measured {msmt_str}-> {node}")
 
         p_L = fail_cnts / n_samples
         std = np.sqrt( var(p_L, n_samples) )
