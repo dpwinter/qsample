@@ -10,8 +10,9 @@ from functools import lru_cache
 class Circuit(MutableSequence):
     """Representation of a quantum circuit"""
 
-    def __init__(self, ticks=None, failures=None):
+    def __init__(self, ticks=None, noisy=True):
         self._ticks = ticks if ticks else []
+        self._noisy = noisy
 
     def __getitem__(self, tick_index):
         return self._ticks[tick_index]

@@ -17,7 +17,7 @@ class CircuitRunnerMixin:
         """Apply gates in `circuit` sequentially to current state.
         If `fault_circuit` is specified apply fault gates at end of each tick.
 
-        Measurement results are saves in the order in which they appear in the
+        Measurement results are saved in the order in which they appear in the
         circuit into an output string."""
 
         msmt_res = []

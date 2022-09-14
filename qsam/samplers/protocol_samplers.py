@@ -44,6 +44,8 @@ class Sampler:
                 p_it = iterate(self.protocol, eval_fns)
                 node = next(p_it)
 
+                if verbose: print(f'--- Protocol run {j:06d} ---')
+
                 while node:
 
                     if node == 'EXIT':
@@ -51,16 +53,19 @@ class Sampler:
                         break
                     else:
                         circuit_hash, circuit = self.protocol.circuit_from_node(node)
-                        circuit_partitions = partitions[circuit_hash]
-                        faults = Depolar.faults_from_probs(circuit_partitions, p_phy)
-                        fault_circuit = Depolar.gen_circuit(len(circuit), faults)
-                        msmt = sim.run(circuit, fault_circuit)
+                        if circuit._noisy:
+                            circuit_partitions = partitions[circuit_hash]
+                            faults = Depolar.faults_from_probs(circuit_partitions, p_phy)
+                            fault_circuit = Depolar.gen_circuit(len(circuit), faults)
+                            msmt = sim.run(circuit, fault_circuit)
+                        else:
+                            msmt = sim.run(circuit)
                         _node = node
                         node = p_it.send(msmt)
                         if verbose:
                             msmt_str = msmt if msmt==None else f'{msmt:07b}'
-                            pauli_faults = [f'Tick {tick} :: {fault_circuit[tick]}' for tick,_ in faults]
-                            print(f"Protocol run {j:06d}, Node {_node}, Faults {pauli_faults}, Measured {msmt_str}-> {node}")
+                            pauli_faults = [] if not circuit._noisy else [f'Tick {tick} :: {fault_circuit[tick]}' for tick,_ in faults]
+                            print(f"Node {_node}, Faults {pauli_faults}, Measured {msmt_str}-> {node}")
 
         p_L = fail_cnts / n_samples
         std = np.sqrt( var(p_L, n_samples) )
