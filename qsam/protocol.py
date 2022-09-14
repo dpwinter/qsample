@@ -50,7 +50,7 @@ class Protocol(nx.DiGraph):
         return {pair[1]: self.edges[pair]['check'] for pair in adj_nodes}
 
 # Cell
-def draw_protocol(protocol, save_path=None, figsize=(6,4), self_loop_offset=(0.03,0.06)):
+def draw_protocol(protocol, save_path=None, figsize=(6,4), self_loop_offset=(0.03,0.06), color=True):
     """Draw graph representation of protocol"""
 
     plt.figure(figsize=figsize)
@@ -61,7 +61,8 @@ def draw_protocol(protocol, save_path=None, figsize=(6,4), self_loop_offset=(0.0
     n_pos = nudge(pos, *self_loop_offset) # offset labels for self-loops
 
     col_val_map = {'START': '#99ccff', 'EXIT': '#ff9999'}
-    col_vals = [col_val_map.get(node, '#ffb266') for node in protocol.nodes]
+    if color: col_vals = [col_val_map.get(node, '#ffb266') for node in protocol.nodes]
+    else: col_vals = 'white'
 
     node_sizes = [len(node_str)**2 * 100 for node_str in pos.keys()]
     nx.draw(protocol, pos=pos, with_labels=True, node_color=col_vals, node_size=node_sizes, edgecolors='black')
