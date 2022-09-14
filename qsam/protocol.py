@@ -9,6 +9,9 @@ from functools import lru_cache
 import pickle
 import simpleeval
 
+import matplotlib.lines as mlines
+import matplotlib.pyplot as plt
+
 # Cell
 class Protocol(nx.DiGraph):
     """Representation of a Quantum Error Correction protocol"""
@@ -47,15 +50,50 @@ class Protocol(nx.DiGraph):
         return {pair[1]: self.edges[pair]['check'] for pair in adj_nodes}
 
 # Cell
-def draw_protocol(protocol):
+def draw_protocol(protocol, save_path=None, figsize=(6,4), self_loop_offset=(0.03,0.06)):
     """Draw graph representation of protocol"""
 
+    plt.figure(figsize=figsize)
+
     pos = nx.kamada_kawai_layout(protocol)
+
+    nudge = lambda pos, x_shift, y_shift: {n:(x + x_shift, y + y_shift) for n,(x,y) in pos.items()}
+    n_pos = nudge(pos, *self_loop_offset) # offset labels for self-loops
+
     col_val_map = {'START': '#99ccff', 'EXIT': '#ff9999'}
     col_vals = [col_val_map.get(node, '#ffb266') for node in protocol.nodes]
-    nx.draw(protocol, pos, node_color=col_vals, with_labels=True)
+
+    node_sizes = [len(node_str)**2 * 100 for node_str in pos.keys()]
+    nx.draw(protocol, pos=pos, with_labels=True, node_color=col_vals, node_size=node_sizes, edgecolors='black')
+
     edge_labels = nx.get_edge_attributes(protocol, 'check')
-    nx.draw_networkx_edge_labels(protocol, pos, edge_labels)
+    n_edge_labels = dict()
+    legend_labels = []
+
+    cnt = 0
+    for k,v in edge_labels.items():
+        if v == 'True':
+            n_edge_labels[k] = v
+        else:
+            i = n_edge_labels.get(k, None)
+            if not i:
+                i = cnt
+                cnt += 1
+
+            n_edge_labels[k] = f'${i}$'
+            legend_elem = mlines.Line2D([], [], color='black', marker=f'${i}$', linestyle='None', markersize=8, label=v)
+            legend_labels.append(legend_elem)
+
+
+    edge_labels_self_loops = {(to,fr): lbl for (to,fr), lbl in n_edge_labels.items() if to == fr}
+    edge_labels_no_loops = {(to,fr): lbl for (to,fr), lbl in n_edge_labels.items() if to != fr}
+
+    for ps, lbls in zip([pos,n_pos], [edge_labels_no_loops, edge_labels_self_loops]):
+        nx.draw_networkx_edge_labels(protocol, ps, lbls, font_size=12, bbox=dict(facecolor='white', edgecolor='black', boxstyle='round,pad=0.3'), rotate=False)
+
+    lgd = plt.legend(handles=legend_labels, bbox_to_anchor=(1.04, 1), loc="upper left")
+
+    if save_path: plt.savefig(save_path, bbox_extra_artists=(lgd,), bbox_inches='tight')
 
 # Cell
 default_fns = simpleeval.DEFAULT_FUNCTIONS.copy()
