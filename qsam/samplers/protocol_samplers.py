@@ -61,14 +61,14 @@ class Sampler:
                         else:
                             msmt = sim.run(circuit)
                         _node = node
-                        node = p_it.send(msmt)
+                        node = p_it.send(int(msmt, 2))
 
                         if verbose:
-                            msmt_str = msmt if msmt==None else bin(msmt)
+                            # msmt_str = msmt if msmt==None else bin(msmt)
                             pauli_faults = [] if not circuit._noisy else [f'Tick {tick} :: {fault_circuit[tick]}' for tick,_ in faults]
 
                             if _node == 'COR': print(f"Node {_node}, Circuit {circuit} -> {node}")
-                            else: print(f"Node {_node}, Faults {pauli_faults}, Measured {msmt_str}-> {node}")
+                            else: print(f"Node {_node}, Faults {pauli_faults}, Measured {msmt}-> {node}")
 
         p_L = fail_cnts / n_samples
         std = np.sqrt( var(p_L, n_samples) )
@@ -226,7 +226,7 @@ class SubsetSampler(SubsetAnalytics):
                 faults = Depolar.faults_from_weights(partitions[circuit_hash], w_vec)
                 fault_circuit = Depolar.gen_circuit(len(circuit), faults)
                 msmt = sim.run(circuit, fault_circuit)
-                node = p_it.send(msmt) # exchange with iterator
+                node = p_it.send(int(msmt,2)) # exchange with iterator
 
                 if node == 'EXIT':
                     counts.set(hist + ["EXIT", "N"], 1, increment=True)

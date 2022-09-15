@@ -64,7 +64,7 @@ def draw_protocol(protocol, save_path=None, figsize=(6,4), layout=nx.kamada_kawa
     if color: col_vals = [col_val_map.get(node, '#ffb266') for node in protocol.nodes]
     else: col_vals = 'white'
 
-    node_sizes = [len(node_str)**2 * 100 for node_str in pos.keys()]
+    node_sizes = max([len(node_str)**2 * 100 for node_str in pos.keys()])
     nx.draw(protocol, pos=pos, with_labels=True, node_color=col_vals, node_size=node_sizes, edgecolors='black')
 
     edge_labels = nx.get_edge_attributes(protocol, 'check')
