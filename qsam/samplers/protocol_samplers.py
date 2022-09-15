@@ -44,7 +44,7 @@ class Sampler:
                 p_it = iterate(self.protocol, eval_fns)
                 node = next(p_it)
 
-                if verbose: print(f'--- Protocol run {j:06d} ---')
+                if verbose: print(f'--- Protocol run {j} ---')
 
                 while node:
 
@@ -62,10 +62,13 @@ class Sampler:
                             msmt = sim.run(circuit)
                         _node = node
                         node = p_it.send(msmt)
+
                         if verbose:
-                            msmt_str = msmt if msmt==None else f'{msmt:07b}'
+                            msmt_str = msmt if msmt==None else bin(msmt)
                             pauli_faults = [] if not circuit._noisy else [f'Tick {tick} :: {fault_circuit[tick]}' for tick,_ in faults]
-                            print(f"Node {_node}, Faults {pauli_faults}, Measured {msmt_str}-> {node}")
+
+                            if _node == 'COR': print(f"Node {_node}, Circuit {circuit} -> {node}")
+                            else: print(f"Node {_node}, Faults {pauli_faults}, Measured {msmt_str}-> {node}")
 
         p_L = fail_cnts / n_samples
         std = np.sqrt( var(p_L, n_samples) )

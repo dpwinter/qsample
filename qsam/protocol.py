@@ -25,7 +25,7 @@ class Protocol(nx.DiGraph):
         self._circuits[circuit_hash] = circuit
         super().add_node(name, circuit_hash=circuit_hash)
 
-    def update_node(self, name, circuit):
+    def update_node(self, node, circuit):
         circuit_hash = make_hash(circuit)
         self._circuits[circuit_hash] = circuit
         self.nodes[node]['circuit_hash'] = circuit_hash
@@ -113,16 +113,17 @@ default_fns.update(
 def iterate(protocol, eval_fns={}):
     """Iterator over protocol"""
 
+    if eval_fns: eval_fns.update(default_fns)
+    else: eval_fns = default_fns
+
     hist = {}
     node = "START"
     name_handler = lambda ast_node: hist.get(ast_node.id, None)
 
-    if eval_fns: eval_fns.update(default_fns)
-    else: eval_fns = default_fns
-
     while True:
-        checks = protocol.checks(node)
-        next_nodes = [(nn,c) for nn,c in checks.items() if simpleeval.simple_eval(c, names=name_handler, functions=eval_fns)]
+        checks = {n: simpleeval.simple_eval(check, names=name_handler, functions=eval_fns)
+                  for n,check in protocol.checks(node).items()}
+        next_nodes = [(nn,check) for nn,check in checks.items() if check]
 
         if len(next_nodes) == 0:
             yield None
