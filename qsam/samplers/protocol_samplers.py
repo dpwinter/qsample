@@ -61,7 +61,7 @@ class Sampler:
                         else:
                             msmt = sim.run(circuit)
                         _node = node
-                        node = p_it.send(int(msmt, 2))
+                        node = p_it.send(msmt if msmt==None else int(msmt,2))
 
                         if verbose:
                             # msmt_str = msmt if msmt==None else bin(msmt)
@@ -151,21 +151,32 @@ class SubsetSampler(SubsetAnalytics):
                 all_paths.append(path)
         return all_paths
 
+    # def ERV(self, counts, hist, node, w_vecs, p_phy, partitions, var):
+    #     # v_L = self.log_var(counts, partitions, p_phy, var)
+    #     deltas = []
+    #     # aug_counts = FlexDict(counts.copy())
+    #     # aug_counts.set(hist + ["N"], 1, increment=True) # use cutoff error to allow opening new branches
+    #     for w_vec in w_vecs: # sort w_vecs, return (cut) at w_max (sort list by Aw)
+    #         # aug_hist = hist + ["%s,%s" % (node,":".join(map(str,w_vec)))]
+    #         # p_fail = aug_counts.get(aug_hist + ["N"], default=0) / aug_counts.get(hist + ["N"])
+    #         # aug_counts_plus = FlexDict(aug_counts.copy())
+    #         # aug_counts_plus.set(aug_hist + ["N"], 1, increment=True)
+    #         # V_plus = self.log_var(aug_counts_plus, partitions, p_phy, var)
+    #         # V_minus = self.log_var(aug_counts, partitions, p_phy, var)
+    #         # v_L_aug = p_fail * V_plus + (1-p_fail) * V_minus
+    #         # delta = v_L - v_L_aug
+    #         delta = var(pw, Nw) - var()
+    #         deltas.append(delta)
+    #     return np.argmax(deltas)
+
     def ERV(self, counts, hist, node, w_vecs, p_phy, partitions, var):
-        v_L = self.log_var(counts, partitions, p_phy, var)
         deltas = []
-        aug_counts = FlexDict(counts.copy())
-        aug_counts.set(hist + ["N"], 1, increment=True) # use cutoff error to allow opening new branches
-        for w_vec in w_vecs: # sort w_vecs, return (cut) at w_max (sort list by Aw)
-            aug_hist = hist + ["%s,%s" % (node,":".join(map(str,w_vec)))]
-            p_fail = aug_counts.get(aug_hist + ["N"], default=0) / aug_counts.get(hist + ["N"])
-            aug_counts_plus = FlexDict(aug_counts.copy())
-            aug_counts_plus.set(aug_hist + ["N"], 1, increment=True)
-            V_plus = self.log_var(aug_counts_plus, partitions, p_phy, var)
-            V_minus = self.log_var(aug_counts, partitions, p_phy, var)
-            v_L_aug = p_fail * V_plus + (1-p_fail) * V_minus
-            delta = v_L - v_L_aug
+        Nw = counts.get(hist + ["N"], default=0) + 1
+        for w_vec in w_vecs:
+            Nn = counts.get(hist + [node, "N"], default=0)
+            delta = var(Nn/Nw, Nw) - var((Nn+1)/Nw, Nw)
             deltas.append(delta)
+        print(deltas)
         return np.argmax(deltas)
 
     def partitions(self, err_params):
@@ -217,6 +228,7 @@ class SubsetSampler(SubsetAnalytics):
                     w_vecs = [w_vecs_all[circuit_hash][idx] for idx in ids]
                     idx = 0 if len(w_vecs) < 2 else self.ERV(counts, hist, node, w_vecs, np.array(p_max), partitions, var)
 
+
                 chi *= Aws_all_at_p_max[circuit_hash][idx]
                 w_vec = w_vecs_all[circuit_hash][idx]
 
@@ -226,7 +238,7 @@ class SubsetSampler(SubsetAnalytics):
                 faults = Depolar.faults_from_weights(partitions[circuit_hash], w_vec)
                 fault_circuit = Depolar.gen_circuit(len(circuit), faults)
                 msmt = sim.run(circuit, fault_circuit)
-                node = p_it.send(int(msmt,2)) # exchange with iterator
+                node = p_it.send(msmt if msmt==None else int(msmt,2)) # exchange with iterator
 
                 if node == 'EXIT':
                     counts.set(hist + ["EXIT", "N"], 1, increment=True)

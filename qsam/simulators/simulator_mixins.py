@@ -35,8 +35,6 @@ class CircuitRunnerMixin:
                         self._apply_gate(f_gate, f_qubit)
 
         if msmt_res:
-            # msmt_bit_str = ''.join(map(str, msmt_res))
-            # return int(msmt_bit_str, 2)
             return ''.join(map(str, msmt_res))
         else:
             return None # no measurement
