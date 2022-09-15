@@ -40,7 +40,7 @@ class Sampler:
                 faults = Depolar.faults_from_probs(partitions, p_phy)
                 fault_circuit = Depolar.gen_circuit(len(self.circuit), faults)
                 msmt = sim.run(self.circuit, fault_circuit)
-                if msmt in fail_patterns:
+                if int(msmt,2) in fail_patterns:
                     fail_cnts[i] += 1
 
         p_L = fail_cnts / n_samples
@@ -73,7 +73,7 @@ class SubsetSampler(SubsetAnalytics):
             faults = Depolar.faults_from_weights(partitions, w_vec)
             fault_circuit = Depolar.gen_circuit(len(self.circuit), faults)
             msmt = sim.run(self.circuit, fault_circuit)
-            if msmt in fail_patterns:
+            if int(msmt,2) in fail_patterns:
                 fail_cnts[ss_idx] += 1
             cnts[ss_idx] += 1
 
