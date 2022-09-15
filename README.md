@@ -28,15 +28,15 @@ Now we define the protocol. **EXIT** marks a *significant* protocol termination 
 ```python
 from qsam.protocol import Protocol,draw_protocol
 
-ghz3 = Protocol()
-ghz3.add_nodes_from(['ghz1','ghz2','ghz3'], circuits=ghz)
+ghz1 = Protocol()
+ghz1.add_nodes_from(['ghz1', 'meas'], circuits=ghz)
 
-ghz3.add_edge('START', 'ghz1', check='True')
-ghz3.add_edge('ghz1', 'ghz2', check='ghz1[-1]==1')
-ghz3.add_edge('ghz2', 'ghz3', check='ghz2[-1]==1')
-ghz3.add_edge('ghz3', 'EXIT', check='ghz3[-1]==1')
+ghz1.add_edge('START', 'ghz1', check='True')
+ghz1.add_edge('ghz1', 'ghz1', check='ghz1[-1]==1')
+ghz1.add_edge('ghz1', 'meas', check='ghz1[-1]==0')
+ghz1.add_edge('meas', 'EXIT', check='meas[-1]==1')
 
-draw_protocol(ghz3)
+draw_protocol(ghz1, figsize=(8,5), self_loop_offset=(0, 0.18))
 ```
 
 
