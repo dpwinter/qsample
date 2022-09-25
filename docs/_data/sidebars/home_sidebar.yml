@@ -40,7 +40,7 @@ entries:
       title: Datatypes
       url: samplers.datatypes.html
     - output: web,pdf
-      title: Title
+      title: Examples
       url: examples.html
     output: web
     title: qsam

@@ -11,7 +11,6 @@ from .sampler_mixins import SubsetAnalytics
 from .datatypes import CountNode, Variable, Constant, Fail, NoFail, Tree
 
 import numpy as np
-from functools import lru_cache
 from tqdm import tqdm
 
 # Cell
