@@ -8,9 +8,11 @@ from ..circuit import partition, make_hash, unpack
 from ..fault_generators import Depolar
 from ..protocol import iterate
 from .sampler_mixins import SubsetAnalytics
+from .datatypes import CountNode, Variable, Constant, Fail, NoFail, Tree
 
 import numpy as np
-from flexdict import FlexDict
+from functools import lru_cache
+from tqdm import tqdm
 
 # Cell
 ONE_QUBIT_GATES = {'H', 'X', 'Z'}
@@ -22,14 +24,16 @@ GATE_GROUPS = {'p': ONE_QUBIT_GATES | TWO_QUBIT_GATES,
                }
 
 # Cell
+
 class Sampler:
     def __init__(self, protocol, simulator):
         self.protocol = protocol
         self.simulator = simulator
         self.n_qubits = len(set(q for c in protocol._circuits.values() for q in unpack(c)))
 
-    def run(self, n_samples, sample_range, err_params, var=math.Wilson_var, eval_fns=None, verbose=False):
+    def run(self, n_samples, sample_range, err_params, RSE_target=1e-1, var=math.Wilson_var, eval_fns=None, verbose=False):
 
+        # RSE: rel. standard error target
         fail_cnts = np.zeros(len(sample_range)) # one fail counter per sample point
         partitions = {circuit_hash: [partition(circuit, GATE_GROUPS[k]) for k in err_params.keys()]
                      for circuit_hash, circuit in self.protocol._circuits.items()}
@@ -38,7 +42,7 @@ class Sampler:
 
             p_phy = np.array(list(err_params.values())) * sample_pt
 
-            for j in range(n_samples):
+            for j in tqdm(range(n_samples)):
 
                 sim = self.simulator(self.n_qubits)
                 p_it = iterate(self.protocol, eval_fns)
@@ -48,33 +52,38 @@ class Sampler:
 
                 while node:
 
-                    if node == 'EXIT':
+                    if not self.protocol.out_edges(node):
                         fail_cnts[i] += 1
                         break
+
+                    circuit_hash, circuit = self.protocol.circuit_from_node(node)
+                    if not circuit._noisy or circuit_hash not in partitions.keys():
+                        msmt = sim.run(circuit)
                     else:
-                        circuit_hash, circuit = self.protocol.circuit_from_node(node)
-                        if circuit._noisy:
-                            circuit_partitions = partitions[circuit_hash]
-                            faults = Depolar.faults_from_probs(circuit_partitions, p_phy)
-                            fault_circuit = Depolar.gen_circuit(len(circuit), faults)
-                            msmt = sim.run(circuit, fault_circuit)
-                        else:
-                            msmt = sim.run(circuit)
-                        _node = node
-                        node = p_it.send(msmt if msmt==None else int(msmt,2))
+                        circuit_partitions = partitions[circuit_hash]
+                        faults = Depolar.faults_from_probs(circuit_partitions, p_phy)
+                        fault_circuit = Depolar.gen_circuit(len(circuit), faults)
+                        msmt = sim.run(circuit, fault_circuit)
+                    _node = node
+                    node = p_it.send(msmt if msmt==None else int(msmt,2))
 
-                        if verbose:
-                            # msmt_str = msmt if msmt==None else bin(msmt)
-                            pauli_faults = [] if not circuit._noisy else [f'Tick {tick} :: {fault_circuit[tick]}' for tick,_ in faults]
+                    if verbose:
+                        pauli_faults = [] if not circuit._noisy else [f'Tick {tick} :: {fault_circuit[tick]}' for tick,_ in faults]
+                        if _node == 'COR': print(f"Node {_node}, Circuit {circuit} -> {node}")
+                        else: print(f"Node {_node}, Faults {pauli_faults}, Measured {msmt}-> {node}")
 
-                            if _node == 'COR': print(f"Node {_node}, Circuit {circuit} -> {node}")
-                            else: print(f"Node {_node}, Faults {pauli_faults}, Measured {msmt}-> {node}")
+                if j > 1:
+                    p_L_j = fail_cnts[i] / j
+                    if p_L_j != 0 and np.sqrt( var(p_L_j, j) )/ p_L_j < RSE_target:
+                        print(f'RSE target of {RSE_target} reached.')
+                        break
 
         p_L = fail_cnts / n_samples
         std = np.sqrt( var(p_L, n_samples) )
         return p_L, std
 
 # Cell
+
 class SubsetSampler(SubsetAnalytics):
     """Subset Sampler of quantum protocols"""
 
@@ -82,169 +91,118 @@ class SubsetSampler(SubsetAnalytics):
         self.protocol = protocol
         self.simulator = simulator
         self.n_qubits = len(set(q for c in protocol._circuits.values() for q in unpack(c)))
+        self.tree = Tree()
 
-    def log_var(self, counts, partitions, p_phy_per_partition, var):
-        all_paths = SubsetSampler.all_paths_from_counts(counts)
-        v_L = 0
-        for path in all_paths:
-            if np.sum([tuple(map(int,node_ss.split(',')[1].split(':'))) for node_ss,_,_ in path]) != 0:
-                for node_ss_i, p_fail_i, n_i in path:
-                    node, w_vec_str = node_ss_i.split(',')
-                    c_hash, circuit = self.protocol.circuit_from_node(node)
-                    w_vec = tuple(map(int, w_vec_str.split(":")))
-                    Aw_i = SubsetSampler.subset_occurence(partitions[c_hash], [w_vec], p_phy_per_partition).flatten()
-                    v_fail_i = var(p_fail_i, n_i)
+    def run(self, n_samples, sample_range, err_params, chi_min=1e-2, p_max=0.1, RSE_target=1e-1, ERV_sel=True, var=math.Wilson_var, eval_fns={}):
 
-                    prod_acc = 1
-                    for node_ss_j, p_fail_j, _ in path:
-                        if node_ss_j != node_ss_i:
-                            node, w_vec_str = node_ss_j.split(',')
-                            c_hash, circuit = self.protocol.circuit_from_node(node)
-                            w_vec = tuple(map(int, w_vec_str.split(":")))
-                            Aw_j = SubsetSampler.subset_occurence(partitions[c_hash], [w_vec], p_phy_per_partition).flatten()
-                            prod_acc *= Aw_j * p_fail_j
-
-                    v_L += v_fail_i * Aw_i ** 2 * prod_acc ** 2
-
-                    # sum_acc = np.zeros_like(Aw_i)
-                    # for pathB in all_paths:
-                    #     if np.sum([tuple(map(int,node_ss.split(',')[1].split(':'))) for node_ss,_,_ in pathB]) != 0:
-                    #         prod_acc = 1
-                    #         for node_ss_j, p_fail_j, _ in pathB:
-                    #             if node_ss_j != node_ss_i:
-                    #                 node, w_vec_str = node_ss_j.split(',')
-                    #                 c_hash, circuit = self.protocol.circuit_from_node(node)
-                    #                 w_vec = tuple(map(int, w_vec_str.split(":")))
-                    #                 Aw_j = SubsetSampler.subset_occurence(partitions[c_hash], [w_vec], p_phy_per_partition).flatten()
-                    #                 prod_acc *= Aw_j * p_fail_j
-                    #         sum_acc += prod_acc
-                    # sum_acc = 1 if sum_acc.any() == 0 else sum_acc
-
-                    # v_L += v_fail_i * Aw_i ** 2 * sum_acc ** 2
-        return v_L
-
-    def log_rate(self, counts, partitions, p_phy_per_partition):
-        all_paths = SubsetSampler.all_paths_from_counts(counts)
-        delta = 1
-        p_L_low = 0
-        for path in all_paths:
-            Aw_prod_acc = 1
-            for node_ss, p_fail, _ in path:
-                node, w_vec_str = node_ss.split(',')
-                c_hash, circuit = self.protocol.circuit_from_node(node)
-                w_vec = list(map(int, w_vec_str.split(":")))
-                Aw_prod_acc *= SubsetSampler.subset_occurence(partitions[c_hash], [w_vec], p_phy_per_partition).flatten()
-            p_L_low += Aw_prod_acc * np.prod([p for _,p,_ in path])
-            delta -= Aw_prod_acc * (1 if len(path) < 2 else np.prod([p for _,p,_ in path[:-1]]))
-        p_L_up = p_L_low + delta
-        return p_L_low, p_L_up
-
-    @staticmethod
-    def all_paths_from_counts(counts):
-        all_paths = []
-        for keys,_ in counts.flatten():
-            if "EXIT" in keys: # last p_fail for non-fail paths is always 0
-                path = []
-                for i in range(1,len(keys)-1): # calculate p_fail
-                    p = counts[keys[:i+1]]["N"] / counts[keys[:i]]["N"]
-                    path.append((keys[i-1], p, counts[keys[:i]]["N"]))
-                all_paths.append(path)
-        return all_paths
-
-    # def ERV(self, counts, hist, node, w_vecs, p_phy, partitions, var):
-    #     # v_L = self.log_var(counts, partitions, p_phy, var)
-    #     deltas = []
-    #     # aug_counts = FlexDict(counts.copy())
-    #     # aug_counts.set(hist + ["N"], 1, increment=True) # use cutoff error to allow opening new branches
-    #     for w_vec in w_vecs: # sort w_vecs, return (cut) at w_max (sort list by Aw)
-    #         # aug_hist = hist + ["%s,%s" % (node,":".join(map(str,w_vec)))]
-    #         # p_fail = aug_counts.get(aug_hist + ["N"], default=0) / aug_counts.get(hist + ["N"])
-    #         # aug_counts_plus = FlexDict(aug_counts.copy())
-    #         # aug_counts_plus.set(aug_hist + ["N"], 1, increment=True)
-    #         # V_plus = self.log_var(aug_counts_plus, partitions, p_phy, var)
-    #         # V_minus = self.log_var(aug_counts, partitions, p_phy, var)
-    #         # v_L_aug = p_fail * V_plus + (1-p_fail) * V_minus
-    #         # delta = v_L - v_L_aug
-    #         delta = var(pw, Nw) - var()
-    #         deltas.append(delta)
-    #     return np.argmax(deltas)
-
-    def ERV(self, counts, hist, node, w_vecs, p_phy, partitions, var):
-        deltas = []
-        Nw = counts.get(hist + ["N"], default=0) + 1
-        for w_vec in w_vecs:
-            Nn = counts.get(hist + [node, "N"], default=0)
-            delta = var(Nn/Nw, Nw) - var((Nn+1)/Nw, Nw)
-            deltas.append(delta)
-        print(deltas)
-        return np.argmax(deltas)
-
-    def partitions(self, err_params):
+        p_phy_per_partition = np.array([[p_phy * mul for p_phy in sample_range] for mul in err_params.values()]).T
         partitions = {circuit_hash: [partition(circuit, GATE_GROUPS[k]) for k in err_params.keys()]
-             for circuit_hash, circuit in self.protocol._circuits.items()}
-        return partitions
+                      for circuit_hash, circuit in self.protocol._circuits.items() if circuit._noisy}
+        w_vecs = {circuit_hash: SubsetSampler.weight_vectors([len(p) for p in pars])
+                  for circuit_hash, pars in partitions.items()}
+        Aws = {circuit_hash: SubsetSampler.subset_occurence(partitions[circuit_hash], w_vecs, p_phy_per_partition)
+               for circuit_hash, w_vecs in w_vecs.items()}
 
-    @staticmethod
-    def p_phy_per_partition(sample_range, err_params):
-        return np.array([[p_phy * mul for p_phy in sample_range] for mul in err_params.values()]).T
+        Aws_at_p_max = {circuit_hash: SubsetSampler.subset_occurence(partitions[circuit_hash], w_vecs, np.array(p_max))
+                        for circuit_hash, w_vecs in w_vecs.items()}
 
-    def run(self, n_samples, sample_range, err_params, chi_min=1e-2, p_max=0.1, var=math.Wilson_var, eval_fns={}):
-        partitions = self.partitions(err_params)
-        p_phy_per_partition = SubsetSampler.p_phy_per_partition(sample_range, err_params)
-        counts = self.sample(n_samples, chi_min, p_max, partitions, var, eval_fns)
-        p_L_low, p_L_up = self.log_rate(counts, partitions, p_phy_per_partition)
-        v_L = self.log_var(counts, partitions, p_phy_per_partition, var)
-        return p_L_low, p_L_up, np.sqrt(v_L)
+        for _ in tqdm(range(n_samples)):
 
-    def sample(self, n_samples, chi_min, p_max, partitions, var=math.Wilson_var, eval_fns={}):
-
-        w_vecs_all = {circuit_hash: SubsetSampler.weight_vectors([len(p) for p in pars])
-                      for circuit_hash, pars in partitions.items()}
-        Aws_all_at_p_max = {circuit_hash: SubsetSampler.subset_occurence(partitions[circuit_hash], w_vecs, np.array(p_max))
-                            for circuit_hash, w_vecs in w_vecs_all.items()}
-
-        counts =  FlexDict()
-        n_thermal = 20 # Thermalize to prefill counts
-
-        for i in range(n_samples):
-            hist = []
             chi = 1
-
             sim = self.simulator(self.n_qubits)
             p_it = iterate(self.protocol, eval_fns)
             node = next(p_it)
+            tree_node = self.tree.add(name=node, node_cls=CountNode)
+            tree_node.counts += 1
 
-            while True:
+            while node:
+
+                if not self.protocol.out_edges(node):
+                    break # terminal node reached
 
                 circuit_hash, circuit = self.protocol.circuit_from_node(node)
 
-                # path cutoff
-                ids = np.where(chi * Aws_all_at_p_max[circuit_hash] > chi_min)[0]
-
-                # ERV
-                if i < n_thermal:
-                    idx = 0 if len(ids) == 0 else np.random.choice(ids)
+                if circuit_hash not in partitions.keys(): # handle circuits created at runtime
+                    msmt = sim.run(circuit)
+                    tree_node = self.tree.add(name=(0,),
+                                              node_cls=Constant,
+                                              parent=tree_node,
+                                              data={'Aw': np.ones(shape=p_phy_per_partition.shape[0]),
+                                                    'Aw_p_max': np.array([1])})
                 else:
-                    w_vecs = [w_vecs_all[circuit_hash][idx] for idx in ids]
-                    idx = 0 if len(w_vecs) < 2 else self.ERV(counts, hist, node, w_vecs, np.array(p_max), partitions, var)
+                    ids = np.where(chi * Aws_at_p_max[circuit_hash] > chi_min)[0]
+                    if len(ids) == 0 or not circuit._noisy:
+                        idx = 0
+                    else:
+                        delta = self.tree.delta(ckey='Aw_p_max')
+                        v_L = self.tree.var(ckey='Aw_p_max')
+                        p_L = self.tree.rate(ckey='Aw_p_max')
 
+                        if not ERV_sel:
+                            idx = np.random.choice(ids)
+                        else:
+                            erv_deltas = []
+                            for idx in ids:
+                                Aw = Aws[circuit_hash][idx]
+                                Aw_p_max = Aws_at_p_max[circuit_hash][idx]
+                                w_vec = w_vecs[circuit_hash][idx]
 
-                chi *= Aws_all_at_p_max[circuit_hash][idx]
-                w_vec = w_vecs_all[circuit_hash][idx]
+                                _tree_node = self.tree.add(w_vec, node_cls=Constant, parent=tree_node, data={'Aw': Aw, 'Aw_p_max': Aw_p_max})
+                                __tree_node = self.tree.add('FAIL', node_cls=Fail, parent=_tree_node)
+                                _delta = self.tree.delta(ckey='Aw_p_max')
+                                _rate = __tree_node.rate
 
-                hist.append("%s,%s" % (node,":".join(map(str,w_vec))))
-                counts.set(hist + ["N"], 1, increment=True)
+                                _tree_node.counts += 1
+                                v_L_minus = self.tree.var(ckey='Aw_p_max')
 
-                faults = Depolar.faults_from_weights(partitions[circuit_hash], w_vec)
-                fault_circuit = Depolar.gen_circuit(len(circuit), faults)
-                msmt = sim.run(circuit, fault_circuit)
+                                __tree_node.counts += 1
+                                v_L_plus = self.tree.var(ckey='Aw_p_max')
+
+                                _v_L = _rate * v_L_plus + (1 - _rate) * v_L_minus
+                                erv_delta = np.abs(v_L - _v_L) + (delta - _delta)
+                                erv_deltas.append( erv_delta )
+
+                                # revert the change
+                                _tree_node.counts -= 1
+                                __tree_node.counts -= 1
+                                if _tree_node.counts == 0: self.tree.detach(_tree_node)
+                                if __tree_node.counts == 0: self.tree.detach(__tree_node)
+
+                            idx = np.argmax(erv_deltas)
+                            idx = ids[idx]
+
+                    Aw = Aws[circuit_hash][idx]
+                    Aw_p_max = Aws_at_p_max[circuit_hash][idx]
+                    w_vec = w_vecs[circuit_hash][idx]
+                    chi *= Aw_p_max
+
+                    faults = Depolar.faults_from_weights(partitions[circuit_hash], w_vec)
+                    fault_circuit = Depolar.gen_circuit(len(circuit), faults)
+                    msmt = sim.run(circuit, fault_circuit)
+
+                    tree_node = self.tree.add(name=w_vec, node_cls=Constant, parent=tree_node, data={'Aw': Aw, 'Aw_p_max': Aw_p_max},
+                                              deterministic=True if circuit._ff_deterministic and not any(w_vec) else False)
+
+                tree_node.counts += 1
                 node = p_it.send(msmt if msmt==None else int(msmt,2)) # exchange with iterator
 
-                if node == 'EXIT':
-                    counts.set(hist + ["EXIT", "N"], 1, increment=True)
-                    break
-                elif node == None:
-                    if not counts.get(hist + ["EXIT", "N"]):
-                        counts.set(hist + ["EXIT", "N"], 0)
-                    break
-        return counts
+                if node == None: name, node_cls = "NO FAIL", NoFail
+                elif node == 'FAIL': name, node_cls = node, Fail
+                else: name, node_cls = node, Variable
+                tree_node = self.tree.add(name=name, node_cls=node_cls, parent=tree_node)
+                tree_node.counts += 1
+
+
+            if p_L > 0 and (np.sqrt(v_L) + delta) / p_L < RSE_target:
+                print(f'RSE target of {RSE_target} reached.')
+                break
+
+        v_L = self.tree.var(ckey='Aw')
+        p_L_low = self.tree.rate(ckey='Aw')
+        p_L_low = np.zeros_like(v_L) if type(p_L_low) == int else p_L_low # if all paths fault free: return array of 0s
+        p_L_up = p_L_low + self.tree.delta(ckey='Aw')
+
+        return p_L_low, p_L_up, np.sqrt(v_L)
+
+    def __str__(self):
+        return self.tree.__str__()

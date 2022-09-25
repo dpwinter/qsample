@@ -30,7 +30,13 @@ index = {"comb": "00_math.ipynb",
          "Sampler": "05b_samplers.protocol_samplers.ipynb",
          "SubsetSampler": "05b_samplers.protocol_samplers.ipynb",
          "calc_w_max": "05a_samplers.circuit_samplers.ipynb",
-         "SubsetAnalytics": "05c_samplers.sampler_mixins.ipynb"}
+         "SubsetAnalytics": "05c_samplers.sampler_mixins.ipynb",
+         "CountNode": "05d_samplers.datatypes.ipynb",
+         "Variable": "05d_samplers.datatypes.ipynb",
+         "Fail": "05d_samplers.datatypes.ipynb",
+         "NoFail": "05d_samplers.datatypes.ipynb",
+         "Constant": "05d_samplers.datatypes.ipynb",
+         "Tree": "05d_samplers.datatypes.ipynb"}
 
 modules = ["math.py",
            "circuit.py",
@@ -40,7 +46,8 @@ modules = ["math.py",
            "fault_generators.py",
            "samplers/circuit_samplers.py",
            "samplers/protocol_samplers.py",
-           "samplers/sampler_mixins.py"]
+           "samplers/sampler_mixins.py",
+           "samplers/datatypes.py"]
 
 doc_url = "https://dpwinter.github.io/qsam/"
 

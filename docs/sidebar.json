@@ -9,6 +9,8 @@
     "Fault generators": "fault_generators.html",
     "Circuit Samplers": "samplers.circuit_samplers.html",
     "Protocol Samplers": "samplers.protocol_samplers.html",
-    "Sampler Mixins": "samplers.sampler_mixins.html"
+    "Sampler Mixins": "samplers.sampler_mixins.html",
+    "Datatypes": "samplers.datatypes.html",
+    "Title": "examples.html"
   }
 }

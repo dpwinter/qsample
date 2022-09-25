@@ -60,8 +60,12 @@ def draw_protocol(protocol, save_path=None, figsize=(6,4), layout=nx.kamada_kawa
     nudge = lambda pos, x_shift, y_shift: {n:(x + x_shift, y + y_shift) for n,(x,y) in pos.items()}
     n_pos = nudge(pos, *self_loop_offset) # offset labels for self-loops
 
-    col_val_map = {'START': '#99ccff', 'EXIT': '#ff9999'}
-    if color: col_vals = [col_val_map.get(node, '#ffb266') for node in protocol.nodes]
+    if color:
+        col_vals = []
+        for node in protocol.nodes:
+            if not protocol.in_edges(node): col_vals.append('#99ccff')
+            elif not protocol.out_edges(node): col_vals.append('#ff9999')
+            else: col_vals.append('#ffb266')
     else: col_vals = 'white'
 
     node_sizes = max([len(node_str)**2 * 100 for node_str in pos.keys()])

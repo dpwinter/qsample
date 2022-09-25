@@ -36,6 +36,12 @@ entries:
     - output: web,pdf
       title: Sampler Mixins
       url: samplers.sampler_mixins.html
+    - output: web,pdf
+      title: Datatypes
+      url: samplers.datatypes.html
+    - output: web,pdf
+      title: Title
+      url: examples.html
     output: web
     title: qsam
   output: web
