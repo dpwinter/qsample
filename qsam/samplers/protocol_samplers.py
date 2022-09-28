@@ -71,11 +71,12 @@ class Sampler:
                         if _node == 'COR': print(f"Node {_node}, Circuit {circuit} -> {node}")
                         else: print(f"Node {_node}, Faults {pauli_faults}, Measured {msmt}-> {node}")
 
-                if j > 1:
-                    p_L_j = fail_cnts[i] / j
-                    if p_L_j != 0 and np.sqrt( var(p_L_j, j) )/ p_L_j < RSE_target:
-                        print(f'RSE target of {RSE_target} reached.')
-                        break
+                # if j > 1:
+                #     p_L_j = fail_cnts[i] / j
+                #     # print(fail_cnts[i], j)
+                #     if p_L_j != 0 and np.sqrt( var(p_L_j, j) )/ p_L_j < RSE_target:
+                #         # print(f'RSE target of {RSE_target} reached.')
+                #         break
 
         p_L = fail_cnts / n_samples
         std = np.sqrt( var(p_L, n_samples) )
@@ -86,11 +87,11 @@ class Sampler:
 class SubsetSampler(SubsetAnalytics):
     """Subset Sampler of quantum protocols"""
 
-    def __init__(self, protocol, simulator):
+    def __init__(self, protocol, simulator, tree=None):
         self.protocol = protocol
         self.simulator = simulator
         self.n_qubits = len(set(q for c in protocol._circuits.values() for q in unpack(c)))
-        self.tree = Tree()
+        self.tree = tree if tree else Tree()
 
     def run(self, n_samples, sample_range, err_params, chi_min=1e-2, p_max=0.1, RSE_target=1e-1, ERV_sel=True, var=math.Wilson_var, eval_fns={}):
 
@@ -192,9 +193,9 @@ class SubsetSampler(SubsetAnalytics):
                 tree_node.counts += 1
 
 
-            if p_L > 0 and (np.sqrt(v_L) + delta) / p_L < RSE_target:
-                print(f'RSE target of {RSE_target} reached.')
-                break
+#             if p_L > 0 and (np.sqrt(v_L) + delta) / p_L < RSE_target:
+#                 print(f'RSE target of {RSE_target} reached.')
+#                 break
 
         v_L = self.tree.var(ckey='Aw')
         p_L_low = self.tree.rate(ckey='Aw')

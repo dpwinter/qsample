@@ -33,8 +33,7 @@ ghz1.add_nodes_from(['ghz1'], circuits=ghz)
 
 ghz1.add_edge('START', 'ghz1', check='True')
 ghz1.add_edge('ghz1', 'ghz1', check='ghz1[-1]==1')
-# ghz1.add_edge('ghz1', 'meas', check='ghz1[-1]==0')
-ghz1.add_edge('ghz1', 'EXIT', check='ghz1[-1]==1')
+ghz1.add_edge('ghz1', 'FAIL', check='ghz1[-1]==0')
 
 draw_protocol(ghz1, figsize=(8,6), self_loop_offset=(0.07, 0.11))
 ```
@@ -54,12 +53,26 @@ err_params = {'p1': 1, 'p2': 0.5}
 
 ```python
 #slow
-from qsam.samplers import Sampler
-from qsam.simulators.chp import CHP
+from qsam.samplers.protocol_samplers import Sampler
+from qsam.simulators.chp import ChpSimulator
 
-sam = Sampler(ghz3, CHP)
+sam = Sampler(ghz1, ChpSimulator)
 p_L, std = sam.run(1000, sample_range, err_params)
 ```
+
+      0%|                                                                       | 0/1000 [00:00<?, ?it/s]/home/dw/Desktop/HiWi/qsam/qsam/samplers/protocol_samplers.py:76: RuntimeWarning: invalid value encountered in sqrt
+      if p_L_j != 0 and np.sqrt( var(p_L_j, j) )/ p_L_j < RSE_target:
+    100%|██████████████████████████████████████████████████████████| 1000/1000 [00:00<00:00, 3703.89it/s]
+    100%|██████████████████████████████████████████████████████████| 1000/1000 [00:00<00:00, 3730.93it/s]
+    100%|██████████████████████████████████████████████████████████| 1000/1000 [00:00<00:00, 3674.43it/s]
+    100%|██████████████████████████████████████████████████████████| 1000/1000 [00:00<00:00, 3446.17it/s]
+    100%|██████████████████████████████████████████████████████████| 1000/1000 [00:00<00:00, 3458.21it/s]
+    100%|██████████████████████████████████████████████████████████| 1000/1000 [00:00<00:00, 3342.92it/s]
+    100%|██████████████████████████████████████████████████████████| 1000/1000 [00:00<00:00, 2924.71it/s]
+    100%|██████████████████████████████████████████████████████████| 1000/1000 [00:00<00:00, 2252.80it/s]
+    100%|██████████████████████████████████████████████████████████| 1000/1000 [00:00<00:00, 1461.73it/s]
+    100%|██████████████████████████████████████████████████████████| 1000/1000 [00:00<00:00, 1103.31it/s]
+
 
 
     
