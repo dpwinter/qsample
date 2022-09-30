@@ -32,11 +32,7 @@ index = {"comb": "00_math.ipynb",
          "calc_w_max": "05a_samplers.circuit_samplers.ipynb",
          "SubsetAnalytics": "05c_samplers.sampler_mixins.ipynb",
          "CountNode": "05d_samplers.datatypes.ipynb",
-         "Variable": "05d_samplers.datatypes.ipynb",
-         "Fail": "05d_samplers.datatypes.ipynb",
-         "NoFail": "05d_samplers.datatypes.ipynb",
-         "Constant": "05d_samplers.datatypes.ipynb",
-         "Tree": "05d_samplers.datatypes.ipynb"}
+         "SampleTree": "05d_samplers.datatypes.ipynb"}
 
 modules = ["math.py",
            "circuit.py",
