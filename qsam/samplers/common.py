@@ -2,9 +2,9 @@
 
 __all__ = ['ONE_QUBIT_GATES', 'TWO_QUBIT_GATES', 'GATE_GROUPS', 'CountNode', 'SampleTree', 'curried', 'stats', 'store',
            'rel_std_target', 'plot_stats', 'verbose', 'plot_stored_stats', 'subset_rates', 'plot_subset_rates',
-           'path_prods', 'plot_paths', 'plot_path_hist', 'plot_save_tree', 'circuit_partitions',
-           'circuit_weight_vectors', 'circuit_subset_occurence', 'protocol_partitions', 'protocol_weight_vectors',
-           'protocol_subset_occurence', 'w_plus1_filter', 'random_sel', 'ERV_sel']
+           'path_stats', 'plot_path_stats', 'plot_save_tree', 'circuit_partitions', 'circuit_weight_vectors',
+           'circuit_subset_occurence', 'protocol_partitions', 'protocol_weight_vectors', 'protocol_subset_occurence',
+           'w_plus1_filter', 'random_sel', 'ERV_sel']
 
 # Cell
 import qsam.math as math
@@ -163,6 +163,7 @@ def curried(func):
     return _curried
 
 # Cell
+@curried
 def stats(**kwargs):
     sampler = kwargs['sampler']
     return sampler.stats(**kwargs)
@@ -195,8 +196,8 @@ def plot_stats(sample_range, **kwargs):
     p_L_up = p_L_low + delta
 
     import matplotlib.pyplot as plt
-    if 'ax' not in kwargs: fig,ax = plt.subplots(figsize=(6,4))
-    else: ax = kwargs['ax']
+
+    fig,ax = plt.subplots(figsize=(6,4))
 
     if np.array_equal(p_L_up, p_L_low):
         ax.errorbar(sample_range, p_L_low, fmt='--', c="black", yerr=std, label="Direct MC")
@@ -220,7 +221,7 @@ def verbose(msmt, _node, node, circuit, faults=None, fault_circuit=None, **kwarg
 
 # Cell
 @curried
-def plot_stored_stats(plot_delta=False, labels=['$p_L\pm std$', 'std', '$\delta$'], **kwargs):
+def plot_stored_stats(n_splits=1, plot_delta=False, labels=['$p_L\pm std$', 'std', '$\delta$'], **kwargs):
     sampler = kwargs['sampler']
     assert 'stats' in sampler.store, f'Sampler {sampler} has no stored stats.'
     stored_stats = np.array(sampler.store['stats'])
@@ -228,34 +229,47 @@ def plot_stored_stats(plot_delta=False, labels=['$p_L\pm std$', 'std', '$\delta$
 
     import matplotlib.pyplot as plt
     p_L, std, delta = stored_stats.T
-    x = range(len(p_L))
-    delta_0 = np.all(delta == 0)
-    if delta_0: n_plots = 2
-    else: n_plots = 3
+    p_L = np.split(p_L, n_splits)
+    std = np.split(std, n_splits)
+    delta = np.split(delta, n_splits)
+    x = range(len(p_L[0]))
 
-    fig, ax = plt.subplots(1, n_plots, figsize=(20, 4))
+    delta_0 = np.all([d==0 for d in delta])
+    if delta_0: n_cols = 2
+    else: n_cols = 3
 
-    ax[0].plot(x, p_L)
-    if plot_delta: ax[0].fill_between(x, p_L - (std + delta), p_L + (std + delta), alpha=0.2)
-    else: ax[0].fill_between(x, p_L - std, p_L + std, alpha=0.2)
-    ax[1].plot(x, std)
-    if not delta_0:
-        ax[2].plot(x, delta)
-        ax[2].set_yscale('log')
+    fig, ax = plt.subplots(n_splits, n_cols, figsize=(5*n_cols, 5*n_splits))
+    if len(ax.shape) == 1: ax = ax[np.newaxis,:]
 
-    for i in range(n_plots):
-        ax[i].set_xlabel('# of samples')
-        ax[i].set_ylabel(labels[i])
+    for i in range(n_splits):
+        ax[i, 0].plot(x, p_L[i])
+        if plot_delta:
+            ax[i, 0].fill_between(x, p_L[i] - std[i], p_L[i] + delta[i] + std[i], alpha=0.2)
+        else:
+            ax[i, 0].fill_between(x, p_L[i] - std[i], p_L[i] + std[i], alpha=0.2)
+        ax[i, 1].plot(x, std[i])
+
+        if not delta_0:
+            ax[i, 2].plot(x, delta[i])
+            ax[i, 2].set_yscale('log')
+
+        for j in range(n_cols):
+            ax[i, j].set_xlabel('# of samples')
+            ax[i, j].set_ylabel(labels[j])
+
     return fig,ax
 
 # Cell
-def subset_rates(**kwargs):
+@curried
+def subset_rates(fail_only=True, **kwargs):
     sampler = kwargs['sampler']
     path_rates = []
     fail_rates = []
     path_names = []
     for leaf in sampler.tree.root.leaves:
-        if not leaf.is_root and leaf.is_fail:
+        if not leaf.is_root:
+            # if no_fails == False and leaf.is_fail == False: continue ## FIX
+            if fail_only and not leaf.is_fail: continue
             path_str = ":".join([f'{n.name}' for n in leaf.path])
             path_names.append(path_str)
             fail_rates.append(leaf.rate)
@@ -271,8 +285,7 @@ def plot_subset_rates(**kwargs):
     sampler = kwargs['sampler']
     assert 'subset_rates' in sampler.store, f'Sampler {sampler} has no stored subset rates.'
 
-    names, path_rates, fail_rates = np.array(sampler.store['subset_rates'], dtype=object).T
-
+    paths, path_rates, fail_rates = np.array(sampler.store['subset_rates'], dtype=object).T
 
     def fill_na(arr):
         max_len = np.max([len(sub_arr) for sub_arr in arr])
@@ -281,99 +294,87 @@ def plot_subset_rates(**kwargs):
     path_rates = fill_na(path_rates)
     fail_rates = fill_na(fail_rates)
 
-    legend_labels = names[-1]
+    legend_labels = paths[-1]
     n_samples = fail_rates.shape[0]
 
     import matplotlib.pyplot as plt
+    from matplotlib import cm
+
+    n_paths = len(legend_labels)
+    cols = [cm.jet(x) for x in np.linspace(0.0, 1.0, n_paths)]
     fig, ax = plt.subplots(1, 2, figsize=(15, 5))
+    names = ['(last) $p_{fail}$', '$\prod_P A_w p_P$ (path product)']
     for i, rates in enumerate([fail_rates, path_rates]):
         ax[i].plot(range(n_samples), rates)
+        for j,line in enumerate(ax[i].lines):
+            line.set_color(cols[j])
+
         ax[i].set_xlim([0, n_samples])
+        ax[i].set_xlabel('# of samples')
+        ax[i].set_ylabel(names[i])
     ax[1].legend(legend_labels, bbox_to_anchor=(1.04, 1), loc='upper left')
     return fig, ax
 
 # Cell
-def path_prods(**kwargs):
+def path_stats(**kwargs):
     sampler = kwargs['sampler']
-    paths, path_fails, prodAws, prodAwPws_m1, prodAwPws = [], [], [], [], []
+    data = {'str':[], 'Aw':[], 'pAw':[], 'pAw-1':[], 'leaf_cnts':[], 'is_f':[]}
     for leaf in sampler.tree.root.leaves:
         if not leaf.is_root:
             prod = 1
             for n in leaf.path[1:]:
                 if n.ckey: prod *= sampler.Aws_pmax[n.ckey[0]][n.ckey[1]]
-            prodAws.append(prod)
+            data['Aw'].append(prod)
 
             for n in leaf.path[1:-1]:
                 if not n.ckey: prod *= n.rate
-            prodAwPws_m1.append(prod)
+            data['pAw-1'].append(prod)
 
             prod *= leaf.rate if leaf.is_fail else 0
-            prodAwPws.append(prod)
+            data['pAw'].append(prod)
 
             path_str = ":".join([f'{n.name}' for n in leaf.path])
-            paths.append( path_str + f" ({leaf.counts}/{sampler.tree.root.counts})" )
-            path_fails.append(leaf.is_fail)
-
-    return paths, path_fails, prodAws, prodAwPws, prodAwPws_m1
+            data['str'].append(path_str)
+            data['leaf_cnts'].append(leaf.counts)
+            data['is_f'].append(leaf.is_fail)
+    return data
 
 # Cell
-def plot_paths(**kwargs):
-    assert 'path_prods' in kwargs, f'`path_prods` not in `kwargs` {kwargs}'
-    path_prods = kwargs['path_prods']
+def plot_path_stats(**kwargs):
+    assert 'path_stats' in kwargs, f'`path_stats` not in `kwargs` {kwargs}'
+    data = kwargs['path_stats']
+
+    paths, Aw, pAw, pAw_1, cnts, is_f = data.values()
+    sorted_ids = np.argsort(Aw)[::-1]
+    paths = np.array(paths)[sorted_ids]
+    is_f = np.array(is_f)[sorted_ids]
+    Aw = np.array(Aw)[sorted_ids]
+    pAw = np.array(pAw)[sorted_ids]
+    pAw_1 = np.array(pAw_1)[sorted_ids]
+    cnts = np.array(cnts)[sorted_ids]
+    f_cnts = cnts.copy()
+    f_cnts[~is_f] = 0
 
     import matplotlib.pyplot as plt
 
-    paths, path_fails, prodAws, prodAwPws, prodAwPws_m1 = path_prods
-    sorted_ids = np.argsort(prodAws)[::-1]
-    paths = np.array(paths)[sorted_ids]
-    path_fails = np.array(path_fails)[sorted_ids]
-    prodAws = np.array(prodAws)[sorted_ids]
-    prodAwPws = np.array(prodAwPws)[sorted_ids]
-    prodAwPws_m1 = np.array(prodAwPws_m1)[sorted_ids]
+    fig,ax = plt.subplots(2,1, figsize=(20,6), sharex=True)
+    ax[0].bar(paths, Aw, label='$\prod_{n\in P} A_w$')
+    ax[0].bar(paths, pAw_1, label='$\prod_{n-1\in P} A_{w} p_n$')
+    ax[0].bar(paths, pAw, label='$\prod_{n\in P} A_{w} p_n$')
+    ax[0].set_yscale('log')
 
-    fig,ax = plt.subplots(figsize=(20,4))
-    ax.bar(paths, prodAws, label='$\prod_{n\in P} A_w$')
-    ax.bar(paths, prodAwPws_m1, label='$\prod_{n-1\in P} A_{w} p_n$')
-    ax.bar(paths, prodAwPws, label='$\prod_{n\in P} A_{w} p_n$')
-    ax.set_yscale('log')
-    plt.setp(ax.get_xticklabels(), ha="right", rotation=45)
+    ax[1].bar(paths, cnts, label="Path count")
+    ax[1].bar(paths, f_cnts, label="Fail count")
+    ax[1].set_yscale('log')
 
-    xticklabels = ax.get_xticklabels()
-    for i, (path, is_fail) in enumerate(zip(paths,path_fails)):
+    xticklabels = ax[1].get_xticklabels()
+    plt.setp(xticklabels, ha="right", rotation=45)
+    for i, (path, is_fail) in enumerate(zip(paths,is_f)):
         if is_fail: plt.setp(xticklabels[i], weight='bold')
 
-    ax.legend()
+    ax[0].legend(loc='upper right')
+    ax[1].legend(loc='upper right')
     return fig, ax
-
-# Cell
-def plot_path_hist(**kwargs):
-    sampler = kwargs['sampler']
-
-    path_cnts = {}
-    for leaf in sampler.tree.root.leaves:
-        if not leaf.is_root:
-            path_str = ":".join([f'{n.name}' for n in leaf.path[:-1]])
-            if path_str in path_cnts.keys():
-                cnts, fails = path_cnts[path_str]
-                path_cnts[path_str] = (cnts, fails + (leaf.counts if leaf.is_fail else 0))
-            else:
-                path_cnts[path_str] = (leaf.parent.counts, (leaf.counts if leaf.is_fail else 0))
-
-    paths = list(path_cnts.keys())
-    cnts, f_cnts = np.array(list(path_cnts.values())).T
-    sorted_ids = np.argsort(cnts)[::-1]
-    paths = np.array(paths)[sorted_ids]
-    cnts = cnts[sorted_ids]
-    f_cnts = f_cnts[sorted_ids]
-
-    import matplotlib.pyplot as plt
-    fig,ax = plt.subplots(figsize=(20,4))
-    ax.bar(paths, cnts, label="Path count")
-    ax.bar(paths, f_cnts, label="Fail count")
-    ax.set_yscale('log')
-    plt.setp(ax.get_xticklabels(), ha="right", rotation=45)
-    ax.legend()
-    return ax, fig
 
 # Cell
 @curried
