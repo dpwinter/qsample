@@ -34,11 +34,8 @@ entries:
       title: Protocol Samplers
       url: samplers.protocol_samplers.html
     - output: web,pdf
-      title: Sampler Mixins
-      url: samplers.sampler_mixins.html
-    - output: web,pdf
-      title: Datatypes
-      url: samplers.datatypes.html
+      title: Samplers Common
+      url: samplers.common.html
     - output: web,pdf
       title: Examples
       url: examples.html

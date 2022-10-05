@@ -13,7 +13,7 @@ class Circuit(MutableSequence):
     def __init__(self, ticks=None, noisy=True, ff_det=False):
         self._ticks = ticks if ticks else []
         self._noisy = noisy
-        self._ff_deterministic = ff_det # fault-free determined successor-path have 0 variance.
+        self._ff_deterministic = ff_det # fault-free deterministic
 
     def __getitem__(self, tick_index):
         return self._ticks[tick_index]
