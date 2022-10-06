@@ -8,6 +8,7 @@ from ..circuit import partition, make_hash, unpack
 from ..fault_generators import Depolar
 from ..protocol import iterate
 from .common import *
+import qsam.samplers.callbacks as cb
 
 import numpy as np
 from tqdm.notebook import tqdm
@@ -27,10 +28,9 @@ class Sampler:
         self.p_phys = [s * np.array(list(err_params.values())) for s in sample_range]
         self.fail_cnts = np.zeros(len(sample_range))
         self.cnts = np.zeros(len(sample_range))
-        self.store = {}
         self.is_setup = True
 
-    def stats(self, p_idx=None, var_fn=math.Wilson_var, **kwargs):
+    def stats(self, p_idx=None, var_fn=math.Wilson_var):
         if p_idx == None:
             rate = self.fail_cnts / self.cnts
             var = var_fn(rate, self.cnts)
@@ -40,12 +40,21 @@ class Sampler:
 
         return rate, np.sqrt(var), 0.0
 
-    def run(self, n_samples, after_cbs=[], inner_cbs=[], outer_cbs=[]):
+    # def run(self, n_samples, after_cbs=[], inner_cbs=[], outer_cbs=[]):
+    def run(self, n_samples, callbacks):
         assert self.is_setup, 'Sampler not setup. Call setup(..) before run(..).'
-        outputs = {}
+
+        if not isinstance(callbacks, cb.CallbackList):
+            callbacks = cb.CallbackList(sampler=self, callbacks=callbacks)
+        callbacks.on_sampler_begin()
 
         for i, p_phy in enumerate(tqdm(self.p_phys, desc='Total')):
+            self.stop_sampling = False
+            self.p_idx = i
+
             for _ in tqdm(range(n_samples), desc=f'p_phy={",".join(list(f"{p:.2E}" for p in p_phy))}', leave=True):
+
+                callbacks.on_protocol_begin()
 
                 sim = self.simulator(self.n_qubits)
                 p_it = iterate(self.protocol)
@@ -53,6 +62,8 @@ class Sampler:
                 self.cnts[i] += 1
 
                 while node:
+
+                    callbacks.on_circuit_begin()
 
                     if not self.protocol.out_edges(node):
                         self.fail_cnts[i] += 1
@@ -69,16 +80,13 @@ class Sampler:
                     _node = node
                     node = p_it.send(msmt)
 
-                    for cb in inner_cbs: # inner
-                        outputs[cb.__name__] = cb(**locals(), run=True)
+                    callbacks.on_circuit_end(locals())
 
-                for cb in outer_cbs: # outer
-                    outputs[cb.__name__] = cb(sampler=self, p_idx=i, run=True, **outputs)
-                if StopIteration in outputs.values(): break
+                callbacks.on_protocol_end()
+                if self.stop_sampling: break
 
-        for cb in after_cbs: # after
-            outputs[cb.__name__] = cb(sampler=self, run=True, **outputs)
-        return outputs
+        callbacks.on_sampler_end()
+
 
 # Cell
 
@@ -99,7 +107,6 @@ class SubsetSampler:
         self.partitions = protocol_partitions(self.protocol._circuits, err_params.keys())
         self.w_vecs = protocol_weight_vectors(self.partitions)
         self.Aws_pmax = protocol_subset_occurence(self.partitions, self.w_vecs, p_max)
-        self.store = dict()
         self.set_range(sample_range)
         self.is_setup = True
 
@@ -117,17 +124,28 @@ class SubsetSampler:
         delta = self.tree.delta(Aws)
         return p_L, np.sqrt(v_L), delta
 
-    def run(self, n_samples, inner_cbs=[], outer_cbs=[], after_cbs=[], ss_filter_fn=w_plus1_filter, ss_sel_fn=ERV_sel):
+    def run(self, n_samples, callbacks, ss_filter_fn=w_plus1_filter, ss_sel_fn=ERV_sel):
         assert self.is_setup, 'Sampler not setup. Call setup(..) before run(..).'
-        outputs = {}
+
+        if not isinstance(callbacks, cb.CallbackList):
+            callbacks = cb.CallbackList(sampler=self, callbacks=callbacks)
+
+        self.stop_sampling = False
+        callbacks.on_sampler_begin()
 
         for i in tqdm(range(n_samples), desc='Total'):
+
+            callbacks.on_protocol_begin()
+
             sim = self.simulator(self.n_qubits)
             p_it = iterate(self.protocol)
             node = next(p_it)
             tree_node = None
 
             while True:
+
+                callbacks.on_circuit_begin()
+
                 tree_node = self.tree.update(name=node, parent=tree_node)
                 if node == None: break
                 elif not self.protocol.out_edges(node): tree_node.is_fail = True; break
@@ -149,14 +167,9 @@ class SubsetSampler:
 
                 _node = node
                 node = p_it.send(msmt)
+                callbacks.on_circuit_end(locals())
 
-                for cb in inner_cbs: # inner
-                    outputs[cb.__name__] = cb(sampler=self, run=True, **locals())
+            callbacks.on_protocol_end()
+            if self.stop_sampling: break
 
-            for cb in outer_cbs: # outer
-                outputs[cb.__name__] = cb(sampler=self, run=True, **outputs)
-            if StopIteration in outputs.values(): break
-
-        for cb in after_cbs: # after
-            outputs[cb.__name__] = cb(sampler=self, run=True, **outputs)
-        return outputs
+        callbacks.on_sampler_end()

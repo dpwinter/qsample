@@ -37,8 +37,14 @@ entries:
       title: Samplers Common
       url: samplers.common.html
     - output: web,pdf
+      title: Sampler Callbacks
+      url: samplers.callbacks.html
+    - output: web,pdf
       title: Examples
       url: examples.html
+    - output: web,pdf
+      title: qsam - quantum protocol sampling
+      url: readme_draft.html
     output: web
     title: qsam
   output: web

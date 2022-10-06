@@ -1,0 +1,332 @@
+{
+  "name": "ghz",
+  "ckey": null,
+  "counts": 600,
+  "is_deterministic": false,
+  "is_fail": false,
+  "children": [
+    {
+      "name": [
+        0
+      ],
+      "ckey": [
+        8770782393360,
+        "0"
+      ],
+      "counts": 2,
+      "is_deterministic": true,
+      "is_fail": false,
+      "children": [
+        {
+          "name": null,
+          "ckey": null,
+          "counts": 2,
+          "is_deterministic": false,
+          "is_fail": false
+        }
+      ]
+    },
+    {
+      "name": [
+        1
+      ],
+      "ckey": [
+        8770782393360,
+        "1"
+      ],
+      "counts": 583,
+      "is_deterministic": false,
+      "is_fail": false,
+      "children": [
+        {
+          "name": null,
+          "ckey": null,
+          "counts": 335,
+          "is_deterministic": false,
+          "is_fail": false
+        },
+        {
+          "name": "ghz",
+          "ckey": null,
+          "counts": 248,
+          "is_deterministic": false,
+          "is_fail": false,
+          "children": [
+            {
+              "name": [
+                0
+              ],
+              "ckey": [
+                8770782393360,
+                "0"
+              ],
+              "counts": 2,
+              "is_deterministic": true,
+              "is_fail": false,
+              "children": [
+                {
+                  "name": null,
+                  "ckey": null,
+                  "counts": 2,
+                  "is_deterministic": false,
+                  "is_fail": false
+                }
+              ]
+            },
+            {
+              "name": [
+                1
+              ],
+              "ckey": [
+                8770782393360,
+                "1"
+              ],
+              "counts": 239,
+              "is_deterministic": false,
+              "is_fail": false,
+              "children": [
+                {
+                  "name": null,
+                  "ckey": null,
+                  "counts": 133,
+                  "is_deterministic": false,
+                  "is_fail": false
+                },
+                {
+                  "name": "FAIL",
+                  "ckey": null,
+                  "counts": 106,
+                  "is_deterministic": false,
+                  "is_fail": true
+                }
+              ]
+            },
+            {
+              "name": [
+                2
+              ],
+              "ckey": [
+                8770782393360,
+                "2"
+              ],
+              "counts": 3,
+              "is_deterministic": false,
+              "is_fail": false,
+              "children": [
+                {
+                  "name": null,
+                  "ckey": null,
+                  "counts": 1,
+                  "is_deterministic": false,
+                  "is_fail": false
+                },
+                {
+                  "name": "FAIL",
+                  "ckey": null,
+                  "counts": 2,
+                  "is_deterministic": false,
+                  "is_fail": true
+                }
+              ]
+            },
+            {
+              "name": [
+                3
+              ],
+              "ckey": [
+                8770782393360,
+                "3"
+              ],
+              "counts": 2,
+              "is_deterministic": false,
+              "is_fail": false,
+              "children": [
+                {
+                  "name": null,
+                  "ckey": null,
+                  "counts": 1,
+                  "is_deterministic": false,
+                  "is_fail": false
+                },
+                {
+                  "name": "FAIL",
+                  "ckey": null,
+                  "counts": 1,
+                  "is_deterministic": false,
+                  "is_fail": true
+                }
+              ]
+            },
+            {
+              "name": [
+                4
+              ],
+              "ckey": [
+                8770782393360,
+                "4"
+              ],
+              "counts": 2,
+              "is_deterministic": false,
+              "is_fail": false,
+              "children": [
+                {
+                  "name": null,
+                  "ckey": null,
+                  "counts": 1,
+                  "is_deterministic": false,
+                  "is_fail": false
+                },
+                {
+                  "name": "FAIL",
+                  "ckey": null,
+                  "counts": 1,
+                  "is_deterministic": false,
+                  "is_fail": true
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": [
+        2
+      ],
+      "ckey": [
+        8770782393360,
+        "2"
+      ],
+      "counts": 11,
+      "is_deterministic": false,
+      "is_fail": false,
+      "children": [
+        {
+          "name": null,
+          "ckey": null,
+          "counts": 9,
+          "is_deterministic": false,
+          "is_fail": false
+        },
+        {
+          "name": "ghz",
+          "ckey": null,
+          "counts": 2,
+          "is_deterministic": false,
+          "is_fail": false,
+          "children": [
+            {
+              "name": [
+                0
+              ],
+              "ckey": [
+                8770782393360,
+                "0"
+              ],
+              "counts": 2,
+              "is_deterministic": true,
+              "is_fail": false,
+              "children": [
+                {
+                  "name": null,
+                  "ckey": null,
+                  "counts": 2,
+                  "is_deterministic": false,
+                  "is_fail": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": [
+        3
+      ],
+      "ckey": [
+        8770782393360,
+        "3"
+      ],
+      "counts": 2,
+      "is_deterministic": false,
+      "is_fail": false,
+      "children": [
+        {
+          "name": "ghz",
+          "ckey": null,
+          "counts": 2,
+          "is_deterministic": false,
+          "is_fail": false,
+          "children": [
+            {
+              "name": [
+                0
+              ],
+              "ckey": [
+                8770782393360,
+                "0"
+              ],
+              "counts": 2,
+              "is_deterministic": true,
+              "is_fail": false,
+              "children": [
+                {
+                  "name": null,
+                  "ckey": null,
+                  "counts": 2,
+                  "is_deterministic": false,
+                  "is_fail": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": [
+        4
+      ],
+      "ckey": [
+        8770782393360,
+        "4"
+      ],
+      "counts": 2,
+      "is_deterministic": false,
+      "is_fail": false,
+      "children": [
+        {
+          "name": "ghz",
+          "ckey": null,
+          "counts": 2,
+          "is_deterministic": false,
+          "is_fail": false,
+          "children": [
+            {
+              "name": [
+                0
+              ],
+              "ckey": [
+                8770782393360,
+                "0"
+              ],
+              "counts": 2,
+              "is_deterministic": true,
+              "is_fail": false,
+              "children": [
+                {
+                  "name": null,
+                  "ckey": null,
+                  "counts": 2,
+                  "is_deterministic": false,
+                  "is_fail": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
