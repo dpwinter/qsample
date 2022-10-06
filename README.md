@@ -192,7 +192,7 @@ The Sampler instance contains a `Tree` structure that we can investigate manuall
 
 ```python
 #slow
-sb_sam.tree.display_tree()
+sb_sam.tree.display()
 ```
 
 

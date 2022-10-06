@@ -136,7 +136,7 @@ class SampleTree:
     def __str__(self):
         return '\n'.join([f'{pre}{node}' for pre, _, node in RenderTree(self.root)])
 
-    def display_tree(self, fname='temp.png'):
+    def display(self, fname='temp.png'):
 
         from anytree.exporter import UniqueDotExporter
         from IPython.display import Image, display ## ! requirements: jupyter, graphviz
