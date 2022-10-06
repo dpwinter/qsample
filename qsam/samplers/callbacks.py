@@ -252,7 +252,7 @@ class StatsPerSample(Callback):
         exclude_delta = True if np.all(delta == 0) else False
         n_cols = 2 if exclude_delta else 3
 
-        fig, ax = plt.subplots(1, n_cols, figsize=(5*n_cols, 5))
+        fig, ax = plt.subplots(1, n_cols, figsize=(8*n_cols, 5))
 
         ax[0].plot(x, p_L)
         ax[0].fill_between(x, p_L - std, p_L + std, alpha=0.2)
