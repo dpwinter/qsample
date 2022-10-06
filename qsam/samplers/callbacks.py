@@ -179,7 +179,8 @@ class PathProducts(Callback):
                 self.data['leaf_cnts'].append(leaf.counts)
                 self.data['is_fail'].append(leaf.is_fail)
         self.plot()
-        if self.log_dir: self.store(self.log_dir, self.data)
+        if self.log_dir:
+            self.store(self.log_dir, self.data)
 
 
     def plot(self):
@@ -194,7 +195,7 @@ class PathProducts(Callback):
         f_cnts = cnts.copy()
         f_cnts[~is_f] = 0
 
-        fig,ax = plt.subplots(2,1, figsize=(20,5), sharex=True)
+        fig,ax = plt.subplots(2,1, figsize=(15,5), sharex=True)
         ax[0].bar(names, Aw, label='$\prod_{n\in P} A_w$')
         ax[0].bar(names, pAw_1, label='$\prod_{n-1\in P} A_{w} p_n$')
         ax[0].bar(names, pAw, label='$\prod_{n\in P} A_{w} p_n$')
