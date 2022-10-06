@@ -1,0 +1,416 @@
+{
+  "name": "ghz",
+  "ckey": null,
+  "counts": 1100,
+  "is_deterministic": false,
+  "is_fail": false,
+  "children": [
+    {
+      "name": [
+        0
+      ],
+      "ckey": [
+        8783573365739,
+        "0"
+      ],
+      "counts": 2,
+      "is_deterministic": true,
+      "is_fail": false,
+      "children": [
+        {
+          "name": null,
+          "ckey": null,
+          "counts": 2,
+          "is_deterministic": false,
+          "is_fail": false
+        }
+      ]
+    },
+    {
+      "name": [
+        1
+      ],
+      "ckey": [
+        8783573365739,
+        "1"
+      ],
+      "counts": 1071,
+      "is_deterministic": false,
+      "is_fail": false,
+      "children": [
+        {
+          "name": "ghz",
+          "ckey": null,
+          "counts": 463,
+          "is_deterministic": false,
+          "is_fail": false,
+          "children": [
+            {
+              "name": [
+                0
+              ],
+              "ckey": [
+                8783573365739,
+                "0"
+              ],
+              "counts": 2,
+              "is_deterministic": true,
+              "is_fail": false,
+              "children": [
+                {
+                  "name": null,
+                  "ckey": null,
+                  "counts": 2,
+                  "is_deterministic": false,
+                  "is_fail": false
+                }
+              ]
+            },
+            {
+              "name": [
+                1
+              ],
+              "ckey": [
+                8783573365739,
+                "1"
+              ],
+              "counts": 451,
+              "is_deterministic": false,
+              "is_fail": false,
+              "children": [
+                {
+                  "name": "FAIL",
+                  "ckey": null,
+                  "counts": 195,
+                  "is_deterministic": false,
+                  "is_fail": true
+                },
+                {
+                  "name": null,
+                  "ckey": null,
+                  "counts": 256,
+                  "is_deterministic": false,
+                  "is_fail": false
+                }
+              ]
+            },
+            {
+              "name": [
+                2
+              ],
+              "ckey": [
+                8783573365739,
+                "2"
+              ],
+              "counts": 8,
+              "is_deterministic": false,
+              "is_fail": false,
+              "children": [
+                {
+                  "name": "FAIL",
+                  "ckey": null,
+                  "counts": 6,
+                  "is_deterministic": false,
+                  "is_fail": true
+                },
+                {
+                  "name": null,
+                  "ckey": null,
+                  "counts": 2,
+                  "is_deterministic": false,
+                  "is_fail": false
+                }
+              ]
+            },
+            {
+              "name": [
+                3
+              ],
+              "ckey": [
+                8783573365739,
+                "3"
+              ],
+              "counts": 1,
+              "is_deterministic": false,
+              "is_fail": false,
+              "children": [
+                {
+                  "name": "FAIL",
+                  "ckey": null,
+                  "counts": 1,
+                  "is_deterministic": false,
+                  "is_fail": true
+                }
+              ]
+            },
+            {
+              "name": [
+                4
+              ],
+              "ckey": [
+                8783573365739,
+                "4"
+              ],
+              "counts": 1,
+              "is_deterministic": false,
+              "is_fail": false,
+              "children": [
+                {
+                  "name": "FAIL",
+                  "ckey": null,
+                  "counts": 1,
+                  "is_deterministic": false,
+                  "is_fail": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": null,
+          "ckey": null,
+          "counts": 608,
+          "is_deterministic": false,
+          "is_fail": false
+        }
+      ]
+    },
+    {
+      "name": [
+        2
+      ],
+      "ckey": [
+        8783573365739,
+        "2"
+      ],
+      "counts": 23,
+      "is_deterministic": false,
+      "is_fail": false,
+      "children": [
+        {
+          "name": "ghz",
+          "ckey": null,
+          "counts": 13,
+          "is_deterministic": false,
+          "is_fail": false,
+          "children": [
+            {
+              "name": [
+                0
+              ],
+              "ckey": [
+                8783573365739,
+                "0"
+              ],
+              "counts": 2,
+              "is_deterministic": true,
+              "is_fail": false,
+              "children": [
+                {
+                  "name": null,
+                  "ckey": null,
+                  "counts": 2,
+                  "is_deterministic": false,
+                  "is_fail": false
+                }
+              ]
+            },
+            {
+              "name": [
+                1
+              ],
+              "ckey": [
+                8783573365739,
+                "1"
+              ],
+              "counts": 7,
+              "is_deterministic": false,
+              "is_fail": false,
+              "children": [
+                {
+                  "name": "FAIL",
+                  "ckey": null,
+                  "counts": 3,
+                  "is_deterministic": false,
+                  "is_fail": true
+                },
+                {
+                  "name": null,
+                  "ckey": null,
+                  "counts": 4,
+                  "is_deterministic": false,
+                  "is_fail": false
+                }
+              ]
+            },
+            {
+              "name": [
+                2
+              ],
+              "ckey": [
+                8783573365739,
+                "2"
+              ],
+              "counts": 1,
+              "is_deterministic": false,
+              "is_fail": false,
+              "children": [
+                {
+                  "name": "FAIL",
+                  "ckey": null,
+                  "counts": 1,
+                  "is_deterministic": false,
+                  "is_fail": true
+                }
+              ]
+            },
+            {
+              "name": [
+                3
+              ],
+              "ckey": [
+                8783573365739,
+                "3"
+              ],
+              "counts": 1,
+              "is_deterministic": false,
+              "is_fail": false,
+              "children": [
+                {
+                  "name": "FAIL",
+                  "ckey": null,
+                  "counts": 1,
+                  "is_deterministic": false,
+                  "is_fail": true
+                }
+              ]
+            },
+            {
+              "name": [
+                4
+              ],
+              "ckey": [
+                8783573365739,
+                "4"
+              ],
+              "counts": 2,
+              "is_deterministic": false,
+              "is_fail": false,
+              "children": [
+                {
+                  "name": null,
+                  "ckey": null,
+                  "counts": 1,
+                  "is_deterministic": false,
+                  "is_fail": false
+                },
+                {
+                  "name": "FAIL",
+                  "ckey": null,
+                  "counts": 1,
+                  "is_deterministic": false,
+                  "is_fail": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": null,
+          "ckey": null,
+          "counts": 10,
+          "is_deterministic": false,
+          "is_fail": false
+        }
+      ]
+    },
+    {
+      "name": [
+        3
+      ],
+      "ckey": [
+        8783573365739,
+        "3"
+      ],
+      "counts": 2,
+      "is_deterministic": false,
+      "is_fail": false,
+      "children": [
+        {
+          "name": "ghz",
+          "ckey": null,
+          "counts": 2,
+          "is_deterministic": false,
+          "is_fail": false,
+          "children": [
+            {
+              "name": [
+                0
+              ],
+              "ckey": [
+                8783573365739,
+                "0"
+              ],
+              "counts": 2,
+              "is_deterministic": true,
+              "is_fail": false,
+              "children": [
+                {
+                  "name": null,
+                  "ckey": null,
+                  "counts": 2,
+                  "is_deterministic": false,
+                  "is_fail": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": [
+        4
+      ],
+      "ckey": [
+        8783573365739,
+        "4"
+      ],
+      "counts": 2,
+      "is_deterministic": false,
+      "is_fail": false,
+      "children": [
+        {
+          "name": "ghz",
+          "ckey": null,
+          "counts": 2,
+          "is_deterministic": false,
+          "is_fail": false,
+          "children": [
+            {
+              "name": [
+                0
+              ],
+              "ckey": [
+                8783573365739,
+                "0"
+              ],
+              "counts": 2,
+              "is_deterministic": true,
+              "is_fail": false,
+              "children": [
+                {
+                  "name": null,
+                  "ckey": null,
+                  "counts": 2,
+                  "is_deterministic": false,
+                  "is_fail": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

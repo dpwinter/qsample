@@ -133,7 +133,7 @@ class SubsetRates(Callback):
 
         cols = [mpl.cm.jet(x) for x in np.linspace(0.0, 1.0, len(names))]
         xs = [range(self.n_calls - len(r), self.n_calls) for r in rates]
-        fig, ax = plt.subplots(1, 2, figsize=(15, 5))
+        fig, ax = plt.subplots(1, 2, figsize=(20, 5))
         y_labels = ['$p_{fail}$', '$\prod_P A_w p_P$']
 
         for i in range(len(names)):

@@ -11,7 +11,6 @@
     "Protocol Samplers": "samplers.protocol_samplers.html",
     "Samplers Common": "samplers.common.html",
     "Sampler Callbacks": "samplers.callbacks.html",
-    "Examples": "examples.html",
-    "qsam - quantum protocol sampling": "readme_draft.html"
+    "Examples": "examples.html"
   }
 }
