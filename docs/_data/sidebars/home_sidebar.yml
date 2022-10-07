@@ -34,11 +34,14 @@ entries:
       title: Protocol Samplers
       url: samplers.protocol_samplers.html
     - output: web,pdf
-      title: Samplers Common
-      url: samplers.common.html
+      title: Samplers Constants
+      url: samplers.constants.html
     - output: web,pdf
       title: Sampler Callbacks
       url: samplers.callbacks.html
+    - output: web,pdf
+      title: Subset Helper
+      url: samplers.subset_helper.html
     - output: web,pdf
       title: Examples
       url: examples.html

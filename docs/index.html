@@ -331,7 +331,7 @@ nb_path: "index.ipynb"
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Its <code>run</code> function takes the maximum number of samples and/or a relative target sampling uncertainty as arguments and generates the output defined by the callback functions. Here we specify a maximum error of 10% (which is actually the default value) or 1000 samples at max. The logical failure rate estimator and its uncertainty should be stored and plotted in the range defined by <code>scale</code>.</p>
+<p>Its <code>run</code> function takes the maximum number of samples and/or user specified callback functions. Here we use for example the <a href="/qsam/samplers.callbacks.html#RelStdTarget"><code>RelStdTarget</code></a> callback to specify a maximum error of 10% (which is actually the default value) or 50000 samples at max. The logical failure rate estimator and its uncertainty are then plotted in the range defined by <code>scale</code> by the <a href="/qsam/samplers.callbacks.html#PlotStats"><code>PlotStats</code></a> callback from the relevant information (counts and fail_counts) which are stored directly in the <a href="/qsam/samplers.protocol_samplers.html#Sampler"><code>Sampler</code></a> object.</p>
 
 </div>
 </div>
@@ -831,7 +831,9 @@ nb_path: "index.ipynb"
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sb_sam</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;ghz_rep.json&#39;</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sb_sam</span> <span class="o">=</span> <span class="n">SubsetSampler</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">ChpSimulator</span><span class="p">)</span>
+<span class="n">sb_sam</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">scale</span><span class="p">,</span> <span class="n">err_params</span><span class="p">,</span> <span class="n">p_max</span><span class="o">=</span><span class="n">err_params</span><span class="p">[</span><span class="s1">&#39;p&#39;</span><span class="p">])</span>
+<span class="n">sb_sam</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;ghz_rep.json&#39;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">sb_sam</span><span class="o">.</span><span class="n">tree</span><span class="p">)</span>
 </pre></div>
 

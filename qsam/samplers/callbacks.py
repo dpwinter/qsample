@@ -217,8 +217,9 @@ class PathProducts(Callback):
 
 # Cell
 class RelStdTarget(Callback):
-    def __init__(self, target=0.1):
+    def __init__(self, target=0.1, include_delta=True):
         self.target = target
+        self.include_delta = include_delta
 
     def on_protocol_end(self, sampler):
         if hasattr(sampler, 'p_idx'):
@@ -226,7 +227,10 @@ class RelStdTarget(Callback):
         else:
             p_L, std, delta = sampler.stats(const="Aws_pmax")
 
-        if p_L > 0 and (std + delta) / p_L < self.target:
+        if self.incluce_delta: err = std + delta
+        else: err = std
+
+        if p_L > 0 and err / p_L < self.target:
             print(f'Rel. std target of {self.target} reached. Sampling stopped.')
             sampler.stop_sampling = True
 

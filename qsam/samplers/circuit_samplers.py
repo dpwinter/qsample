@@ -6,7 +6,9 @@ __all__ = ['Sampler', 'SubsetSampler', 'calc_w_max']
 import qsam.math as math
 from ..circuit import partition, make_hash, unpack
 from ..fault_generators import Depolar
-from .common import *
+import qsam.samplers.callbacks as cb
+from .constants import *
+from .subset_helper import *
 
 import numpy as np
 import itertools as it
@@ -22,9 +24,10 @@ class Sampler:
 
     def setup(self, sample_range, err_params):
         self.partitions = [partition(self.circuit, GATE_GROUPS[k]) for k in err_params.keys()]
+        self.p_phys = [s * np.array(list(err_params.values())) for s in sample_range]
+
         self.cnts = np.zeros(len(sample_range))
         self.fail_cnts = np.zeros(len(sample_range))
-        self.p_phys = [s * np.array(list(err_params.values())) for s in sample_range]
         self.is_setup = True
 
     def stats(self, p_idx=None, var_fn=math.Wilson_var, **kwargs):
@@ -37,11 +40,17 @@ class Sampler:
 
         return rate, np.sqrt(var), 0.0
 
-    def run(self, n_samples, fail_patterns, after_cbs=[], inner_cbs=[]):
+    def run(self, n_samples, callbacks=[]):
         assert self.is_setup, 'Sampler not setup. Call setup(..) before run(..).'
-        outputs = {}
+
+        if not isinstance(callbacks, cb.CallbackList):
+            callbacks = cb.CallbackList(sampler=self, callbacks=callbacks)
+        callbacks.on_sampler_begin()
 
         for i, p_phy in enumerate(tqdm(self.p_phys, desc='Total')):
+            self.stop_sampling = False
+            self.p_idx = i
+
             for _ in tqdm(range(n_samples), desc=f'p_phy={",".join(list(f"{p:.2E}" for p in p_phy))}', leave=True):
                 sim = self.simulator(self.n_qubits)
                 faults = Depolar.faults_from_probs(self.partitions, p_phy)
@@ -51,13 +60,10 @@ class Sampler:
                     self.fail_cnts[i] += 1
                 self.cnts[i] += 1
 
-                for cb in inner_cbs: # inner
-                    outputs[cb.__name__] = cb(sampler=self, p_idx=i, **outputs)
-                if StopIteration in outputs.values(): break
+                callbacks.on_circuit_end(locals())
+                if self.stop_sampling: break
 
-        for cb in after_cbs: # after
-            outputs[cb.__name__] = cb(sampler=self, **outputs)
-        return outputs
+        callbacks.on_sampler_end()
 
 # Cell
 
@@ -96,16 +102,26 @@ class SubsetSampler:
     def stats(self, const='Aws', var_fn=math.Wilson_var, **kwargs):
         if const == 'Aws': Aws, Aws_inclusive = self.Aws, self.Aws_inclusive
         elif const == 'Aws_pmax': Aws, Aws_inclusive = self.Aws_pmax[:,None], self.Aws_pmax_inclusive[:,None]
-        p_L = np.sum(Aws * self.ss_rate, axis=0)
         v_L = np.sum( [Aws[w]**2 * var_fn(self.ss_rate[w], self.cnts[w]) for w in range(len(self.w_vecs))], axis=0 )
+        p_L = np.sum(Aws * self.ss_rate, axis=0)
+        if isinstance(v_L, np.ndarray) and isinstance(p_L, int):
+            p_L = np.zeros_like(v_L)
         delta = 1 - np.sum(Aws_inclusive, axis=0)
         return p_L, np.sqrt(v_L), delta
 
-    def run(self, n_samples, fail_patterns, inner_cbs=[], after_cbs=[]):
+    def run(self, n_samples, callbacks=[]):
         assert self.is_setup, 'Sampler not setup. Call setup(..) before run(..).'
-        outputs = {}
+
+        if not isinstance(callbacks, cb.CallbackList):
+            callbacks = cb.CallbackList(sampler=self, callbacks=callbacks)
+
+        self.stop_sampling = False
+        callbacks.on_sampler_begin()
 
         for i in tqdm(range(n_samples), desc='Total'):
+
+            callbacks.on_circuit_begin()
+
             sim = self.simulator(self.n_qubits)
             w_idx = self.cnts.argmin() # balanced weight selector
             w_vec = self.w_vecs[w_idx]
@@ -116,13 +132,10 @@ class SubsetSampler:
                 self.fail_cnts[w_idx] += 1
             self.cnts[w_idx] += 1
 
-            for cb in inner_cbs: # inner
-                outputs[cb.__name__] = cb(sampler=self, **outputs)
-            if StopIteration in outputs.values(): break
+            callbacks.on_circuit_end(locals())
+            if self.stop_sampling: break
 
-        for cb in after_cbs: # after
-            outputs[cb.__name__] = cb(sampler=self, **outputs)
-        return outputs
+        callbacks.on_sampler_end()
 
 # Cell
 #hide

@@ -9,8 +9,9 @@
     "Fault generators": "fault_generators.html",
     "Circuit Samplers": "samplers.circuit_samplers.html",
     "Protocol Samplers": "samplers.protocol_samplers.html",
-    "Samplers Common": "samplers.common.html",
+    "Samplers Constants": "samplers.constants.html",
     "Sampler Callbacks": "samplers.callbacks.html",
+    "Subset Helper": "samplers.subset_helper.html",
     "Examples": "examples.html"
   }
 }

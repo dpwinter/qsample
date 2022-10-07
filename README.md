@@ -124,7 +124,7 @@ mc_sam = Sampler(g, ChpSimulator)
 mc_sam.setup(scale, err_params)
 ```
 
-Its `run` function takes the maximum number of samples and/or a relative target sampling uncertainty as arguments and generates the output defined by the callback functions. Here we specify a maximum error of 10% (which is actually the default value) or 1000 samples at max. The logical failure rate estimator and its uncertainty should be stored and plotted in the range defined by `scale`.
+Its `run` function takes the maximum number of samples and/or user specified callback functions. Here we use for example the `RelStdTarget` callback to specify a maximum error of 10% (which is actually the default value) or 50000 samples at max. The logical failure rate estimator and its uncertainty are then plotted in the range defined by `scale` by the `PlotStats` callback from the relevant information (counts and fail_counts) which are stored directly in the `Sampler` object.
 
 ```python
 #slow
@@ -343,6 +343,8 @@ sb_sam.tree.save('ghz_rep.json')
 
 ```python
 #slow
+sb_sam = SubsetSampler(g, ChpSimulator)
+sb_sam.setup(scale, err_params, p_max=err_params['p'])
 sb_sam.tree.load('ghz_rep.json')
 print(sb_sam.tree)
 ```
