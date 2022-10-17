@@ -86,7 +86,7 @@ nb_path: "04_fault_generators.ipynb"
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>The fault generator implements a function to populate the fault circuit (randomly) due to some specified parameters. For now, we only implement a generator for depolarizing circuit-level noise, i.e. equal probability of errors on each given circuit element. For now we also only consider gates as circuit elements (1-qubit, 2-qubit, measurements). In the future, we will also implement a way to place idle and cross-talk noise.</p>
+<p>The fault generator implements a function to populate the fault circuit (randomly) due to some specified parameters. For now, we only implement a fault generator for depolarizing circuit-level noise, i.e. equal probability of errors on each given circuit element. For now we also only consider gates as circuit elements (1-qubit, 2-qubit, measurements). In the future, we will also implement a way to place idle and cross-talk noise.</p>
 
 </div>
 </div>
@@ -102,7 +102,107 @@ nb_path: "04_fault_generators.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="Depolar" class="doc_header"><code>class</code> <code>Depolar</code><a href="https://github.com/dpwinter/qsam/tree/master/qsam/fault_generators.py#L16" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Depolar</code>()</p>
+<h4 id="to_ndarray" class="doc_header"><code>to_ndarray</code><a href="https://github.com/dpwinter/qsam/tree/master/qsam/fault_generators.py#L12" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>to_ndarray</code>(<strong><code>e</code></strong>)</p>
+</blockquote>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h4 id="pad" class="doc_header"><code>pad</code><a href="https://github.com/dpwinter/qsam/tree/master/qsam/fault_generators.py#L18" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>pad</code>(<strong><code>lst</code></strong>, <strong><code>size</code></strong>, <strong><code>val</code></strong>)</p>
+</blockquote>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h2 id="FaultGenerator" class="doc_header"><code>class</code> <code>FaultGenerator</code><a href="https://github.com/dpwinter/qsam/tree/master/qsam/fault_generators.py#L35" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>FaultGenerator</code>(<strong><code>err_params</code></strong>, <strong><code>one_qubit_faults</code></strong>, <strong><code>two_qubit_faults</code></strong>)</p>
+</blockquote>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h2 id="Depolarizing" class="doc_header"><code>class</code> <code>Depolarizing</code><a href="https://github.com/dpwinter/qsam/tree/master/qsam/fault_generators.py#L110" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Depolarizing</code>(<strong><code>err_params</code></strong>) :: <a href="/qsam/fault_generators.html#FaultGenerator"><code>FaultGenerator</code></a></p>
 </blockquote>
 
 </div>
@@ -129,12 +229,15 @@ nb_path: "04_fault_generators.ipynb"
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">partitions</span> <span class="o">=</span> <span class="p">[[(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">),(</span><span class="mi">5</span><span class="p">,</span><span class="mi">2</span><span class="p">)],[(</span><span class="mi">0</span><span class="p">,(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">)),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,(</span><span class="mi">4</span><span class="p">,</span><span class="mi">3</span><span class="p">)),</span> <span class="p">(</span><span class="mi">3</span><span class="p">,(</span><span class="mi">5</span><span class="p">,</span><span class="mi">4</span><span class="p">))]]</span>
-<span class="n">ps</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.4</span><span class="p">,</span><span class="mf">0.2</span><span class="p">]</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">ref_circ</span> <span class="o">=</span> <span class="n">Circuit</span><span class="p">([{</span><span class="s2">&quot;H&quot;</span><span class="p">:{</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">}},</span> <span class="p">{</span><span class="s2">&quot;CNOT&quot;</span><span class="p">:</span> <span class="p">{(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">)}},</span> <span class="p">{</span><span class="s2">&quot;measure&quot;</span><span class="p">:{</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">}}])</span>
+<span class="n">err_params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;p1&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span><span class="mf">0.2</span><span class="p">,</span><span class="mf">0.3</span><span class="p">],</span> <span class="s1">&#39;p2&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span><span class="mf">0.1</span><span class="p">]}</span>
 
-<span class="n">faults</span> <span class="o">=</span> <span class="n">Depolar</span><span class="o">.</span><span class="n">faults_from_probs</span><span class="p">(</span><span class="n">partitions</span><span class="p">,</span> <span class="n">ps</span><span class="p">)</span>
-<span class="n">fault_circuit</span> <span class="o">=</span> <span class="n">Depolar</span><span class="o">.</span><span class="n">gen_circuit</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="n">faults</span><span class="p">)</span>
+<span class="n">fault_gen</span> <span class="o">=</span> <span class="n">Depolarizing</span><span class="p">(</span><span class="n">err_params</span><span class="p">)</span>
+<span class="n">fault_gen</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span><span class="n">ref_circ</span><span class="p">)</span>
+<span class="n">faults</span> <span class="o">=</span> <span class="n">fault_gen</span><span class="o">.</span><span class="n">faults_from_probs</span><span class="p">(</span> <span class="p">(</span><span class="mf">0.8</span><span class="p">,)</span> <span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">faults</span><span class="p">)</span>
 
+<span class="n">fault_circuit</span> <span class="o">=</span> <span class="n">fault_gen</span><span class="o">.</span><span class="n">gen_circuit</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ref_circ</span><span class="p">),</span> <span class="n">faults</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">fault_circuit</span><span class="p">)</span>
 </pre></div>
 
@@ -148,12 +251,10 @@ nb_path: "04_fault_generators.ipynb"
 <div class="output_area">
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>0: {&#39;Y&#39;: {1}}
-1: {&#39;Y&#39;: {3}}
-2: {&#39;X&#39;: {4}, &#39;Z&#39;: {3}}
-3: {}
-4: {}
-5: {}
+<pre>[(0, 0), (0, 1)]
+0: {&#39;X&#39;: {0}, &#39;Z&#39;: {1}}
+1: {}
+2: {}
 </pre>
 </div>
 </div>
@@ -178,11 +279,15 @@ nb_path: "04_fault_generators.ipynb"
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">ws</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">ref_circ</span> <span class="o">=</span> <span class="n">Circuit</span><span class="p">([{</span><span class="s2">&quot;H&quot;</span><span class="p">:{</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">}},</span> <span class="p">{</span><span class="s2">&quot;CNOT&quot;</span><span class="p">:</span> <span class="p">{(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">)}},</span> <span class="p">{</span><span class="s2">&quot;measure&quot;</span><span class="p">:{</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">}}])</span>
+<span class="n">err_params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;p1&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span><span class="mf">0.2</span><span class="p">,</span><span class="mf">0.3</span><span class="p">],</span> <span class="s1">&#39;p2&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span><span class="mf">0.1</span><span class="p">]}</span>
 
-<span class="n">faults</span> <span class="o">=</span> <span class="n">Depolar</span><span class="o">.</span><span class="n">faults_from_weights</span><span class="p">(</span><span class="n">partitions</span><span class="p">,</span> <span class="n">ws</span><span class="p">)</span>
-<span class="n">fault_circuit</span> <span class="o">=</span> <span class="n">Depolar</span><span class="o">.</span><span class="n">gen_circuit</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="n">faults</span><span class="p">)</span>
+<span class="n">fault_gen</span> <span class="o">=</span> <span class="n">Depolarizing</span><span class="p">(</span><span class="n">err_params</span><span class="p">)</span>
+<span class="n">fault_gen</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span><span class="n">ref_circ</span><span class="p">)</span>
+<span class="n">faults</span> <span class="o">=</span> <span class="n">fault_gen</span><span class="o">.</span><span class="n">faults_from_weights</span><span class="p">(</span> <span class="p">(</span><span class="mi">2</span><span class="p">,)</span> <span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">faults</span><span class="p">)</span>
 
+<span class="n">fault_circuit</span> <span class="o">=</span> <span class="n">fault_gen</span><span class="o">.</span><span class="n">gen_circuit</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ref_circ</span><span class="p">),</span> <span class="n">faults</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">fault_circuit</span><span class="p">)</span>
 </pre></div>
 
@@ -196,12 +301,10 @@ nb_path: "04_fault_generators.ipynb"
 <div class="output_area">
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>0: {&#39;Y&#39;: {2}, &#39;X&#39;: {3}}
+<pre>[(0, 1), (0, 0)]
+0: {&#39;Z&#39;: {1}, &#39;X&#39;: {0}}
 1: {}
-2: {&#39;X&#39;: {4}, &#39;Z&#39;: {3}}
-3: {}
-4: {}
-5: {}
+2: {}
 </pre>
 </div>
 </div>

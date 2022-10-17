@@ -4,37 +4,31 @@ __all__ = ['Sampler', 'CountNode', 'SampleTree', 'SubsetSampler']
 
 # Cell
 import qsam.math as math
-from ..circuit import partition, make_hash, unpack
-from ..fault_generators import Depolar
+from ..circuit import make_hash, unpack
 from ..protocol import iterate
-from .constants import *
 from .subset_helper import *
 import qsam.samplers.callbacks as cb
+from ..fault_generators import Depolarizing, to_ndarray
 
 import numpy as np
-from tqdm.notebook import tqdm # ask if we are in notebook or not: if not use normal tqdm.
+from tqdm.auto import tqdm # automatically choose jupyter tqdm version when available.
 
 from anytree import RenderTree, NodeMixin
 from anytree.exporter import JsonExporter
 from anytree.importer import JsonImporter, DictImporter
 
 # Cell
-
 class Sampler:
-    def __init__(self, protocol, simulator):
+    def __init__(self, protocol, simulator, fault_gen):
         self.protocol = protocol
         self.simulator = simulator
         self.n_qubits = len(set(q for c in protocol._circuits.values() for q in unpack(c)))
-        self.is_setup = False
 
-    def setup(self, sample_range, err_params):
-        self.partitions = {circuit_hash: [partition(circuit, GATE_GROUPS[k]) for k in err_params.keys()]
-                           for circuit_hash, circuit in self.protocol._circuits.items()}
-        self.p_phys = [s * np.array(list(err_params.values())) for s in sample_range]
+        fault_gen.configure(self.protocol._circuits)
+        self.fault_gen = fault_gen
 
-        self.cnts = np.zeros(len(sample_range))
-        self.fail_cnts = np.zeros(len(sample_range))
-        self.is_setup = True
+        self.cnts = np.zeros(len(self.fault_gen.p_phy))
+        self.fail_cnts = np.zeros(len(self.fault_gen.p_phy))
 
     def stats(self, p_idx=None, var_fn=math.Wilson_var):
         if p_idx == None:
@@ -44,22 +38,30 @@ class Sampler:
             rate = self.fail_cnts[p_idx] / self.cnts[p_idx]
             var = var_fn(rate, self.cnts[p_idx])
 
-        return rate, np.sqrt(var), 0.0
+        return rate, np.sqrt(var), 0.0, 0.0 # no delta nor delta_var
 
-    def run(self, n_samples, callbacks=[]):
-        assert self.is_setup, 'Sampler not setup. Call setup(..) before run(..).'
+    def sample_protocol(self):
+        pass
+
+    def sample_circuit(self):
+        pass
+
+    def _verbose(self):
+        pass
+
+    def run(self, n_samples, callbacks=[], verbose=False):
 
         if not isinstance(callbacks, cb.CallbackList):
             callbacks = cb.CallbackList(sampler=self, callbacks=callbacks)
         callbacks.on_sampler_begin()
 
-        for i, p_phy in enumerate(tqdm(self.p_phys, desc='Total')):
+        for i, p_phy in enumerate(tqdm(self.fault_gen.p_phy, desc='Total')):
             self.stop_sampling = False
             self.p_idx = i
 
             for _ in tqdm(range(n_samples), desc=f'p_phy={",".join(list(f"{p:.2E}" for p in p_phy))}', leave=True):
 
-                callbacks.on_protocol_begin()
+                callbacks.on_sample_begin()
 
                 sim = self.simulator(self.n_qubits)
                 p_it = iterate(self.protocol)
@@ -68,30 +70,31 @@ class Sampler:
 
                 while node:
 
-                    callbacks.on_circuit_begin()
-
                     if not self.protocol.out_edges(node):
                         self.fail_cnts[i] += 1
                         break
 
                     circuit_hash, circuit = self.protocol.circuit_from_node(node)
-                    if not circuit._noisy or circuit_hash not in self.partitions.keys():
+                    if not circuit._noisy or circuit_hash not in self.protocol._circuits.keys():
                         msmt = sim.run(circuit)
                     else:
-                        circuit_partitions = self.partitions[circuit_hash]
-                        faults = Depolar.faults_from_probs(circuit_partitions, p_phy)
-                        fault_circuit = Depolar.gen_circuit(len(circuit), faults)
+                        faults = self.fault_gen.faults_from_probs(p_phy, circuit_hash)
+                        fault_circuit = self.fault_gen.gen_circuit(len(circuit), faults)
                         msmt = sim.run(circuit, fault_circuit)
                     _node = node
                     node = p_it.send(msmt)
 
-                    callbacks.on_circuit_end(locals())
+                    if verbose:
+                        fs = [] if not circuit._noisy else [f'Tick {tick}: {fault_circuit[tick]}' for tick,_ in faults]
+                        if circuit_hash not in self.protocol._circuits.keys():
+                            print(f'Node {_node}, Circuit {circuit} -> {node}') # COR nodes
+                        else: # circuit nodes
+                            print(f'Node {_node}, faults {fs}, measured {msmt} -> {node}')
 
-                callbacks.on_protocol_end()
+                callbacks.on_sample_end()
                 if self.stop_sampling: break
 
         callbacks.on_sampler_end()
-
 
 # Cell
 class CountNode(NodeMixin):
@@ -112,13 +115,13 @@ class CountNode(NodeMixin):
     @property
     def rate(self):
         assert not self.ckey and not self.is_root
-        if self.parent.counts < 2: return 0.5
+        if self.parent.counts == 0: return 0
         else: return self.counts / self.parent.counts
 
     @property
     def var(self, var_fn=math.Wilson_var):
         assert not self.ckey and not self.is_root
-        if self.parent.counts < 2: return 1.0
+        if self.parent.counts == 0: return 1.0
         else: return var_fn(self.rate, self.parent.counts)
 
     def __str__(self):
@@ -151,6 +154,10 @@ class SampleTree:
         node.parent = None
 
     def rate(self, const):
+        """Calculate logical failure rate
+        Sum of products of constants and rates along a path
+        for every path leading to a fail.
+        """
         p = 0
         for leaf in self.root.leaves:
             if not leaf.is_root and not leaf.parent.is_deterministic and leaf.is_fail:
@@ -161,9 +168,58 @@ class SampleTree:
                 p += prod
         return p
 
+    def delta(self, const):
+        """Calculate the cutoff error (delta)
+        Sum of products of constants and rates along a path
+        for every path that has been sampled.
+        """
+        delta = 1.0
+        for leaf in self.root.leaves:
+            if not leaf.is_root:
+                prod = 1.0
+                for n in leaf.path[1:]:
+                    if n.ckey: prod *= const[n.ckey[0]][n.ckey[1]]
+                    else: prod *= n.rate
+                delta -= prod
+        return delta
+
     def var(self, const):
+        """Calculate variance of logical failure rate
+        Apply Gaussian error propagation to every differentiable node.
+        All non-constant nodes are differentiable, as they contain a rate.
+        """
         var = 0
-        for node in [n for n in self.root.descendants if not n.ckey]:
+        for node in [n for n in self.root.descendants if not n.ckey]: # all circuit nodes incl. None and Fail.
+            if not node.parent.is_deterministic:
+
+                twig = 1.0
+                for n in node.path[1:-1]:
+                    if n.ckey: twig *= const[n.ckey[0]][n.ckey[1]]
+                    else: twig *= n.rate
+
+                if node.is_leaf and len(node.siblings) == 0:
+                    var += node.var * twig**2 # count single None leaf nodes
+                else:
+                    subtree = 0
+                    for leaf in node.leaves:
+                        if not leaf.is_fail:  # No-Fail paths in subtree multiply to 0.
+                            continue
+                        prod = 1
+                        for n in leaf.iter_path_reverse():
+                            if n == node: break
+                            elif n.ckey: prod *= const[n.ckey[0]][n.ckey[1]]
+                            else: prod *= n.rate
+                        subtree += prod
+                    var += node.var * twig**2 * subtree**2
+        return var
+
+    def delta_var(self, const):
+        """Calculate the variance of the cutoff error (delta)
+        Apply Gaussian error propagation to every sampled differentiable node.
+        Fail/No-Fail branching can be ignored as it always sums to 1 here.
+        """
+        var = 0
+        for node in [n for n in self.root.descendants if not n.ckey and not n.is_leaf]:
             if not node.parent.is_deterministic:
                 twig = 1.0
                 for n in node.path[1:-1]:
@@ -172,44 +228,33 @@ class SampleTree:
 
                 subtree = 0
                 for leaf in node.leaves:
-                    if not leaf.is_fail: # CHECK.
-                        continue
-
                     prod = 1
                     for n in leaf.iter_path_reverse():
-                        if n == node:
-                            break
+                        if n == node: break
                         elif n.ckey: prod *= const[n.ckey[0]][n.ckey[1]]
                         else: prod *= n.rate
-
                     subtree += prod
-
                 var += node.var * twig**2 * subtree**2
         return var
-
-    def delta(self, const):
-        path_sum = 0.0
-        for leaf in self.root.leaves:
-            if not leaf.is_root:
-                prod = 1.0
-                for n in leaf.path[1:]:
-                    if n.ckey: prod *= const[n.ckey[0]][n.ckey[1]]
-                    else: prod *= n.rate
-                path_sum += prod
-        return 1.0 - path_sum
 
     def __str__(self):
         return '\n'.join([f'{pre}{node}' for pre, _, node in RenderTree(self.root)])
 
     def display(self, fname='temp.png'):
 
-        # TODO: CHECK IF THIS LIB IS INSTALLED OTHERWISE RAISE.
-        from anytree.exporter import UniqueDotExporter
-        from IPython.display import Image, display ## ! requirements: jupyter, graphviz
+        try:
+            from anytree.exporter import UniqueDotExporter
+            from IPython.display import Image, display ## ! requirements: jupyter, graphviz
+        except ImportError as e:
+            print(f"Cannot display tree due to missing libraries. Original error message {e}")
+            return None
 
         def edgeattrfunc(node, child):
             weight = 10.0 * child.counts / self.root.counts
-            weight = 5.0 if weight > 5.0 else weight
+            if weight > 5.0:
+                weight = 5.0
+            elif weight < 0.2:
+                weight = 0.2
             return f'penwidth="{weight}"'
 
         def nodeattrfunc(node):
@@ -241,26 +286,25 @@ class SampleTree:
 class SubsetSampler:
     """Subset Sampler of quantum protocols"""
 
-    def __init__(self, protocol, simulator):
+    def __init__(self, protocol, simulator, fault_gen, p_max):
         self.protocol = protocol
         self.simulator = simulator
         self.n_qubits = len(set(q for c in protocol._circuits.values() for q in unpack(c)))
         self.tree = SampleTree()
-        self.is_setup = False
 
-    def setup(self, sample_range, err_params, p_max):
-        p_max = np.array([p_max]) if isinstance(p_max, float) else np.array(p_max)
-        assert len(p_max) == len(err_params)
-        self.err_params = err_params
-        self.partitions = protocol_partitions(self.protocol._circuits, err_params.keys())
-        self.w_vecs = protocol_weight_vectors(self.partitions)
-        self.Aws_pmax = protocol_subset_occurence(self.partitions, self.w_vecs, p_max)
-        self.set_range(sample_range)
-        self.is_setup = True
+        fault_gen.configure(self.protocol._circuits)
+        self.fault_gen = fault_gen
 
-    def set_range(self, sample_range):
-        p_phy_per_partition = np.array([[p_phy * mul for p_phy in sample_range] for mul in self.err_params.values()]).T
-        self.Aws = protocol_subset_occurence(self.partitions, self.w_vecs, p_phy_per_partition)
+        p_max = to_ndarray(p_max)
+        assert len(p_max) == len(self.fault_gen.partition_names)
+
+        self.w_vecs = protocol_weight_vectors(self.fault_gen.partitions)
+        self.Aws_pmax = protocol_subset_occurence(self.fault_gen.partitions, self.w_vecs, p_max)
+        self.set_range()
+
+    def set_range(self, err_params=None):
+        if err_params: self.fault_gen.__init__(err_params)
+        self.Aws = protocol_subset_occurence(self.fault_gen.partitions, self.w_vecs, self.fault_gen.p_phy)
 
     def stats(self, const='Aws', **kwargs):
         if const == 'Aws': Aws = self.Aws
@@ -270,10 +314,10 @@ class SubsetSampler:
         if isinstance(v_L, np.ndarray) and isinstance(p_L, int):
             p_L = np.zeros_like(v_L)
         delta = self.tree.delta(Aws)
-        return p_L, np.sqrt(v_L), delta
+        delta_var = self.tree.delta_var(Aws)
+        return p_L, np.sqrt(v_L), delta, np.sqrt(delta_var)
 
-    def run(self, n_samples, callbacks=[], ss_filter_fn=w_plus1_filter, ss_sel_fn=ERV_sel):
-        assert self.is_setup, 'Sampler not setup. Call setup(..) before run(..).'
+    def run(self, n_samples, callbacks=[], ss_filter_fn=w_plus1_filter, ss_sel_fn=ERV_sel, verbose=False):
 
         if not isinstance(callbacks, cb.CallbackList):
             callbacks = cb.CallbackList(sampler=self, callbacks=callbacks)
@@ -283,7 +327,7 @@ class SubsetSampler:
 
         for i in tqdm(range(n_samples), desc='Total'):
 
-            callbacks.on_protocol_begin()
+            callbacks.on_sample_begin()
 
             sim = self.simulator(self.n_qubits)
             p_it = iterate(self.protocol)
@@ -292,14 +336,12 @@ class SubsetSampler:
 
             while True:
 
-                callbacks.on_circuit_begin()
-
                 tree_node = self.tree.update(name=node, parent=tree_node)
                 if node == None: break
                 elif not self.protocol.out_edges(node): tree_node.is_fail = True; break
 
                 circuit_hash, circuit = self.protocol.circuit_from_node(node)
-                if circuit_hash not in self.partitions.keys() or not circuit._noisy: # correction circuits
+                if circuit_hash not in self.protocol._circuits.keys() or not circuit._noisy: # correction circuits
                     msmt = sim.run(circuit)
                 else:
                     w_ids = [n.ckey[1] for n in tree_node.children]
@@ -308,16 +350,21 @@ class SubsetSampler:
                     w_vec = self.w_vecs[circuit_hash][w_idx]
                     tree_node = self.tree.update(name=w_vec, parent=tree_node, ckey=(circuit_hash, w_idx),
                                                 is_deterministic=True if circuit._ff_deterministic and not any(w_vec) else False)
-
-                    faults = Depolar.faults_from_weights(self.partitions[circuit_hash], w_vec)
-                    fault_circuit = Depolar.gen_circuit(len(circuit), faults)
+                    faults = self.fault_gen.faults_from_weights(w_vec, circuit_hash)
+                    fault_circuit = self.fault_gen.gen_circuit(len(circuit), faults)
                     msmt = sim.run(circuit, fault_circuit)
 
                 _node = node
                 node = p_it.send(msmt)
-                callbacks.on_circuit_end(locals())
 
-            callbacks.on_protocol_end()
+                if verbose:
+                    fs = [] if not circuit._noisy else [f'Tick {tick}: {fault_circuit[tick]}' for tick,_ in faults]
+                    if circuit_hash not in self.protocol._circuits.keys():
+                        print(f'Node {_node}, Circuit {circuit} -> {node}') # COR nodes
+                    else: # circuit nodes
+                        print(f'Node {_node}, faults {fs}, measured {msmt} -> {node}')
+
+            callbacks.on_sample_end()
             if self.stop_sampling: break
 
         callbacks.on_sampler_end()

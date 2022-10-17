@@ -25,6 +25,9 @@ entries:
       title: CHP Simulator
       url: simulators.chp.html
     - output: web,pdf
+      title: ProjectQ Statevector Simulator
+      url: simulators.projectq.html
+    - output: web,pdf
       title: Fault generators
       url: fault_generators.html
     - output: web,pdf
@@ -33,9 +36,6 @@ entries:
     - output: web,pdf
       title: Protocol Samplers
       url: samplers.protocol_samplers.html
-    - output: web,pdf
-      title: Samplers Constants
-      url: samplers.constants.html
     - output: web,pdf
       title: Sampler Callbacks
       url: samplers.callbacks.html

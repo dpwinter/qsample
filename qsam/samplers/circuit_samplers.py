@@ -4,31 +4,30 @@ __all__ = ['Sampler', 'SubsetSampler', 'calc_w_max']
 
 # Cell
 import qsam.math as math
-from ..circuit import partition, make_hash, unpack
-from ..fault_generators import Depolar
+from ..circuit import make_hash, unpack
 import qsam.samplers.callbacks as cb
-from .constants import *
 from .subset_helper import *
+from ..fault_generators import Depolarizing
 
 import numpy as np
 import itertools as it
-from tqdm.notebook import tqdm
+from tqdm.auto import tqdm
 
 # Cell
+
 class Sampler:
-    def __init__(self, circuit, simulator):
+
+    def __init__(self, circuit, simulator, fault_gen, fail_patterns):
         self.circuit = circuit
         self.simulator = simulator
         self.n_qubits = circuit.n_qubits
-        self.is_setup = False
+        self.fail_patterns = fail_patterns
 
-    def setup(self, sample_range, err_params):
-        self.partitions = [partition(self.circuit, GATE_GROUPS[k]) for k in err_params.keys()]
-        self.p_phys = [s * np.array(list(err_params.values())) for s in sample_range]
+        fault_gen.configure(circuit)
+        self.fault_gen = fault_gen
 
-        self.cnts = np.zeros(len(sample_range))
-        self.fail_cnts = np.zeros(len(sample_range))
-        self.is_setup = True
+        self.cnts = np.zeros(len(self.fault_gen.p_phy))
+        self.fail_cnts = np.zeros(len(self.fault_gen.p_phy))
 
     def stats(self, p_idx=None, var_fn=math.Wilson_var, **kwargs):
         if p_idx == None:
@@ -38,25 +37,24 @@ class Sampler:
             rate = self.fail_cnts[p_idx] / self.cnts[p_idx]
             var = var_fn(rate, self.cnts[p_idx])
 
-        return rate, np.sqrt(var), 0.0
+        return rate, np.sqrt(var), 0.0, 0.0
 
     def run(self, n_samples, callbacks=[]):
-        assert self.is_setup, 'Sampler not setup. Call setup(..) before run(..).'
 
         if not isinstance(callbacks, cb.CallbackList):
             callbacks = cb.CallbackList(sampler=self, callbacks=callbacks)
         callbacks.on_sampler_begin()
 
-        for i, p_phy in enumerate(tqdm(self.p_phys, desc='Total')):
+        for i, p_phy in enumerate(tqdm(self.fault_gen.p_phy, desc='Total')):
             self.stop_sampling = False
             self.p_idx = i
 
             for _ in tqdm(range(n_samples), desc=f'p_phy={",".join(list(f"{p:.2E}" for p in p_phy))}', leave=True):
                 sim = self.simulator(self.n_qubits)
-                faults = Depolar.faults_from_probs(self.partitions, p_phy)
-                fault_circuit = Depolar.gen_circuit(len(self.circuit), faults)
+                faults = self.fault_gen.faults_from_probs(p_phy)
+                fault_circuit = self.fault_gen.gen_circuit(len(self.circuit), faults)
                 msmt = sim.run(self.circuit, fault_circuit)
-                if int(msmt,2) in fail_patterns:
+                if int(msmt,2) in self.fail_patterns:
                     self.fail_cnts[i] += 1
                 self.cnts[i] += 1
 
@@ -66,33 +64,34 @@ class Sampler:
         callbacks.on_sampler_end()
 
 # Cell
-
 class SubsetSampler:
-    def __init__(self, circuit, simulator):
+
+    def __init__(self, circuit, simulator, fault_gen, fail_patterns, w_max, p_max, w_exclude={}):
         self.circuit = circuit
         self.simulator = simulator
         self.n_qubits = circuit.n_qubits
-        self.is_setup = False
 
-    def setup(self, sample_range, err_params, w_max, w_exclude={}, p_max=0.1):
+        fault_gen.configure(circuit)
+        self.fault_gen = fault_gen
+
+        self.fail_patterns = fail_patterns
+
         p_max = np.array([p_max]) if isinstance(p_max, float) else np.array(p_max)
-        assert len(p_max) == len(err_params)
-        self.partitions = circuit_partitions(self.circuit, err_params.keys())
+        assert len(p_max) == len(self.fault_gen.partition_names)
+
         self.w_vecs = circuit_weight_vectors(w_max, w_exclude)
-        self.err_params = err_params
         self.w_max = w_max
-        self.Aws_pmax = circuit_subset_occurence(self.partitions, self.w_vecs, p_max)
-        self.Aws_pmax_inclusive = circuit_subset_occurence(self.partitions, circuit_weight_vectors(self.w_max), p_max)
-        self.set_range(sample_range)
+        self.set_range()
+        self.Aws_pmax = circuit_subset_occurence(self.fault_gen.partitions, self.w_vecs, p_max)
+        self.Aws_pmax_inclusive = circuit_subset_occurence(self.fault_gen.partitions, circuit_weight_vectors(w_max), p_max)
 
         self.cnts = np.zeros((len(self.w_vecs))) + 1 # one virtual sample to avoid div0
         self.fail_cnts = np.zeros((len(self.w_vecs)))
-        self.is_setup = True
 
-    def set_range(self, sample_range):
-        p_phy_per_partition = np.array([[p_phy * mul for p_phy in sample_range] for mul in self.err_params.values()]).T
-        self.Aws = circuit_subset_occurence(self.partitions, self.w_vecs, p_phy_per_partition)
-        self.Aws_inclusive = circuit_subset_occurence(self.partitions, circuit_weight_vectors(self.w_max,{}), p_phy_per_partition)
+    def set_range(self, err_params=None):
+        if err_params: self.fault_gen.__init__(err_params)
+        self.Aws = circuit_subset_occurence(self.fault_gen.partitions, self.w_vecs, self.fault_gen.p_phy)
+        self.Aws_inclusive = circuit_subset_occurence(self.fault_gen.partitions, circuit_weight_vectors(self.w_max,{}), self.fault_gen.p_phy)
 
     @property
     def ss_rate(self):
@@ -107,10 +106,9 @@ class SubsetSampler:
         if isinstance(v_L, np.ndarray) and isinstance(p_L, int):
             p_L = np.zeros_like(v_L)
         delta = 1 - np.sum(Aws_inclusive, axis=0)
-        return p_L, np.sqrt(v_L), delta
+        return p_L, np.sqrt(v_L), delta, 0.0
 
     def run(self, n_samples, callbacks=[]):
-        assert self.is_setup, 'Sampler not setup. Call setup(..) before run(..).'
 
         if not isinstance(callbacks, cb.CallbackList):
             callbacks = cb.CallbackList(sampler=self, callbacks=callbacks)
@@ -125,8 +123,8 @@ class SubsetSampler:
             sim = self.simulator(self.n_qubits)
             w_idx = self.cnts.argmin() # balanced weight selector
             w_vec = self.w_vecs[w_idx]
-            faults = Depolar.faults_from_weights(self.partitions, w_vec)
-            fault_circuit = Depolar.gen_circuit(len(self.circuit), faults)
+            faults = self.fault_gen.faults_from_weights(w_vec)
+            fault_circuit = self.fault_gen.gen_circuit(len(self.circuit), faults)
             msmt = sim.run(self.circuit, fault_circuit)
             if int(msmt,2) in fail_patterns:
                 self.fail_cnts[w_idx] += 1
