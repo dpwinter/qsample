@@ -3,7 +3,7 @@
 __all__ = ['MeasureResult', 'StateVectorSimulator']
 
 # Cell
-from .simulator_mixins import CircuitRunnerMixin
+from .mixins import CircuitRunnerMixin
 
 from projectq import MainEngine
 import projectq.ops as ops

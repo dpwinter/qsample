@@ -4,13 +4,16 @@
     "Math": "math.html",
     "Circuit": "circuit.html",
     "Protocol": "protocol.html",
-    "Simulator Mixins": "simulators.simulator_mixins.html",
+    "Simulator Mixins": "simulators.mixins.html",
     "CHP Simulator": "simulators.chp.html",
     "ProjectQ Statevector Simulator": "simulators.projectq.html",
     "Fault generators": "fault_generators.html",
-    "Protocol Samplers": "samplers.protocol_samplers.html",
-    "Sampler Callbacks": "samplers.callbacks.html",
-    "Subset Helper": "samplers.subset_helper.html",
+    "Sampler": "xxsampler.html",
+    "Sampler base class": "sampler.base_sampler.html",
+    "Direct Monte Carlo sampler": "sampler.direct_sampler.html",
+    "Sample Tree": "sampler.sample_tree.html",
+    "Subset Monte Carlo sampler": "sampler.subset_sampler.html",
+    "Sampler Callbacks": "callbacks.html",
     "Examples": "examples.html"
   }
 }

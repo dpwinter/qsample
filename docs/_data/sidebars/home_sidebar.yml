@@ -20,7 +20,7 @@ entries:
       url: protocol.html
     - output: web,pdf
       title: Simulator Mixins
-      url: simulators.simulator_mixins.html
+      url: simulators.mixins.html
     - output: web,pdf
       title: CHP Simulator
       url: simulators.chp.html
@@ -31,14 +31,23 @@ entries:
       title: Fault generators
       url: fault_generators.html
     - output: web,pdf
-      title: Protocol Samplers
-      url: samplers.protocol_samplers.html
+      title: Sampler
+      url: xxsampler.html
+    - output: web,pdf
+      title: Sampler base class
+      url: sampler.base_sampler.html
+    - output: web,pdf
+      title: Direct Monte Carlo sampler
+      url: sampler.direct_sampler.html
+    - output: web,pdf
+      title: Sample Tree
+      url: sampler.sample_tree.html
+    - output: web,pdf
+      title: Subset Monte Carlo sampler
+      url: sampler.subset_sampler.html
     - output: web,pdf
       title: Sampler Callbacks
-      url: samplers.callbacks.html
-    - output: web,pdf
-      title: Subset Helper
-      url: samplers.subset_helper.html
+      url: callbacks.html
     - output: web,pdf
       title: Examples
       url: examples.html

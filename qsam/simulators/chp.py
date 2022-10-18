@@ -3,7 +3,7 @@
 __all__ = ['pauli_product_phase', 'MeasureResult', 'ChpSimulator']
 
 # Cell
-from .simulator_mixins import CircuitRunnerMixin
+from .mixins import CircuitRunnerMixin
 from typing import Union, Any
 import numpy as np
 import random

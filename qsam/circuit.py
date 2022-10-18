@@ -71,7 +71,7 @@ def partition(circuit,gates):
     """Find all (tick,qubit) circuit locations for list of `gates`"""
 
     return [(t_idx,q) for (t_idx,tick) in enumerate(circuit)
-            for g,qs in tick.items() for q in qs if g.upper() in gates]
+            for g,qs in tick.items() for q in qs if g in gates]
 
 # Cell
 #export
