@@ -30,14 +30,19 @@ class StateVectorSimulator(CircuitRunnerMixin):
         if outcome.value == 1:
             self.X(qubit)
 
-    def measure(self, qubit: int) -> None:
+    def measure(self, qubit: int) -> MeasureResult:
         q = self.qubits[qubit]
         self.eng.flush()
         ops.Measure | q
         self.eng.flush()
         return MeasureResult(value=int(q))
 
-    # expectation value function
+    def expectation(self, qubit: int) -> float:
+        self.eng.flush()
+        exp_op = ops.QubitOperator(f'Z{qubit}')
+        exp = self.eng.backend.get_expectation_value(exp_op, self.qureg)
+        ops.All(ops.Measure) | self.qureg # To avoid error message of deallocating qubits in a superposition
+        return exp
 
     def I(self, qubit: int) -> None:
         pass
@@ -76,7 +81,14 @@ class StateVectorSimulator(CircuitRunnerMixin):
         Qd = ops.get_inverse(ops.SqrtX)
         Qd | self.qubits[qubit]
 
-    # + Arbitrary X,Y,Z rotations
+    def Rx(self, qubit: int, angle: float) -> None:
+        ops.Rx(angle) | self.qubits[qubit]
+
+    def Ry(self, qubit: int, angle: float) -> None:
+        ops.Ry(angle) | self.qubits[qubit]
+
+    def Rz(self, qubit: int, angle: float) -> None:
+        ops.Rz(angle) | self.qubits[qubit]
 
     def R(self, qubit: int) -> None:
         ops.R | self.qubits[qubit]

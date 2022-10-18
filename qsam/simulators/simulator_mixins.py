@@ -23,19 +23,23 @@ class CircuitRunnerMixin:
         msmt_res = []
         for tick_index in range(circuit.n_ticks):
 
-            # apply fault ticks for meas before circuit tick.
+            msmts = []
 
             for gate, qubits in circuit[tick_index].items():
                 for qubit in qubits:
+                    if 'measure' in gate:
+                        msmts.append( (gate,qubit) ) # exec measurements at end.
+                        continue
                     res = self._apply_gate(gate, qubit)
-
-                    if res is not None:
-                        msmt_res.append( int(res.value) )
 
             if fault_circuit:
                 for f_gate, f_qubits in fault_circuit[tick_index].items():
                     for f_qubit in f_qubits:
                         self._apply_gate(f_gate, f_qubit)
+
+            for gate, qubit in msmts:
+                res = self._apply_gate(gate, qubit)
+                msmt_res.append( int(res.value) )
 
         if msmt_res:
             return ''.join(map(str, msmt_res))

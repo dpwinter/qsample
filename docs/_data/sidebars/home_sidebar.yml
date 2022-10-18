@@ -31,9 +31,6 @@ entries:
       title: Fault generators
       url: fault_generators.html
     - output: web,pdf
-      title: Circuit Samplers
-      url: samplers.circuit_samplers.html
-    - output: web,pdf
       title: Protocol Samplers
       url: samplers.protocol_samplers.html
     - output: web,pdf

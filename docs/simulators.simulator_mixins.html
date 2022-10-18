@@ -95,9 +95,10 @@ nb_path: "03a_simulators.simulator_mixins.ipynb"
             <span class="k">return</span> <span class="n">MeasureResult</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">determined</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     
 <span class="n">circuit</span> <span class="o">=</span> <span class="n">Circuit</span><span class="p">([{</span><span class="s1">&#39;X&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]},</span> <span class="p">{</span><span class="s1">&#39;measure&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">]},</span> <span class="p">{</span><span class="s1">&#39;measure&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">]}])</span>
+<span class="n">f_circuit</span> <span class="o">=</span> <span class="n">Circuit</span><span class="p">([{},</span> <span class="p">{},</span> <span class="p">{</span><span class="s1">&#39;X&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">]}])</span>
 
 <span class="n">test_sim</span> <span class="o">=</span> <span class="n">TestSim</span><span class="p">()</span>
-<span class="n">res</span> <span class="o">=</span> <span class="n">test_sim</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">circuit</span><span class="p">)</span> <span class="c1"># TestSim knows how to run() a circuit</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">test_sim</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span> <span class="n">f_circuit</span><span class="p">)</span> <span class="c1"># TestSim knows how to run() a circuit</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
 </pre></div>
 

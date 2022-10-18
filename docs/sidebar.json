@@ -8,7 +8,6 @@
     "CHP Simulator": "simulators.chp.html",
     "ProjectQ Statevector Simulator": "simulators.projectq.html",
     "Fault generators": "fault_generators.html",
-    "Circuit Samplers": "samplers.circuit_samplers.html",
     "Protocol Samplers": "samplers.protocol_samplers.html",
     "Sampler Callbacks": "samplers.callbacks.html",
     "Subset Helper": "samplers.subset_helper.html",
