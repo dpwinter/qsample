@@ -19,35 +19,32 @@ entries:
       title: Protocol
       url: protocol.html
     - output: web,pdf
-      title: Simulator Mixins
-      url: simulators.mixins.html
+      title: Simulator Mixin
+      url: sim.mixin.html
     - output: web,pdf
       title: CHP Simulator
-      url: simulators.chp.html
+      url: sim.stabilizer.html
     - output: web,pdf
-      title: ProjectQ Statevector Simulator
-      url: simulators.projectq.html
-    - output: web,pdf
-      title: Fault generators
-      url: fault_generators.html
-    - output: web,pdf
-      title: Sampler
-      url: xxsampler.html
-    - output: web,pdf
-      title: Sampler base class
-      url: sampler.base_sampler.html
-    - output: web,pdf
-      title: Direct Monte Carlo sampler
-      url: sampler.direct_sampler.html
-    - output: web,pdf
-      title: Sample Tree
-      url: sampler.sample_tree.html
-    - output: web,pdf
-      title: Subset Monte Carlo sampler
-      url: sampler.subset_sampler.html
+      title: Statevector Simulator
+      url: sim.statevector.html
     - output: web,pdf
       title: Sampler Callbacks
       url: callbacks.html
+    - output: web,pdf
+      title: Count Tree
+      url: sampler.tree.html
+    - output: web,pdf
+      title: Sampler base class
+      url: sampler.base.html
+    - output: web,pdf
+      title: Direct Monte Carlo sampler
+      url: sampler.direct.html
+    - output: web,pdf
+      title: Subset Monte Carlo sampler
+      url: sampler.subset.html
+    - output: web,pdf
+      title: Noise / Error models
+      url: noise.html
     - output: web,pdf
       title: Examples
       url: examples.html

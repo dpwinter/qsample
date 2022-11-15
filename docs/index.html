@@ -226,7 +226,7 @@ nb_path: "index.ipynb"
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>The protocol is now defined as a graph, where nodes are circuits and edges between the nodes are labelled with transition conditions between the circuits. Terminating a protocol with success (instead of fail) will not be shown explicitly by the protocol graph. The <code>check</code> argument takes a function, which returns a boolean, to evaluate a transition based on the sequence of measurement results stored in the node as a list (<code>ghz</code> in this example).</p>
+<p>The protocol is now defined as a graph, where nodes are circuits and edges between the nodes are labelled with transition conditions between the circuits. Terminating a protocol with success (instead of fail) will not be shown explicitly by the protocol graph. The <code>check</code> argument takes a function, which returns a boolean, to evaluate a transition based on the sequence of measurement results stored in the node as a list (<a href="/qsam/examples.html#ghz"><code>ghz</code></a> in this example).</p>
 
 </div>
 </div>
@@ -332,7 +332,7 @@ nb_path: "index.ipynb"
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Its <code>run</code> function takes the maximum number of samples and/or user specified callback functions. Here we use for example the <a href="/qsam/callbacks.html#RelStdTarget"><code>RelStdTarget</code></a> callback to specify a maximum error of 10% (which is actually the default value) or 50000 samples at max. The logical failure rate estimator and its uncertainty are then plotted in the range defined by <code>scale</code> by the <a href="/qsam/callbacks.html#PlotStats"><code>PlotStats</code></a> callback from the relevant information (counts and fail_counts) which are stored directly in the <a href="/qsam/xxsampler.html#Sampler"><code>Sampler</code></a> object.</p>
+<p>Its <code>run</code> function takes the maximum number of samples and/or user specified callback functions. Here we use for example the <a href="/qsam/callbacks.html#RelStdTarget"><code>RelStdTarget</code></a> callback to specify a maximum error of 10% (which is actually the default value) or 50000 samples at max. The logical failure rate estimator and its uncertainty are then plotted in the range defined by <code>scale</code> by the <a href="/qsam/callbacks.html#PlotStats"><code>PlotStats</code></a> callback from the relevant information (counts and fail_counts) which are stored directly in the <a href="/qsam/sampler.base.html#Sampler"><code>Sampler</code></a> object.</p>
 
 </div>
 </div>
@@ -1020,7 +1020,7 @@ nb_path: "index.ipynb"
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Let's first run 10 samples to see what the protocol does. For this means we can use the <code>VerboseCircuitExec</code> callback:</p>
+<p>Let's first run 10 samples to see what the protocol does. For this means we can use the <a href="/qsam/callbacks.html#VerboseCircuitExec"><code>VerboseCircuitExec</code></a> callback:</p>
 
 </div>
 </div>
