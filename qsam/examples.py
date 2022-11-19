@@ -161,7 +161,7 @@ def gen_ghz3():
     ghz3.add_edge('ghz', 'ghz', check='repeat(ghz)')
     ghz3.add_edge('ghz', 'FAIL', check='logErr(ghz)')
 
-    ghz3._ft = True
+    ghz3.fault_tolerant = True
 
     return ghz3
 ghz3 = gen_ghz3()
@@ -202,7 +202,7 @@ def gen_ghz_stab():
     ghz_stab.add_edge('COR', 'meas_2', check='True')
     ghz_stab.add_edge('meas_2', 'FAIL', check='logErr(meas_2[-1])')
 
-    ghz_stab._ft = True
+    ghz_stab.fault_tolerant = True
 
     return ghz_stab
 ghz_stab = gen_ghz_stab()
@@ -249,7 +249,7 @@ def gen_ftsteane():
 
     ftsteane.add_edge('meas', 'FAIL', check='logErr(meas[-1])')
 
-    ftsteane._ft = True
+    ftsteane.fault_tolerant = True
 
     return ftsteane
 ftsteane = gen_ftsteane()
@@ -313,7 +313,7 @@ def gen_steane0():
 
     init.add_edge('meas', 'FAIL', check='logErr(meas[-1])')
 
-    init._ft = True
+    init.fault_tolerant = True
 
     return init
 
@@ -413,7 +413,7 @@ def gen_flagstab():
 
     flagstab.add_edge('meas', 'FAIL', check='logErr(meas[-1])')
 
-    flagstab._ft = True
+    flagstab.fault_tolerant = True
 
     return flagstab
 

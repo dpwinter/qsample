@@ -7,7 +7,6 @@ __all__ = ['Callback', 'CallbackList', 'PlotStats', 'RelStdTarget', 'StatsPerSam
 import qsam.math as math
 import matplotlib.pyplot as plt
 import numpy as np
-from collections import OrderedDict
 
 # Cell
 class Callback:
@@ -73,22 +72,11 @@ class CallbackList:
 # Cell
 class PlotStats(Callback):
 
-    # def __init__(self, locgrp_probs=None):
-    #     self.locgrp_probs = locgrp_probs
-
     def on_sampler_end(self, sampler):
 
-        from .sampler.base import ranges_from_probs
-
         stats = sampler.stats()
-        if len(stats) == 4:
-            xs = ranges_from_probs(sampler.err_params).T
-        else:
-            xs = np.array(list(sampler.trees.keys())).T
-
-        x_label = list(sampler.err_params.keys())
-        fig,ax = plt.subplots(figsize=(6,4))
-        ax.set_ylabel('$p_L$')
+        xs = sampler.err_probs.T
+        x_label = list(sampler.err_model.groups)
 
         def pop(stats_len, ax):
             n_lines = int(stats_len/2)
@@ -110,7 +98,7 @@ class PlotStats(Callback):
 
             if len(set(x)) <= 1:
                 xticks = ax.get_xticks()
-                ax.set_xticks(xticks, [0] * len(xticks))
+                ax.set_xticks(xticks, [x[0]] * len(xticks))
                 pop(stats_len, ax)
             else:
                 ax.set_xscale('log')
@@ -118,6 +106,7 @@ class PlotStats(Callback):
                 if drawn:
                     pop(stats_len, ax)
                 else:
+                    ax.plot(x,x ,'k:', alpha=0.5)
                     ax.legend()
                 drawn = True
 
@@ -128,11 +117,13 @@ class PlotStats(Callback):
 
             return drawn
 
+        fig,ax = plt.subplots(figsize=(6,4))
+        ax.set_ylabel('$p_L$')
+
         drawn = plot(ax,xs[0],stats,0,False)
         for i,x in enumerate(xs[1:],1):
             ax = ax.twiny()
             drawn = plot(ax,x,stats,i,drawn)
-        ax.plot(xs[0], xs[0], 'k:', alpha=0.5)
 
 
 # Cell
@@ -235,7 +226,7 @@ class ErvPerSample(Callback):
         self.n_calls += 1
 
     def on_sampler_end(self, **kwargs):
-        data = OrderedDict()
+        data = dict()
         for i, erv_sel in enumerate(self.data):
             for j, (name, subset, erv) in enumerate(erv_sel):
                 key = (j, name, subset)

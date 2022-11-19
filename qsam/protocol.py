@@ -16,7 +16,7 @@ class Protocol:
 
     def __init__(self, fault_tolerant=False, *args, **kwargs):
         self.graph = nx.DiGraph(*args, **kwargs)
-        self._ft = fault_tolerant
+        self.fault_tolerant = fault_tolerant
         self._check_fns = DEFAULT_FUNCTIONS.copy()
         self._check_fns.update(len=len, bin=bin)
         self._circuits = {}
@@ -63,7 +63,7 @@ class Protocol:
             res = pickle.load(fp)
         self._circuits = res._circuits
         self._check_fns = res._check_fns
-        self._ft = res._ft
+        self.fault_tolerant = res.fault_tolerant
         return self
 
     def __iter__(self):

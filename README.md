@@ -72,7 +72,7 @@ sz_123 = Circuit([{"init": {8}},
 From the single ghz-circuit given above, we may construct a simple toy-protocol to demonstrate essential features of qsam. The protocol is that, whenever the circuit measurement is $-1$, we shall repeat the preparation circuit since the fifth qubit indicates preparation of an erroneous state. When the measurement is $+1$ the state is prepared correctly. If there is still no $+1$ after two preparation attempts, we count the protocol run as a logical failure. These conditions are defined in the following functions:
 
 ```python
-from qsam.protocol import Protocol, draw_protocol
+from qsam.protocol import Protocol
 
 def repeat(m):
     return len(m) < 2 and m[-1] == 1
@@ -86,7 +86,7 @@ functions = {'logErr': logErr, 'repeat': repeat}
 The protocol is now defined as a graph, where nodes are circuits and edges between the nodes are labelled with transition conditions between the circuits. Terminating a protocol with success (instead of fail) will not be shown explicitly by the protocol graph. The `check` argument takes a function, which returns a boolean, to evaluate a transition based on the sequence of measurement results stored in the node as a list (`ghz` in this example).
 
 ```python
-g = Protocol()
+g = Protocol(fault_tolerant=True)
 g._check_fns.update(functions)
 g.add_nodes_from(['ghz'], circuits=[ghz])
 
@@ -95,7 +95,7 @@ g.add_edge('START', 'ghz', check='True')
 g.add_edge('ghz', 'ghz', check='repeat(ghz)')
 g.add_edge('ghz', 'FAIL', check='logErr(ghz)')
 
-draw_protocol(g, figsize=(6,5))
+g.draw(figsize=(6,5))
 ```
 
 
@@ -107,11 +107,8 @@ draw_protocol(g, figsize=(6,5))
 We may now specify our error parameters, i.e. the range over which we wish to scale the physical error rates. Let's start with a single parameter $p$ for both single- and two-qubit-gates. Here, we are exploring logical failure rates for physical error rates $p \in [0.00001, 0.1]$.
 
 ```python
-from qsam.fault_generators import Depolarizing
-
 scale = np.logspace(-5,-1,5)
-err_params = {'p': scale}
-fault_gen = Depolarizing(err_params)
+err_probs = {'q': scale}
 ```
 
 We initialize a new direct Monte Carlo sampler and set up a depolarizing noise model.
@@ -119,25 +116,24 @@ We initialize a new direct Monte Carlo sampler and set up a depolarizing noise m
 ```python
 #slow
 
-from qsam.simulators.chp import ChpSimulator
-from qsam.sampler.direct_sampler import DirectSampler
+from qsam.sim.stabilizer import StabilizerSimulator as CHP
+from qsam.sampler.direct import DirectSampler
+from qsam.noise import E1
+import qsam.callbacks as cb
 
-d_sam = DirectSampler(g, ChpSimulator, fault_gen)
+d_sam = DirectSampler(protocol=g, simulator=CHP, err_model=E1, err_probs=err_probs)
 ```
 
 Its `run` function takes the maximum number of samples and/or user specified callback functions. Here we use for example the `RelStdTarget` callback to specify a maximum error of 10% (which is actually the default value) or 50000 samples at max. The logical failure rate estimator and its uncertainty are then plotted in the range defined by `scale` by the `PlotStats` callback from the relevant information (counts and fail_counts) which are stored directly in the `Sampler` object.
 
 ```python
 #slow
-
-import qsam.samplers.callbacks as cb
-
 callbacks = [
     cb.RelStdTarget(target=0.1),
-    cb.PlotStats(scale)
+    cb.PlotStats()
 ]
 
-d_sam.run(n_samples=1000, callbacks=callbacks)
+d_sam.run(n_samples=5000, callbacks=callbacks)
 ```
 
 
@@ -155,9 +151,20 @@ print(p_L)
 print(std)
 ```
 
-    [0.    0.    0.    0.002 0.049]
-    [0.00191345 0.00191345 0.00191345 0.00335716 0.01346508]
+    [0.0, 0.0, 0.0002, 0.0008, 0.0426]
+    [0.00038387 0.00038387 0.00054841 0.00087211 0.00560673]
 
+
+```python
+from ipywidgets import interact
+import ipywidgets as widgets
+
+def get_tree(i):
+    print("p_phy=", list(d_sam.trees.keys())[i])
+    return (list(d_sam.trees.values())[i]).draw()
+
+interact(get_tree, i=widgets.IntSlider(min=0, max=len(d_sam.trees)-1, step=1, value=0));
+```
 
 We can observe in the statistics of the direct MC Sampler that it does not even record logical failures with moderately low $p$ with the given number of samples. The Subset Sampler fixes this problem. 
 
@@ -165,20 +172,20 @@ Additionally to just sampling the logical failure rate we can specify a variety 
 
 ```python
 #slow
-from qsam.sampler.subset_sampler import SubsetSampler
+from qsam.sampler.subset import SubsetSampler
 
-s_sam = SubsetSampler(g, ChpSimulator, fault_gen, p_max=0.1)
+s_sam = SubsetSampler(protocol=g, simulator=CHP, pmax={'q': 0.1}, err_model=E1, err_probs=err_probs)
 
 
 callbacks = [
     cb.StatsPerSample()
 ]
-s_sam.run(1000, callbacks=callbacks)
+s_sam.run(n_samples=1000, callbacks=callbacks)
 ```
 
 
     
-![png](docs/images/output_27_0.png)
+![png](docs/images/output_28_0.png)
     
 
 
@@ -186,20 +193,13 @@ The Sampler instance contains a `Tree` structure that we can investigate manuall
 
 ```python
 #slow
-s_sam.tree.display()
+s_sam.tree.draw()
 ```
 
 
     
-![png](docs/images/output_29_0.png)
+![png](docs/images/output_30_0.png)
     
-
-
-
-
-
-    'temp.png'
-
 
 
 From plotting the MC and SS results together we can see that they produce the same results in some intermediate regime of $p$. Subset Sampling achieves tight bounds on the logical failure rate for low $p$ where the uncertainty for MC is large. Vice versa, Subset Sampling becomes inefficient if the cutoff error from only sampling a few subsets becomes large for larger $p$. Here though, MC is efficient.
@@ -229,7 +229,7 @@ plt.legend();
 
 
     
-![png](docs/images/output_31_0.png)
+![png](docs/images/output_32_0.png)
     
 
 
@@ -238,8 +238,7 @@ With the already sampled subsets we can also vary the plotted range in retrospec
 ```python
 #slow
 adjusted_scale = np.logspace(-3,-1,5)
-s_sam.set_range({'p': adjusted_scale})
-p_L_low, ss_std, delta, _ = s_sam.stats()
+p_L_low, ss_std, delta, _ = s_sam.stats({'q': adjusted_scale})
 ```
 
 (Below we also show the MC output in the adjusted range but for the direct Sampler we cannot modify the range in that way)
@@ -263,7 +262,7 @@ plt.legend();
 
 
     
-![png](docs/images/output_35_0.png)
+![png](docs/images/output_36_0.png)
     
 
 
@@ -276,7 +275,7 @@ s_sam.run(100, callbacks=callbacks)
 
 
     
-![png](docs/images/output_37_0.png)
+![png](docs/images/output_38_0.png)
     
 
 
@@ -287,100 +286,113 @@ s_sam.run(100, callbacks=callbacks)
 print(s_sam.tree)
 ```
 
-    ghz (1100)
-    ├── (0,) (1)
-    │   └── None (1/1, 1.57e-01)
-    ├── (1,) (839)
-    │   ├── ghz (366/839, 1.12e-03)
-    │   │   ├── (0,) (1)
-    │   │   │   └── None (1/1, 1.57e-01)
-    │   │   ├── (1,) (278)
-    │   │   │   ├── None (182/278, 3.09e-03)
-    │   │   │   └── FAIL (96/278, 3.09e-03)
-    │   │   ├── (2,) (78)
-    │   │   │   ├── FAIL (44/78, 1.16e-02)
-    │   │   │   └── None (34/78, 1.16e-02)
-    │   │   └── (3,) (9)
-    │   │       ├── FAIL (4/9, 7.41e-02)
-    │   │       └── None (5/9, 7.41e-02)
-    │   └── None (473/839, 1.12e-03)
-    ├── (2,) (229)
-    │   ├── None (118/229, 4.12e-03)
-    │   └── ghz (111/229, 4.12e-03)
-    │       ├── (0,) (1)
-    │       │   └── None (1/1, 1.57e-01)
-    │       ├── (1,) (88)
-    │       │   ├── None (47/88, 1.04e-02)
-    │       │   └── FAIL (41/88, 1.04e-02)
-    │       ├── (2,) (21)
-    │       │   ├── None (13/21, 3.68e-02)
-    │       │   └── FAIL (8/21, 3.68e-02)
-    │       └── (3,) (1)
-    │           └── FAIL (1/1, 1.57e-01)
-    └── (3,) (31)
-        ├── ghz (13/31, 2.69e-02)
-        │   ├── (0,) (1)
-        │   │   └── None (1/1, 1.57e-01)
-        │   ├── (1,) (11)
-        │   │   ├── None (5/11, 6.43e-02)
-        │   │   └── FAIL (6/11, 6.43e-02)
-        │   └── (2,) (1)
-        │       └── None (1/1, 1.57e-01)
-        └── None (18/31, 2.69e-02)
+    ghz (1100, 0.00e+00)
+    ├── (0,) (1, 1.57e-01)
+    │   └── None (1/1)
+    ├── (1,) (841, 1.11e-03)
+    │   ├── None (482/841)
+    │   └── ghz (359/841)
+    │       ├── (2,) (81, 1.13e-02)
+    │       │   ├── FAIL (43/81)
+    │       │   └── None (38/81)
+    │       ├── (1,) (266, 3.48e-03)
+    │       │   ├── None (153/266)
+    │       │   └── FAIL (113/266)
+    │       ├── (0,) (1, 1.57e-01)
+    │       │   └── None (1/1)
+    │       └── (3,) (11, 6.43e-02)
+    │           ├── FAIL (5/11)
+    │           └── None (6/11)
+    ├── (3,) (26, 3.15e-02)
+    │   ├── None (11/26)
+    │   └── ghz (15/26)
+    │       ├── (2,) (3, 1.34e-01)
+    │       │   ├── None (1/3)
+    │       │   └── FAIL (2/3)
+    │       ├── (0,) (1, 1.57e-01)
+    │       │   └── None (1/1)
+    │       └── (1,) (11, 6.43e-02)
+    │           ├── FAIL (5/11)
+    │           └── None (6/11)
+    ├── (2,) (228, 4.14e-03)
+    │   ├── None (114/228)
+    │   └── ghz (114/228)
+    │       ├── (0,) (1, 1.57e-01)
+    │       │   └── None (1/1)
+    │       ├── (1,) (86, 1.01e-02)
+    │       │   ├── FAIL (33/86)
+    │       │   └── None (53/86)
+    │       ├── (3,) (2, 1.64e-01)
+    │       │   ├── FAIL (1/2)
+    │       │   └── None (1/2)
+    │       └── (2,) (25, 3.21e-02)
+    │           ├── None (15/25)
+    │           └── FAIL (10/25)
+    └── (4,) (4, 1.07e-01)
+        ├── None (3/4)
+        └── ghz (1/4)
+            └── (0,) (1, 1.57e-01)
+                └── None (1/1)
 
 
 ```python
 #slow
-s_sam.tree.save('ghz_rep.json')
+s_sam.save('ghz_rep')
 ```
 
 ```python
 #slow
-s_sam = SubsetSampler(g, ChpSimulator, fault_gen, p_max=0.1)
-s_sam.tree.load('ghz_rep.json')
-print(s_sam.tree)
+s_sam2 = SubsetSampler.load('ghz_rep')
+print(s_sam2.tree)
 ```
 
-    ghz (1100)
-    ├── [0] (1)
-    │   └── None (1/1, 1.57e-01)
-    ├── [1] (839)
-    │   ├── ghz (366/839, 1.12e-03)
-    │   │   ├── [0] (1)
-    │   │   │   └── None (1/1, 1.57e-01)
-    │   │   ├── [1] (278)
-    │   │   │   ├── None (182/278, 3.09e-03)
-    │   │   │   └── FAIL (96/278, 3.09e-03)
-    │   │   ├── [2] (78)
-    │   │   │   ├── FAIL (44/78, 1.16e-02)
-    │   │   │   └── None (34/78, 1.16e-02)
-    │   │   └── [3] (9)
-    │   │       ├── FAIL (4/9, 7.41e-02)
-    │   │       └── None (5/9, 7.41e-02)
-    │   └── None (473/839, 1.12e-03)
-    ├── [2] (229)
-    │   ├── None (118/229, 4.12e-03)
-    │   └── ghz (111/229, 4.12e-03)
-    │       ├── [0] (1)
-    │       │   └── None (1/1, 1.57e-01)
-    │       ├── [1] (88)
-    │       │   ├── None (47/88, 1.04e-02)
-    │       │   └── FAIL (41/88, 1.04e-02)
-    │       ├── [2] (21)
-    │       │   ├── None (13/21, 3.68e-02)
-    │       │   └── FAIL (8/21, 3.68e-02)
-    │       └── [3] (1)
-    │           └── FAIL (1/1, 1.57e-01)
-    └── [3] (31)
-        ├── ghz (13/31, 2.69e-02)
-        │   ├── [0] (1)
-        │   │   └── None (1/1, 1.57e-01)
-        │   ├── [1] (11)
-        │   │   ├── None (5/11, 6.43e-02)
-        │   │   └── FAIL (6/11, 6.43e-02)
-        │   └── [2] (1)
-        │       └── None (1/1, 1.57e-01)
-        └── None (18/31, 2.69e-02)
+    ghz (1100, 0.00e+00)
+    ├── (0,) (1, 1.57e-01)
+    │   └── None (1/1)
+    ├── (1,) (841, 1.11e-03)
+    │   ├── None (482/841)
+    │   └── ghz (359/841)
+    │       ├── (2,) (81, 1.13e-02)
+    │       │   ├── FAIL (43/81)
+    │       │   └── None (38/81)
+    │       ├── (1,) (266, 3.48e-03)
+    │       │   ├── None (153/266)
+    │       │   └── FAIL (113/266)
+    │       ├── (0,) (1, 1.57e-01)
+    │       │   └── None (1/1)
+    │       └── (3,) (11, 6.43e-02)
+    │           ├── FAIL (5/11)
+    │           └── None (6/11)
+    ├── (3,) (26, 3.15e-02)
+    │   ├── None (11/26)
+    │   └── ghz (15/26)
+    │       ├── (2,) (3, 1.34e-01)
+    │       │   ├── None (1/3)
+    │       │   └── FAIL (2/3)
+    │       ├── (0,) (1, 1.57e-01)
+    │       │   └── None (1/1)
+    │       └── (1,) (11, 6.43e-02)
+    │           ├── FAIL (5/11)
+    │           └── None (6/11)
+    ├── (2,) (228, 4.14e-03)
+    │   ├── None (114/228)
+    │   └── ghz (114/228)
+    │       ├── (0,) (1, 1.57e-01)
+    │       │   └── None (1/1)
+    │       ├── (1,) (86, 1.01e-02)
+    │       │   ├── FAIL (33/86)
+    │       │   └── None (53/86)
+    │       ├── (3,) (2, 1.64e-01)
+    │       │   ├── FAIL (1/2)
+    │       │   └── None (1/2)
+    │       └── (2,) (25, 3.21e-02)
+    │           ├── None (15/25)
+    │           └── FAIL (10/25)
+    └── (4,) (4, 1.07e-01)
+        ├── None (3/4)
+        └── ghz (1/4)
+            └── (0,) (1, 1.57e-01)
+                └── None (1/1)
 
 
 ## Real examples
@@ -446,7 +458,7 @@ def flagged_z_look_up_table_1(z):
 
 functions = {"logErr": logErr, "lut": flagged_z_look_up_table_1}
 
-init = Protocol()
+init = Protocol(fault_tolerant=True)
 init._check_fns.update(functions)
 
 init.add_nodes_from(['ENC', 'SZ', 'meas'], circuits=[eft, sz_123, meas])
@@ -463,12 +475,12 @@ init.add_edge('X_COR', 'meas', check='True')
 
 init.add_edge('meas', 'FAIL', check='logErr(meas[-1])')
 
-draw_protocol(init, figsize=(6,6), edge_legend=True)
+init.draw(figsize=(6,8), legend=True)
 ```
 
 
     
-![png](docs/images/output_44_0.png)
+![png](docs/images/output_45_0.png)
     
 
 
@@ -477,45 +489,55 @@ The protocol contains a recovery operation which is applied conditioned on the s
 We may choose more realistic error rates for single and two qubit gates.
 
 ```python
-err_params = {'p1': 0.01 * scale, 'p2': 0.1 * scale}
+err_probs = {'q1': 0.01 * scale, 'q2': 0.1 * scale}
 ```
 
 Let's first run 10 samples to see what the protocol does. For this means we can use the `VerboseCircuitExec` callback:
 
 ```python
 #slow
-fault_gen.__init__(err_params)
-sb_sam = SubsetSampler(init, ChpSimulator, fault_gen, p_max=(0.01, 0.1))
+from qsam.noise import E2
 
-sb_sam.run(10, verbose=True)
+sb_sam = SubsetSampler(init, CHP, pmax={'q1': 0.01, 'q2': 0.1}, err_probs=err_probs, err_model=E2)
+
+callbacks = [
+    cb.VerboseCircuitExec()
+]
+sb_sam.run(10, callbacks=callbacks)
 ```
 
-    Node ENC, faults ["Tick 5: {'Y': {0}, 'Z': {6}}"], measured 1 -> SZ
-    Node SZ, faults [], measured 1 -> X_COR
-    Node X_COR, faults [], measured None -> meas
-    Node meas, faults [], measured 1101101 -> None
-    Node ENC, faults [], measured 0 -> meas
-    Node meas, faults [], measured 1101001 -> None
-    Node ENC, faults [], measured 0 -> meas
-    Node meas, faults [], measured 1010101 -> None
-    Node ENC, faults ["Tick 4: {'X': {3}}"], measured 1 -> SZ
-    Node SZ, faults ["Tick 1: {'Y': {8}}"], measured 0 -> None
-    Node ENC, faults ["Tick 2: {'Y': {0}}", "Tick 12: {'X': {5, 7}}"], measured 0 -> meas
-    Node meas, faults [], measured 1101111 -> FAIL
-    Node ENC, faults [], measured 0 -> meas
-    Node meas, faults [], measured 1100110 -> None
-    Node ENC, faults ["Tick 11: {'X': {2}, 'Y': {7}}"], measured 1 -> SZ
-    Node SZ, faults [], measured 0 -> None
-    Node ENC, faults ["Tick 6: {'X': {3, 4}}"], measured 1 -> SZ
-    Node SZ, faults [], measured 1 -> X_COR
-    Node X_COR, faults [], measured None -> meas
-    Node meas, faults [], measured 0110001 -> None
-    Node ENC, faults ["Tick 2: {'X': {0}, 'Y': {4}}"], measured 0 -> meas
-    Node meas, faults [], measured 1010101 -> None
-    Node ENC, faults ["Tick 5: {'X': {0}, 'Z': {6}}"], measured 1 -> SZ
-    Node SZ, faults [], measured 1 -> X_COR
-    Node X_COR, faults [], measured None -> meas
-    Node meas, faults [], measured 0001011 -> None
+    ENC -> Faults: [] -> Msmt: 0
+    meas -> Faults: [] -> Msmt: 1100110
+    None
+    ENC -> Faults: [(9, {'Y': {5, 6}}), (10, {'Z': {4}, 'X': {7}})] -> Msmt: 0
+    meas -> Faults: [] -> Msmt: 0001100
+    FAIL
+    ENC -> Faults: [(2, {'X': {0}})] -> Msmt: 1
+    SZ -> Faults: [(1, {'Z': {0}})] -> Msmt: 0
+    None
+    ENC -> Faults: [(12, {'Y': {5, 7}})] -> Msmt: 1
+    SZ -> Faults: [(2, {'Z': {1}, 'X': {8}})] -> Msmt: 1
+    X_COR: [(0, {'X': {6}})]
+    meas -> Faults: [] -> Msmt: 0110000
+    FAIL
+    ENC -> Faults: [(2, {'Z': {0}})] -> Msmt: 0
+    meas -> Faults: [] -> Msmt: 0110011
+    None
+    ENC -> Faults: [(5, {'Z': {0}, 'X': {6}}), (6, {'Y': {3, 4}}), (7, {'X': {5}})] -> Msmt: 0
+    meas -> Faults: [] -> Msmt: 0001110
+    None
+    ENC -> Faults: [(4, {'Z': {3}, 'Y': {5}}), (6, {'X': {3, 4}}), (9, {'Z': {5}})] -> Msmt: 0
+    meas -> Faults: [] -> Msmt: 1101001
+    None
+    ENC -> Faults: [(2, {'Y': {0}, 'Z': {4}}), (8, {'X': {0, 2}})] -> Msmt: 0
+    meas -> Faults: [] -> Msmt: 1010100
+    None
+    ENC -> Faults: [(2, {'Y': {0}, 'Z': {4}})] -> Msmt: 1
+    SZ -> Faults: [] -> Msmt: 0
+    None
+    ENC -> Faults: [(10, {'Y': {4}})] -> Msmt: 0
+    meas -> Faults: [] -> Msmt: 0110111
+    None
 
 
 When the flag is triggered, measurement of $Z_0Z_1Z_3Z_6$ follows. 
@@ -523,20 +545,17 @@ When the flag is triggered, measurement of $Z_0Z_1Z_3Z_6$ follows.
 We can now go on and sample in a regime virtually inaccessible to direct MC until our target uncertainty of -- let say 5% -- is reached.
 
 ```python
-err_params = {'p1': 0.0001 * scale, 'p2': 0.001 * scale}
-fault_gen.__init__(err_params)
+err_probs = {'q1': 0.0001 * scale, 'q2': 0.001 * scale}
 ```
 
 ```python
 #slow
-fault_gen.__init__(err_params)
-sb_sam = SubsetSampler(init, ChpSimulator, fault_gen, p_max=(0.01, 0.1))
+sb_sam = SubsetSampler(init, CHP, pmax={'q1': 0.01, 'q2': 0.1}, err_probs=err_probs, err_model=E2)
 
 callbacks = [
-    cb.RelStdTarget(target=0.05),
-    cb.SubsetRates(),
+    cb.RelStdTarget(target=0.01),
     cb.StatsPerSample(),
-    cb.PlotStats(scale)
+    cb.PlotStats()
 ]
 
 sb_sam.run(1_000, callbacks=callbacks)
@@ -544,126 +563,25 @@ sb_sam.run(1_000, callbacks=callbacks)
 
 
     
-![png](docs/images/output_51_0.png)
+![png](docs/images/output_52_0.png)
     
 
 
 
     
-![png](docs/images/output_51_1.png)
-    
-
-
-
-    
-![png](docs/images/output_51_2.png)
+![png](docs/images/output_52_1.png)
     
 
 
 ```python
 #slow
-print(sb_sam.tree)
+sb_sam.tree.draw()
 ```
 
-    ENC (1000)
-    ├── (0, 1) (564)
-    │   ├── meas (265/564, 1.69e-03)
-    │   │   └── (0, 0) (265)
-    │   │       └── None (265/265, 5.10e-05)
-    │   └── SZ (299/564, 1.69e-03)
-    │       ├── (0, 0) (219)
-    │       │   ├── X_COR (70/219, 3.76e-03)
-    │       │   │   └── meas (70/70, 6.77e-04)
-    │       │   │       └── (0, 0) (70)
-    │       │   │           └── None (70/70, 6.77e-04)
-    │       │   └── None (149/219, 3.76e-03)
-    │       ├── (0, 1) (74)
-    │       │   ├── X_COR (38/74, 1.23e-02)
-    │       │   │   └── meas (38/38, 2.11e-03)
-    │       │   │       └── (0, 0) (38)
-    │       │   │           ├── None (16/38, 2.24e-02)
-    │       │   │           └── FAIL (22/38, 2.24e-02)
-    │       │   └── None (36/74, 1.23e-02)
-    │       └── (0, 2) (6)
-    │           ├── None (2/6, 9.10e-02)
-    │           └── X_COR (4/6, 9.10e-02)
-    │               └── meas (4/4, 6.00e-02)
-    │                   └── (0, 0) (4)
-    │                       ├── FAIL (3/4, 1.07e-01)
-    │                       └── None (1/4, 1.07e-01)
-    ├── (0, 0) (76)
-    │   └── meas (76/76, 5.79e-04)
-    │       └── (0, 0) (76)
-    │           └── None (76/76, 5.79e-04)
-    ├── (0, 2) (271)
-    │   ├── SZ (134/271, 3.49e-03)
-    │   │   ├── (0, 0) (96)
-    │   │   │   ├── X_COR (42/96, 9.47e-03)
-    │   │   │   │   └── meas (42/42, 1.76e-03)
-    │   │   │   │       └── (0, 0) (42)
-    │   │   │   │           ├── None (32/42, 1.57e-02)
-    │   │   │   │           └── FAIL (10/42, 1.57e-02)
-    │   │   │   └── None (54/96, 9.47e-03)
-    │   │   ├── (0, 1) (37)
-    │   │   │   ├── None (16/37, 2.31e-02)
-    │   │   │   └── X_COR (21/37, 2.31e-02)
-    │   │   │       └── meas (21/21, 5.98e-03)
-    │   │   │           └── (0, 0) (21)
-    │   │   │               ├── None (15/21, 3.27e-02)
-    │   │   │               └── FAIL (6/21, 3.27e-02)
-    │   │   └── (0, 2) (1)
-    │   │       └── None (1/1, 1.57e-01)
-    │   └── meas (137/271, 3.49e-03)
-    │       └── (0, 0) (137)
-    │           ├── None (104/137, 5.04e-03)
-    │           └── FAIL (33/137, 5.04e-03)
-    ├── (0, 3) (74)
-    │   ├── meas (40/74, 1.23e-02)
-    │   │   └── (0, 0) (40)
-    │   │       ├── None (26/40, 2.01e-02)
-    │   │       └── FAIL (14/40, 2.01e-02)
-    │   └── SZ (34/74, 1.23e-02)
-    │       ├── (0, 0) (30)
-    │       │   ├── None (14/30, 2.83e-02)
-    │       │   └── X_COR (16/30, 2.83e-02)
-    │       │       └── meas (16/16, 9.37e-03)
-    │       │           └── (0, 0) (16)
-    │       │               ├── None (12/16, 3.86e-02)
-    │       │               └── FAIL (4/16, 3.86e-02)
-    │       └── (0, 1) (4)
-    │           └── X_COR (4/4, 6.00e-02)
-    │               └── meas (4/4, 6.00e-02)
-    │                   └── (0, 0) (4)
-    │                       ├── FAIL (3/4, 1.07e-01)
-    │                       └── None (1/4, 1.07e-01)
-    ├── (0, 4) (1)
-    │   └── meas (1/1, 1.57e-01)
-    │       └── (0, 0) (1)
-    │           └── FAIL (1/1, 1.57e-01)
-    ├── (1, 1) (12)
-    │   ├── SZ (5/12, 5.93e-02)
-    │   │   ├── (0, 0) (4)
-    │   │   │   ├── X_COR (2/4, 1.22e-01)
-    │   │   │   │   └── meas (2/2, 1.08e-01)
-    │   │   │   │       └── (0, 0) (2)
-    │   │   │   │           └── None (2/2, 1.08e-01)
-    │   │   │   └── None (2/4, 1.22e-01)
-    │   │   └── (0, 1) (1)
-    │   │       └── X_COR (1/1, 1.57e-01)
-    │   │           └── meas (1/1, 1.57e-01)
-    │   │               └── (0, 0) (1)
-    │   │                   └── None (1/1, 1.57e-01)
-    │   └── meas (7/12, 5.93e-02)
-    │       └── (0, 0) (7)
-    │           └── None (7/7, 3.14e-02)
-    ├── (1, 0) (1)
-    │   └── meas (1/1, 1.57e-01)
-    │       └── (0, 0) (1)
-    │           └── None (1/1, 1.57e-01)
-    └── (1, 2) (1)
-        └── meas (1/1, 1.57e-01)
-            └── (0, 0) (1)
-                └── None (1/1, 1.57e-01)
+
+    
+![png](docs/images/output_53_0.png)
+    
 
 
 More elaborate examples are given in `directory`.

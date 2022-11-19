@@ -1,7 +1,1 @@
-- circuit: Automatically detect and set ff_det
-- Avoid different interface for ss and direct
-- err_params dict: keys should not be arbitrary.
-- check plotStats callback.. too complex!
-
-- faster way to compute ERV
-- check delta var p invariance for long chains
+-change name

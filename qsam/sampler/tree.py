@@ -7,6 +7,7 @@ __all__ = ['Node', 'Variable', 'Constant', 'CountTree']
 from anytree import NodeMixin, RenderTree, PreOrderIter
 import qsam.math as math
 import pydot
+import dill as pickle
 
 # Cell
 class Node(NodeMixin):
@@ -101,22 +102,8 @@ class CountTree:
         return acc
 
     @property
-    def delta2(self):
-        return 1.0 - self.norm
-
-    @property
     def delta(self):
-        acc = 0
-        variables = [node for node in self.root.descendants if isinstance(node, Variable) and not node.is_leaf] + [self.root]
-        for node in variables:
-            if all([isinstance(child, Variable) for child in node.children]): continue
-            if node.is_root: twig = 1
-            else: twig = self.twig(node)
-            child_delta = 1
-            for child in node.children:
-                child_delta -= self.constants[child.cid][child.name]
-            acc += twig * child_delta
-        return acc
+        return 1.0 - self.norm
 
     @property
     def rate(self):
@@ -137,11 +124,15 @@ class CountTree:
 
     def subtree(self, node, all_leaves=False):
         path_sum = 0.0
+
         for leaf in node.leaves:
             if leaf.marked or all_leaves:
+
+                # if self.is_invariant_path(leaf): ## NEEDS TO BE DISCUSSED!
+                #     continue # exclude invariant paths (would always lead to None)
+
                 prod = 1.0
                 for n in leaf.iter_path_reverse():
-                    #if is_invariant_path(n): #
                     if n == node:
                         break
                     else:
@@ -155,7 +146,8 @@ class CountTree:
         for child in node.children:
             subtree = self.subtree(child, all_leaves)
             subtrees.append(subtree)
-        if len(subtrees) == 1: return subtrees[0]
+        if len(subtrees) == 1:
+            return subtrees[0]
         elif len(subtrees) == 2: return subtrees[0] - subtrees[1]
         else: raise Exception(f"Node {node.name} must have <= 2 children.")
 
@@ -164,20 +156,19 @@ class CountTree:
         subtreediff = self.subtreediff(node, all_leaves)
         return node.variance * subtreediff**2
 
-    def is_invariant_path(self, node):
-        if all([n.is_leaf for n in node.children]):
-            path_weight = sum([sum(n.name) for n in node.path[1:] if isinstance(n,Constant)])
-            return path_weight < self.min_path_weight
-        else:
-            return False
+    def is_invariant_path(self, leaf):
+        path_weight = sum([sum(n.name) for n in leaf.path[1:] if isinstance(n,Constant)])
+        return path_weight < self.min_path_weight
 
     @property
     def variance(self):
         acc = 0.0
         constants = [node for node in self.root.descendants if isinstance(node, Constant)]
         for node in constants:
-            if node.is_deterministic or self.is_invariant_path(node):
-                continue
+
+            if node.is_deterministic or (all([c.is_leaf for c in node.children]) and self.is_invariant_path(node)):
+                continue # exclude deterministic nodes and invariant paths
+
             twig = self.twig(node)
             if len(node.children) == 1 and node.children[0].is_leaf:
                 acc += twig**2 * node.variance
@@ -205,12 +196,12 @@ class CountTree:
         import numpy as np
         data = self.to_dict()
         data["constants"] = {k: v.tolist() if isinstance(v, np.ndarray) else v for k,v in self.constants.items()}
-        with open(path, 'w') as fp:
-            json.dump(data, fp, default=lambda x: x.item() if isinstance(x, np.generic) else x)
+        with open(path, 'wb') as fp:
+            pickle.dump(data, fp)
 
     def load(self, path):
-        with open(path, 'r') as fp:
-            data = json.load(fp)
+        with open(path, 'rb') as fp:
+            data = pickle.load(fp)
         self.constants = data.pop("constants")
         self.from_dict(data)
 

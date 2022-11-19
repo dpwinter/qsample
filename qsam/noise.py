@@ -30,16 +30,16 @@ class ErrorModel:
         raise NotImplemented
 
     @staticmethod
-    def choose_p(groups, probs):
+    def choose_p(groups: dict, probs: list):
         """Select elements from group g_i with probability p_i."""
         return {grp: [loc for loc in locs if np.random.random() < prob]
-                for (grp,locs),prob in zip(groups.items(), probs)}
+                for (grp,locs), prob in zip(groups.items(), probs)}
 
     @staticmethod
-    def choose_w(groups, weights):
+    def choose_w(groups: dict, weights: list):
         """Select w_i locations for group g_i in groups"""
-        return {grp: [locs[i] for i in np.random.choice(len(locs), wgt, replace=False)]
-                for (grp,locs),wgt in zip(groups.items(), weights)}
+        return {grp: [locs[i] for i in np.random.choice(len(locs), weight, replace=False)]
+                for (grp,locs),weight in zip(groups.items(), weights)}
 
     def run(self, circuit, fgroups):
         """Generate new Circuit of same length as `Circuit` with faults generated
@@ -66,7 +66,7 @@ class E0(ErrorModel):
     groups = ["0"]
 
     def group(self, circuit):
-        return {0: {}}
+        return {"0": {}}
 
     def run(self, *args, **kwargs):
         return None
@@ -75,25 +75,25 @@ class E0(ErrorModel):
 class E1(ErrorModel):
     """One prob/weight for all 1- and 2-qubit gates"""
 
-    groups = ["1+2"]
+    groups = ["q"]
 
     def group(self, circuit):
-        gates = GATES["1qb"] | GATES["2qb"]
-        return {"1+2": [(ti,q) for ti,t in enumerate(circuit) for g,qs in t.items() for q in qs if g in gates]}
+        gates = GATES["q1"] | GATES["q2"]
+        return {"q": [(ti,q) for ti,t in enumerate(circuit) for g,qs in t.items() for q in qs if g in gates]}
 
     def generate(self, fgroups, circuit):
 
         errsets = {
-            1: DEPOLAR1,
-            2: DEPOLAR2
+            "q1": DEPOLAR1,
+            "q2": DEPOLAR2
         }
 
         for grp, locs in fgroups.items():
             for loc in locs:
                 if isinstance(loc[1], tuple):
-                    errset = errsets[2]
+                    errset = errsets["q2"]
                 else:
-                    errset = errsets[1]
+                    errset = errsets["q1"]
                 fop = list(errset)[np.random.choice(len(errset))]
                 yield loc, fop
 
@@ -101,25 +101,25 @@ class E1(ErrorModel):
 class E2(ErrorModel):
     """Individual errors on 1-qubit and 2-qubit gates."""
 
-    groups = ["0", "1"]
+    groups = ["q1", "q2"]
 
     def group(self, circuit):
-        gates = {0: GATES["1qb"], 1: GATES["2qb"]}
-        return {i: [(ti,q) for ti,t in enumerate(circuit) for g,qs in t.items()
-                    for q in qs if g in gset] for i,gset in gates.items()}
+        gates = {"q1": GATES["q1"], "q2": GATES["q2"]}
+        return {grp: [(ti,q) for ti,t in enumerate(circuit) for g,qs in t.items()
+                      for q in qs if g in gset] for grp,gset in gates.items()}
 
     def generate(self, fgroups, circuit):
         errsets = {
-            1: DEPOLAR1,
-            2: DEPOLAR2
+            "q1": DEPOLAR1,
+            "q2": DEPOLAR2
         }
 
         for grp, locs in fgroups.items():
             for loc in locs:
                 if isinstance(loc[1], tuple):
-                    errset = errsets[2]
+                    errset = errsets["q2"]
                 else:
-                    errset = errsets[1]
+                    errset = errsets["q1"]
                 fop = list(errset)[np.random.choice(len(errset))]
                 yield loc, fop
 
@@ -127,11 +127,11 @@ class E2(ErrorModel):
 class E3(ErrorModel):
     """Errors on all gates individual + idle."""
 
-    groups = ["1", "2", "meas", "idle", "init"]
+    groups = ["q1", "q2", "meas", "idle", "init"]
 
     def group(self, circuit):
-        groups =  {i: [(ti,q) for ti,t in enumerate(circuit) for g,qs in t.items()
-                          for q in qs if g in gset] for i,gset in GATES.items()}
+        groups =  {grp: [(ti,q) for ti,t in enumerate(circuit) for g,qs in t.items()
+                         for q in qs if g in gset] for grp,gset in GATES.items()}
         qbs = set(unpack(circuit))
         groups['idle'] = [(ti,q) for ti,t in enumerate(circuit) for q in qbs.difference(set(unpack(t)))]
         return groups
@@ -139,10 +139,10 @@ class E3(ErrorModel):
     def generate(self, fgroups, circuit):
 
         errsets = {
-            '1qb': DEPOLAR1,
-            '2qb': DEPOLAR2,
+            'q1': DEPOLAR1,
+            'q2': DEPOLAR2,
             'meas': XFLIP,
-            'idle': DEPOLAR1,
+            'idle': ZFLIP,
             'init': XFLIP
         }
 
@@ -155,7 +155,7 @@ class E3(ErrorModel):
 class E3_1(ErrorModel):
     """Like E3, but idle locations split in two subsets."""
 
-    groups = ["1", "2", "meas", "idle1", "idle2", "init"]
+    groups = ["q1", "q2", "meas", "idle1", "idle2", "init"]
 
     def group(self, circuit):
         groups =  {i: [(ti,q) for ti,t in enumerate(circuit) for g,qs in t.items()
@@ -163,17 +163,17 @@ class E3_1(ErrorModel):
         qbs = set(unpack(circuit))
         groups['idle1'] = [(ti,q) for ti,t in enumerate(circuit)
                            for q in qbs.difference(set(unpack(t)))
-                           if not any([op in GATES['2qb'] for op in t.keys()])]
+                           if not any([op in GATES['q2'] for op in t.keys()])]
         groups['idle2'] = [(ti,q) for ti,t in enumerate(circuit)
                            for q in qbs.difference(set(unpack(t)))
-                           if any([op in GATES['2qb'] for op in t.keys()])]
+                           if any([op in GATES['q2'] for op in t.keys()])]
         return groups
 
     def generate(self, fgroups, circuit):
 
         errsets = {
-            '1qb': DEPOLAR1,
-            '2qb': DEPOLAR2,
+            'q1': DEPOLAR1,
+            'q2': DEPOLAR2,
             'meas': XFLIP,
             'idle1': DEPOLAR1,
             'idle2': DEPOLAR1,
@@ -189,7 +189,7 @@ class E3_1(ErrorModel):
 class InnsbruckTrap(ErrorModel):
     """Extension of E3_1 adding crosstalk and idlem."""
 
-    groups = ["1", "2", "init", "meas", "idle1", "idle2", "idlem", "c1", "c2_com", "c2_!com"]
+    groups = ["q1", "q2", "init", "meas", "idle1", "idle2", "idlem", "c1", "c2_com", "c2_!com"]
 
     def group(self, circuit):
         res = {}
@@ -207,7 +207,7 @@ class InnsbruckTrap(ErrorModel):
             idle_qubits = [(tidx,q) for q in qubits.difference(set(unpack(tick)))]
             if any([True for g,locs in tick.items() if g == 'measure']):
                 res['idlem'] += idle_qubits
-            elif any([True for g,locs in tick.items() if g in GATES['2qb']]):
+            elif any([True for g,locs in tick.items() if g in GATES['q2']]):
                 res['idle2'] += idle_qubits
             else:
                 res['idle1'] += idle_qubits
@@ -221,14 +221,14 @@ class InnsbruckTrap(ErrorModel):
 
             for g,qs in tick.items():
 
-                if g in GATES['1qb']:
+                if g in GATES['q1']:
                     for q in qs:
                         if q-1 in inactive:
                             res['c1'].append((i,q-1))
                         elif q+1 in inactive:
                             res['c1'].append((i,q+1))
 
-                elif g in GATES['qb2']:
+                elif g in GATES['q1']:
                     neighbors = []
                     for qtup in qs:
                         neighbor = []
@@ -247,8 +247,8 @@ class InnsbruckTrap(ErrorModel):
     def generate(self, fgroups, circuit):
 
         errsets = {
-            '1qb': DEPOLAR1,
-            '2qb': DEPOLAR2,
+            'q1': DEPOLAR1,
+            'q2': DEPOLAR2,
             'init': XFLIP,
             'meas': XFLIP,
             'idle1': ZFLIP,

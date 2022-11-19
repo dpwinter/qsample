@@ -3,11 +3,17 @@
 __all__ = ['DirectSampler']
 
 # Cell
-from .base import Sampler
+from .base import Sampler, err_probs_tomatrix
 import numpy as np
 
 # Cell
 class DirectSampler(Sampler):
+
+    def __init__(self, protocol, simulator, err_model=None, err_probs=None):
+        super().__init__(protocol, simulator, err_probs=err_probs, err_model=err_model)
+        # err_probs = sort_by_list(err_probs, self.err_model.groups)
+        # self.err_probs = np.array(tomatrix(err_probs.values())).T
+        self.err_probs = err_probs_tomatrix(err_probs, self.err_model.groups)
 
     def stats(self, tree_idx=None):
         if tree_idx:
@@ -20,8 +26,8 @@ class DirectSampler(Sampler):
                 v_L.append(tree.direct_variance)
         return p_L, np.sqrt(v_L)
 
-    def optimize(self, tree_node, circuit, grp_probs): # not really optimize here...
-        locgrps = self.protocol_locgrps[circuit.id]
+    def optimize(self, tree_node, circuit, grp_probs):
+        locgrps = self.protocol_groups[circuit.id]
         flocs = self.err_model.choose_p(locgrps,grp_probs)
-        grp_wgts = tuple(len(locs) for locs in flocs.values())
-        return {'grp_wgts': grp_wgts, 'flocs': flocs}
+        subset = tuple(len(locs) for locs in flocs.values())
+        return {'subset': subset, 'flocs': flocs}

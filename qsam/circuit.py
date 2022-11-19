@@ -11,8 +11,8 @@ import latextools
 # Cell
 GATES = {
     "init": {"init"},
-    "1qb": {"I", "X", "Y", "Z", "H", "T", "Q", "Qd", "S", "Sd", "R", "Rd", "Rx", "Ry", "Rz"},
-    "2qb": {"CNOT", "MSd"},
+    "q1": {"I", "X", "Y", "Z", "H", "T", "Q", "Qd", "S", "Sd", "R", "Rd", "Rx", "Ry", "Rz"},
+    "q2": {"CNOT", "MSd"},
     "meas": {"measure"}
 }
 
@@ -36,17 +36,6 @@ class Circuit(MutableSequence):
         self._noisy = noisy
         self._ff_det = ff_det # fault-free deterministic
         self.id = sha1((repr(self)).encode('UTF-8')).hexdigest()[:5]
-
-    # @cached_property
-    # def _ff_det(self):
-    #     """Flag telling if circuit is fault-free deterministic, i.e.
-    #     for a fault-free execution the measurement/output is always same.
-    #     Can happen only if all qubits have been (re)initialized or if
-    #     no measurement gate in circuit."""
-    #     for q,locs in self[0].items():
-    #         if q == 'init' and locs == set(range(self.n_qubits)):
-    #             return True # all qubits initialized
-    #     return any([True for tick in self if 'measure' in tick.keys()]) # measure in circuit
 
     def __getitem__(self, tick_index):
         return self._ticks[tick_index]
@@ -94,7 +83,7 @@ class Circuit(MutableSequence):
 
         for col, tick in enumerate(self,1):
             for gate, qbs in tick.items():
-                if gate in GATES['2qb']:
+                if gate in GATES['q2']:
                     for qbtup in qbs:
                         ctrl, targ = qbtup[0], qbtup[1]
                         delta = targ - ctrl
@@ -106,7 +95,7 @@ class Circuit(MutableSequence):
                 elif gate == "measure": sym = r"\meter"
                 elif gate == "init": sym = r"\push{\ket{0}}"
 
-                elif gate in GATES['1qb']:
+                elif gate in GATES['q1']:
                     sym = r"\gate{%s}" % gate
                 else:
                     raise Exception(f'Unknown gate {gate}')

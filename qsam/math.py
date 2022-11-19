@@ -14,6 +14,7 @@ def comb(n, k):
 # Cell
 def binom(k, n, p):
     """Vectorized binomial function"""
+    k, n, p = np.array(k), np.array(n), np.array(p)
     return comb(n,k) * p**k * (1-p)**(n-k)
 
 # Cell
