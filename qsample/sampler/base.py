@@ -10,7 +10,7 @@ from ..callbacks import CallbackList
 from tqdm.auto import tqdm
 import itertools as it
 import numpy as np
-import qsam.math as math
+import qsample.math as math
 from ..noise import E0
 import dill as pickle
 

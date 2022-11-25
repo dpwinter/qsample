@@ -144,7 +144,7 @@ nb_path: "06d_sampler.subset.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="SubsetSampler" class="doc_header"><code>class</code> <code>SubsetSampler</code><a href="https://github.com/dpwinter/qsam/tree/master/qsam/sampler/subset.py#L12" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>SubsetSampler</code>(<strong><code>protocol</code></strong>, <strong><code>simulator</code></strong>, <strong><code>pmax</code></strong>, <strong><code>err_model</code></strong>=<em><code>None</code></em>, <strong><code>err_probs</code></strong>=<em><code>None</code></em>) :: <a href="/qsam/sampler.base.html#Sampler"><code>Sampler</code></a></p>
+<h2 id="SubsetSampler" class="doc_header"><code>class</code> <code>SubsetSampler</code><a href="https://github.com/dpwinter/qsample/tree/master/qsample/sampler/subset.py#L12" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>SubsetSampler</code>(<strong><code>protocol</code></strong>, <strong><code>simulator</code></strong>, <strong><code>pmax</code></strong>, <strong><code>err_model</code></strong>=<em><code>None</code></em>, <strong><code>err_probs</code></strong>=<em><code>None</code></em>) :: <a href="/qsample/sampler.base.html#Sampler"><code>Sampler</code></a></p>
 </blockquote>
 
 </div>
@@ -171,10 +171,10 @@ nb_path: "06d_sampler.subset.ipynb"
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">qsam.examples</span> <span class="kn">import</span> <span class="n">ghz3</span><span class="p">,</span> <span class="n">flagstab</span>
-<span class="kn">from</span> <span class="nn">qsam.sim.stabilizer</span> <span class="kn">import</span> <span class="n">StabilizerSimulator</span> <span class="k">as</span> <span class="n">CHP</span>
-<span class="kn">from</span> <span class="nn">qsam.noise</span> <span class="kn">import</span> <span class="n">E1</span><span class="p">,</span> <span class="n">E2</span>
-<span class="kn">from</span> <span class="nn">qsam.callbacks</span> <span class="kn">import</span> <span class="o">*</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">qsample.examples</span> <span class="kn">import</span> <span class="n">ghz3</span><span class="p">,</span> <span class="n">flagstab</span>
+<span class="kn">from</span> <span class="nn">qsample.sim.stabilizer</span> <span class="kn">import</span> <span class="n">StabilizerSimulator</span> <span class="k">as</span> <span class="n">CHP</span>
+<span class="kn">from</span> <span class="nn">qsample.noise</span> <span class="kn">import</span> <span class="n">E1</span><span class="p">,</span> <span class="n">E2</span>
+<span class="kn">from</span> <span class="nn">qsample.callbacks</span> <span class="kn">import</span> <span class="o">*</span>
 
 <span class="n">e</span> <span class="o">=</span> <span class="n">E2</span>
 <span class="c1"># e = E1</span>

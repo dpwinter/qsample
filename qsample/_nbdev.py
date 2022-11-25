@@ -84,8 +84,8 @@ modules = ["math.py",
            "noise.py",
            "examples.py"]
 
-doc_url = "https://dpwinter.github.io/qsam/"
+doc_url = "https://dpwinter.github.io/qsample/"
 
-git_url = "https://github.com/dpwinter/qsam/tree/master/"
+git_url = "https://github.com/dpwinter/qsample/tree/master/"
 
 def custom_doc_links(name): return None

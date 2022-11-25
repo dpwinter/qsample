@@ -4,7 +4,7 @@ __all__ = ['Callback', 'CallbackList', 'PlotStats', 'RelStdTarget', 'StatsPerSam
            'ErvPerSample']
 
 # Cell
-import qsam.math as math
+import qsample.math as math
 import matplotlib.pyplot as plt
 import numpy as np
 

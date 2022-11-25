@@ -5,7 +5,7 @@ __all__ = ['Node', 'Variable', 'Constant', 'CountTree']
 # Cell
 
 from anytree import NodeMixin, RenderTree, PreOrderIter
-import qsam.math as math
+import qsample.math as math
 import pydot
 import dill as pickle
 

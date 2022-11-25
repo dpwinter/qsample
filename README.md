@@ -36,7 +36,7 @@ The predominant method to model incoherent Pauli noise in quantum circuits is di
 To get started, we first need to define one or more circuits, which is easily done in qsam. Below we create a circuit that prepares the 4-qubit GHZ state $|\text{GHZ}\rangle=\frac{1}{\sqrt{2}}(|0000\rangle+|1111\rangle)$. 
 
 ```python
-from qsam.circuit import Circuit
+from qsample.circuit import Circuit
 
 ghz = Circuit([ {"init": {0,1,2,3,4}},
                 {"H": {0}},
@@ -72,7 +72,7 @@ sz_123 = Circuit([{"init": {8}},
 From the single ghz-circuit given above, we may construct a simple toy-protocol to demonstrate essential features of qsam. The protocol is that, whenever the circuit measurement is $-1$, we shall repeat the preparation circuit since the fifth qubit indicates preparation of an erroneous state. When the measurement is $+1$ the state is prepared correctly. If there is still no $+1$ after two preparation attempts, we count the protocol run as a logical failure. These conditions are defined in the following functions:
 
 ```python
-from qsam.protocol import Protocol
+from qsample.protocol import Protocol
 
 def repeat(m):
     return len(m) < 2 and m[-1] == 1
@@ -116,10 +116,10 @@ We initialize a new direct Monte Carlo sampler and set up a depolarizing noise m
 ```python
 #slow
 
-from qsam.sim.stabilizer import StabilizerSimulator as CHP
-from qsam.sampler.direct import DirectSampler
-from qsam.noise import E1
-import qsam.callbacks as cb
+from qsample.sim.stabilizer import StabilizerSimulator as CHP
+from qsample.sampler.direct import DirectSampler
+from qsample.noise import E1
+import qsample.callbacks as cb
 
 d_sam = DirectSampler(protocol=g, simulator=CHP, err_model=E1, err_probs=err_probs)
 ```
@@ -156,6 +156,7 @@ print(std)
 
 
 ```python
+#slow
 from ipywidgets import interact
 import ipywidgets as widgets
 
@@ -172,7 +173,7 @@ Additionally to just sampling the logical failure rate we can specify a variety 
 
 ```python
 #slow
-from qsam.sampler.subset import SubsetSampler
+from qsample.sampler.subset import SubsetSampler
 
 s_sam = SubsetSampler(protocol=g, simulator=CHP, pmax={'q': 0.1}, err_model=E1, err_probs=err_probs)
 
@@ -496,7 +497,7 @@ Let's first run 10 samples to see what the protocol does. For this means we can 
 
 ```python
 #slow
-from qsam.noise import E2
+from qsample.noise import E2
 
 sb_sam = SubsetSampler(init, CHP, pmax={'q1': 0.01, 'q2': 0.1}, err_probs=err_probs, err_model=E2)
 

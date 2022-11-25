@@ -104,7 +104,7 @@ nb_path: "index.ipynb"
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">qsam.circuit</span> <span class="kn">import</span> <span class="n">Circuit</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">qsample.circuit</span> <span class="kn">import</span> <span class="n">Circuit</span>
 
 <span class="n">ghz</span> <span class="o">=</span> <span class="n">Circuit</span><span class="p">([</span> <span class="p">{</span><span class="s2">&quot;init&quot;</span><span class="p">:</span> <span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">}},</span>
                 <span class="p">{</span><span class="s2">&quot;H&quot;</span><span class="p">:</span> <span class="p">{</span><span class="mi">0</span><span class="p">}},</span>
@@ -206,7 +206,7 @@ nb_path: "index.ipynb"
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">qsam.protocol</span> <span class="kn">import</span> <span class="n">Protocol</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">qsample.protocol</span> <span class="kn">import</span> <span class="n">Protocol</span>
 
 <span class="k">def</span> <span class="nf">repeat</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
     <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">m</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span>
@@ -226,7 +226,7 @@ nb_path: "index.ipynb"
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>The protocol is now defined as a graph, where nodes are circuits and edges between the nodes are labelled with transition conditions between the circuits. Terminating a protocol with success (instead of fail) will not be shown explicitly by the protocol graph. The <code>check</code> argument takes a function, which returns a boolean, to evaluate a transition based on the sequence of measurement results stored in the node as a list (<a href="/qsam/examples.html#ghz"><code>ghz</code></a> in this example).</p>
+<p>The protocol is now defined as a graph, where nodes are circuits and edges between the nodes are labelled with transition conditions between the circuits. Terminating a protocol with success (instead of fail) will not be shown explicitly by the protocol graph. The <code>check</code> argument takes a function, which returns a boolean, to evaluate a transition based on the sequence of measurement results stored in the node as a list (<a href="/qsample/examples.html#ghz"><code>ghz</code></a> in this example).</p>
 
 </div>
 </div>
@@ -314,10 +314,10 @@ nb_path: "index.ipynb"
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">qsam.sim.stabilizer</span> <span class="kn">import</span> <span class="n">StabilizerSimulator</span> <span class="k">as</span> <span class="n">CHP</span>
-<span class="kn">from</span> <span class="nn">qsam.sampler.direct</span> <span class="kn">import</span> <span class="n">DirectSampler</span>
-<span class="kn">from</span> <span class="nn">qsam.noise</span> <span class="kn">import</span> <span class="n">E1</span>
-<span class="kn">import</span> <span class="nn">qsam.callbacks</span> <span class="k">as</span> <span class="nn">cb</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">qsample.sim.stabilizer</span> <span class="kn">import</span> <span class="n">StabilizerSimulator</span> <span class="k">as</span> <span class="n">CHP</span>
+<span class="kn">from</span> <span class="nn">qsample.sampler.direct</span> <span class="kn">import</span> <span class="n">DirectSampler</span>
+<span class="kn">from</span> <span class="nn">qsample.noise</span> <span class="kn">import</span> <span class="n">E1</span>
+<span class="kn">import</span> <span class="nn">qsample.callbacks</span> <span class="k">as</span> <span class="nn">cb</span>
 
 <span class="n">d_sam</span> <span class="o">=</span> <span class="n">DirectSampler</span><span class="p">(</span><span class="n">protocol</span><span class="o">=</span><span class="n">g</span><span class="p">,</span> <span class="n">simulator</span><span class="o">=</span><span class="n">CHP</span><span class="p">,</span> <span class="n">err_model</span><span class="o">=</span><span class="n">E1</span><span class="p">,</span> <span class="n">err_probs</span><span class="o">=</span><span class="n">err_probs</span><span class="p">)</span>
 </pre></div>
@@ -331,7 +331,7 @@ nb_path: "index.ipynb"
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Its <code>run</code> function takes the maximum number of samples and/or user specified callback functions. Here we use for example the <a href="/qsam/callbacks.html#RelStdTarget"><code>RelStdTarget</code></a> callback to specify a maximum error of 10% (which is actually the default value) or 50000 samples at max. The logical failure rate estimator and its uncertainty are then plotted in the range defined by <code>scale</code> by the <a href="/qsam/callbacks.html#PlotStats"><code>PlotStats</code></a> callback from the relevant information (counts and fail_counts) which are stored directly in the <a href="/qsam/sampler.base.html#Sampler"><code>Sampler</code></a> object.</p>
+<p>Its <code>run</code> function takes the maximum number of samples and/or user specified callback functions. Here we use for example the <a href="/qsample/callbacks.html#RelStdTarget"><code>RelStdTarget</code></a> callback to specify a maximum error of 10% (which is actually the default value) or 50000 samples at max. The logical failure rate estimator and its uncertainty are then plotted in the range defined by <code>scale</code> by the <a href="/qsample/callbacks.html#PlotStats"><code>PlotStats</code></a> callback from the relevant information (counts and fail_counts) which are stored directly in the <a href="/qsample/sampler.base.html#Sampler"><code>Sampler</code></a> object.</p>
 
 </div>
 </div>
@@ -456,7 +456,7 @@ nb_path: "index.ipynb"
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">qsam.sampler.subset</span> <span class="kn">import</span> <span class="n">SubsetSampler</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">qsample.sampler.subset</span> <span class="kn">import</span> <span class="n">SubsetSampler</span>
 
 <span class="n">s_sam</span> <span class="o">=</span> <span class="n">SubsetSampler</span><span class="p">(</span><span class="n">protocol</span><span class="o">=</span><span class="n">g</span><span class="p">,</span> <span class="n">simulator</span><span class="o">=</span><span class="n">CHP</span><span class="p">,</span> <span class="n">pmax</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;q&#39;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">},</span> <span class="n">err_model</span><span class="o">=</span><span class="n">E1</span><span class="p">,</span> <span class="n">err_probs</span><span class="o">=</span><span class="n">err_probs</span><span class="p">)</span>
 
@@ -1043,7 +1043,7 @@ nb_path: "index.ipynb"
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Let's first run 10 samples to see what the protocol does. For this means we can use the <a href="/qsam/callbacks.html#VerboseCircuitExec"><code>VerboseCircuitExec</code></a> callback:</p>
+<p>Let's first run 10 samples to see what the protocol does. For this means we can use the <a href="/qsample/callbacks.html#VerboseCircuitExec"><code>VerboseCircuitExec</code></a> callback:</p>
 
 </div>
 </div>
@@ -1055,7 +1055,7 @@ nb_path: "index.ipynb"
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">qsam.noise</span> <span class="kn">import</span> <span class="n">E2</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">qsample.noise</span> <span class="kn">import</span> <span class="n">E2</span>
 
 <span class="n">sb_sam</span> <span class="o">=</span> <span class="n">SubsetSampler</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="n">CHP</span><span class="p">,</span> <span class="n">pmax</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;q1&#39;</span><span class="p">:</span> <span class="mf">0.01</span><span class="p">,</span> <span class="s1">&#39;q2&#39;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">},</span> <span class="n">err_probs</span><span class="o">=</span><span class="n">err_probs</span><span class="p">,</span> <span class="n">err_model</span><span class="o">=</span><span class="n">E2</span><span class="p">)</span>
 

@@ -49,6 +49,6 @@ entries:
       title: Examples
       url: examples.html
     output: web
-    title: qsam
+    title: qsample
   output: web
   title: Sidebar
