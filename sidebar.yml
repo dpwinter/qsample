@@ -15,3 +15,14 @@ website:
       - 06d_sampler.subset.ipynb
       - 07_noise.ipynb
       - 08_examples.ipynb
+      - CONTRIBUTING.md
+      - LICENSE
+      - MANIFEST.in
+      - README.md
+      - docker-compose.yml
+      - nbdev.yml
+      - settings.ini
+      - setup.py
+      - sidebar.yml
+      - styles.css
+      - test
