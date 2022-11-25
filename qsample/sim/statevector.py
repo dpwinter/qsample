@@ -19,7 +19,7 @@ class MeasureResult:
 
 # %% ../../04c_sim.statevector.ipynb 5
 class StatevectorSimulator(CircuitRunnerMixin):
-        
+
     def __init__(self, num_qubits):
         self._n = num_qubits
         self.eng = MainEngine()
