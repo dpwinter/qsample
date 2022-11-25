@@ -11,8 +11,6 @@ class DirectSampler(Sampler):
 
     def __init__(self, protocol, simulator, err_model=None, err_probs=None):
         super().__init__(protocol, simulator, err_probs=err_probs, err_model=err_model)
-        # err_probs = sort_by_list(err_probs, self.err_model.groups)
-        # self.err_probs = np.array(tomatrix(err_probs.values())).T
         self.err_probs = err_probs_tomatrix(err_probs, self.err_model.groups)
 
     def stats(self, tree_idx=None):

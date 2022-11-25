@@ -128,9 +128,6 @@ class CountTree:
         for leaf in node.leaves:
             if leaf.marked or all_leaves:
 
-                # if self.is_invariant_path(leaf): ## NEEDS TO BE DISCUSSED!
-                #     continue # exclude invariant paths (would always lead to None)
-
                 prod = 1.0
                 for n in leaf.iter_path_reverse():
                     if n == node:
