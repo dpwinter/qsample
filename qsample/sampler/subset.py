@@ -25,10 +25,10 @@ class SubsetSampler(Sampler):
         v_L = self.tree.variance
         p_L = self.tree.rate
         delta = self.tree.delta
-        delta_var = self.tree.norm_variance
+        v_L_up_var = self.tree.variance_ub #norm_variance
         
         self.tree.constants = _protocol_Aws
-        return tomatrix([p_L, np.sqrt(v_L), p_L+delta, np.sqrt(v_L+delta_var)])
+        return tomatrix([p_L, np.sqrt(v_L), p_L+delta, np.sqrt(v_L_up_var)])#np.sqrt(v_L+delta_var)])
         
     def __init__(self, protocol, simulator, pmax, err_model=None, err_probs=None):
         super().__init__(protocol, simulator, err_probs=pmax, err_model=err_model)

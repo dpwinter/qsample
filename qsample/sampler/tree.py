@@ -127,6 +127,7 @@ class CountTree:
                 
         for leaf in node.leaves:
             if leaf.marked or all_leaves:
+                if all_leaves and leaf.marked: continue #!!
                 
                 prod = 1.0
                 for n in leaf.iter_path_reverse():
@@ -172,15 +173,28 @@ class CountTree:
             else:
                 acc += twig**2 * self.partial_variance(node)
         return acc
-
+            
+    # @property
+    # def norm_variance(self):
+    #     acc = 0.0
+    #     constants = [node for node in self.root.descendants if isinstance(node, Constant)]
+    #     for node in constants:
+    #         if node.is_deterministic or self.is_invariant_path(node):
+    #             continue
+    #         elif all([n.is_leaf for n in node.children]): 
+    #             continue
+    #         twig = self.twig(node)
+    #         acc += twig**2 * self.partial_variance(node, all_leaves=True)
+    #     return acc
+    
     @property
-    def norm_variance(self):
+    def variance_ub(self):
         acc = 0.0
         constants = [node for node in self.root.descendants if isinstance(node, Constant)]
         for node in constants:
-            if node.is_deterministic or self.is_invariant_path(node):
+            if node.is_deterministic:
                 continue
-            elif all([n.is_leaf for n in node.children]): 
+            if all([n.is_leaf for n in node.children]) and not any([n.marked for n in node.children]): 
                 continue
             twig = self.twig(node)
             acc += twig**2 * self.partial_variance(node, all_leaves=True)

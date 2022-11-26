@@ -1,5 +1,12 @@
 [
   {
+    "objectID": "untitled.html",
+    "href": "untitled.html",
+    "title": "qsample",
+    "section": "",
+    "text": "Who is thise package for?\nHow to install?\nElementary datatypes\n3.1. Circuit\n3.2. Protocol\n\nSimulators\nError models\nSamplers\n6.1. Direct\n6.2. Subset\n\nCallbacks\n\n\nl1 = [1,2,3]\nl2 = [3,4,5]\n\n\ndf = pd.DataFrame(list(zip(l1,l2)), columns=['a', 'b'])\n\n\ndf\n\n\n\n\n\n  \n    \n      \n      a\n      b\n    \n  \n  \n    \n      0\n      1\n      3\n    \n    \n      1\n      2\n      4\n    \n    \n      2\n      3\n      5\n    \n  \n\n\n\n\n\nfrom ipywidgets import interact\ndef my_function(x):\n    return x\n# create a slider\ninteract(my_function, x=20)\n\n\n\n\n<function __main__.my_function(x)>\n\n\nxx\nblabla\nGoodbye."
+  },
+  {
     "objectID": "circuit.html",
     "href": "circuit.html",
     "title": "Circuit",
@@ -116,14 +123,14 @@
     "href": "index.html",
     "title": "qsample",
     "section": "",
-    "text": "pip install qsample… not yet, soon to come"
+    "text": "We are currently in the process to reclaim the name from PyPI, s.t. this package can be installed directly via pip.\nHowever, for now you need to do the following steps: 1. Clone the repository to your computer. 2. cd into it. 3. Execute pip install .."
   },
   {
     "objectID": "index.html#prerequisites",
     "href": "index.html#prerequisites",
     "title": "qsample",
     "section": "Prerequisites",
-    "text": "Prerequisites"
+    "text": "Prerequisites\nBesides the required python libraries which will be downloaded automatically when you install via pip, some functions of qsample have other non-python dependencies: * All draw() functionality was designed for usage in Jupyter. Some features might not be available when executing directly in the interpreter. * Additionally, the Circuit.draw() function uses the package latextools which is turn requires the pdflatex compiler."
   },
   {
     "objectID": "index.html#when-to-use",
@@ -186,6 +193,6 @@
     "href": "sampler.subset.html",
     "title": "Subset Monte Carlo sampler",
     "section": "",
-    "text": "from qsample.examples import ghz3, flagstab\nfrom qsample.sim.stabilizer import StabilizerSimulator as CHP\nfrom qsample.noise import E1, E2\nfrom qsample.callbacks import *\nimport matplotlib.pyplot as plt\n\n\ne = E2\n# e = E1\n\nsample_range = np.logspace(-3,0,5)\n\nerr_probs = {\n    \"q1\": sample_range ,\n    \"q2\": sample_range,\n    # \"init\": 0,\n    # \"meas\": 0,\n    # \"idle\": 0\n}\npmax = {\n    \"q2\" : 0.1,\n    \"q1\": 0.1,\n    # \"init\": 0,\n    # \"meas\": 0,\n    # \"idle\": 0\n}\n\n# sam = SubsetSampler(flagstab, CHP, pmax=pmax, err_probs=err_probs, err_model=e)\nsam = SubsetSamplerERV(flagstab, CHP, pmax=pmax, err_probs=err_probs, err_model=e)\nsam.run(100, callbacks=[PlotStats()])\n\n\n\n\n\n\n\n\nsam.tree.draw()\n\n\n\n\n\np_L_low, ss_std_low, p_L_up, ss_std_up = sam.stats()\nplt.loglog(sample_range,ss_std_low)\nplt.loglog(sample_range,ss_std_up)"
+    "text": "from qsample.examples import ghz3, flagstab\nfrom qsample.sim.stabilizer import StabilizerSimulator as CHP\nfrom qsample.noise import E1, E2\nfrom qsample.callbacks import *\nimport matplotlib.pyplot as plt\n\n\n# e = E2\ne = E1\n\nsample_range = np.logspace(-3,0,5)\n\nerr_probs = {\n    \"q\": sample_range ,\n    # \"q2\": sample_range,\n    # \"init\": 0,\n    # \"meas\": 0,\n    # \"idle\": 0\n}\npmax = {\n    \"q\" : 0.1,\n    # \"q1\": 0.1,\n    # \"init\": 0,\n    # \"meas\": 0,\n    # \"idle\": 0\n}\n\nsam = SubsetSampler(ghz3, CHP, pmax=pmax, err_probs=err_probs, err_model=e)\n# sam = SubsetSamplerERV(flagstab, CHP, pmax=pmax, err_probs=err_probs, err_model=e)\nsam.run(100, callbacks=[PlotStats()])\n\n\n\n\n\n\n\n\nsam.stats()\n\n[array([2.11369326e-08, 3.58736483e-06, 4.94800743e-04, 2.11351492e-02,\n        0.00000000e+00]),\n array([1.61047868e-08, 2.68114806e-06, 3.31627714e-04, 1.11579342e-02,\n        0.00000000e+00]),\n array([2.12262026e-08, 3.67822105e-06, 5.90600210e-04, 8.69184341e-02,\n        1.00000000e+00]),\n array([1.61083140e-08, 2.68576076e-06, 3.40904277e-04, 2.25541253e-02,\n        0.00000000e+00])]\n\n\n\nsam.tree.draw()\n\n\n\n\n\np_L_low, ss_std_low, p_L_up, ss_std_up = sam.stats()\nplt.loglog(sample_range,ss_std_low)\nplt.loglog(sample_range,ss_std_up)"
   }
 ]
