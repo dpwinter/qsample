@@ -5,9 +5,22 @@ qsample
 
 ## Install
 
-`pip install qsample`… not yet, soon to come
+We are currently in the process to reclaim the name from PyPI, s.t. this
+package can be installed directly via `pip`.
+
+However, for now you need to do the following steps: 1. Clone the
+repository to your computer. 2. `cd` into it. 3. Execute
+`pip install .`.
 
 ## Prerequisites
+
+Besides the required python libraries which will be downloaded
+automatically when you install via `pip`, some functions of `qsample`
+have other non-python dependencies: \* All `draw()` functionality was
+designed for usage in Jupyter. Some features might not be available when
+executing directly in the interpreter. \* Additionally, the
+`Circuit.draw()` function uses the package `latextools` which is turn
+requires the `pdflatex` compiler.
 
 ## When to use
 
@@ -138,7 +151,7 @@ g.add_edge('ghz', 'FAIL', check='logErr(ghz)')
 g.draw(figsize=(6,5))
 ```
 
-![](index_files/figure-commonmark/cell-9-output-1.png)
+![](index_files/figure-commonmark/cell-8-output-1.png)
 
 We may now specify our error parameters, i.e. the range over which we
 wish to scale the physical error rates. Let’s start with a single
@@ -164,12 +177,16 @@ d_sam = DirectSampler(protocol=g, simulator=CHP, err_model=E1, err_probs=err_pro
 ```
 
 Its `run` function takes the maximum number of samples and/or user
-specified callback functions. Here we use for example the `RelStdTarget`
+specified callback functions. Here we use for example the
+[`RelStdTarget`](https://dpwinter.github.io/qsample/callbacks.html#relstdtarget)
 callback to specify a maximum error of 10% (which is actually the
 default value) or 50000 samples at max. The logical failure rate
 estimator and its uncertainty are then plotted in the range defined by
-`scale` by the `PlotStats` callback from the relevant information
-(counts and fail_counts) which are stored directly in the `Sampler`
+`scale` by the
+[`PlotStats`](https://dpwinter.github.io/qsample/callbacks.html#plotstats)
+callback from the relevant information (counts and fail_counts) which
+are stored directly in the
+[`Sampler`](https://dpwinter.github.io/qsample/sampler.base.html#sampler)
 object.
 
 ``` python
@@ -191,7 +208,7 @@ d_sam.run(n_samples=5000, callbacks=callbacks)
 
     p_phy=1.00E-01:   0%|          | 0/5000 [00:00<?, ?it/s]
 
-![](index_files/figure-commonmark/cell-12-output-6.png)
+![](index_files/figure-commonmark/cell-11-output-6.png)
 
 The sampler instance allows to print the logical failure rate estimator
 and its sampling and cutoff error over the sampled range.
@@ -242,7 +259,7 @@ s_sam.run(n_samples=1000, callbacks=callbacks)
 
     p_phy=1.00E-01:   0%|          | 0/1000 [00:00<?, ?it/s]
 
-![](index_files/figure-commonmark/cell-15-output-2.png)
+![](index_files/figure-commonmark/cell-14-output-2.png)
 
 The Sampler instance contains a `Tree` structure that we can investigate
 manually with `sb_sam.tree`, or plot as image.
@@ -251,7 +268,7 @@ manually with `sb_sam.tree`, or plot as image.
 s_sam.tree.draw()
 ```
 
-![](index_files/figure-commonmark/cell-16-output-1.png)
+![](index_files/figure-commonmark/cell-15-output-1.png)
 
 From plotting the MC and SS results together we can see that they
 produce the same results in some intermediate regime of $p$. Subset
@@ -282,7 +299,7 @@ plt.xlabel(r'$\lambda$ - uniform')
 plt.legend();
 ```
 
-![](index_files/figure-commonmark/cell-17-output-1.png)
+![](index_files/figure-commonmark/cell-16-output-1.png)
 
 With the already sampled subsets we can also vary the plotted range in
 retrospect.
@@ -311,7 +328,7 @@ plt.xlabel(r'$\lambda$ - uniform')
 plt.legend();
 ```
 
-![](index_files/figure-commonmark/cell-19-output-1.png)
+![](index_files/figure-commonmark/cell-18-output-1.png)
 
 We may add 100 more samples to the already existing 500 samples…
 
@@ -321,7 +338,7 @@ s_sam.run(100, callbacks=callbacks)
 
     p_phy=1.00E-01:   0%|          | 0/100 [00:00<?, ?it/s]
 
-![](index_files/figure-commonmark/cell-20-output-2.png)
+![](index_files/figure-commonmark/cell-19-output-2.png)
 
 … or pickle it for later use.
 
@@ -525,7 +542,7 @@ init.add_edge('meas', 'FAIL', check='logErr(meas[-1])')
 init.draw(figsize=(6,8), legend=True)
 ```
 
-![](index_files/figure-commonmark/cell-24-output-1.png)
+![](index_files/figure-commonmark/cell-23-output-1.png)
 
 The protocol contains a recovery operation which is applied conditioned
 on the stabilizer measurement result being $-1$. The `check` function,
@@ -543,7 +560,9 @@ err_probs = {'q1': 0.01 * scale, 'q2': 0.1 * scale}
 ```
 
 Let’s first run 10 samples to see what the protocol does. For this means
-we can use the `VerboseCircuitExec` callback:
+we can use the
+[`VerboseCircuitExec`](https://dpwinter.github.io/qsample/callbacks.html#verbosecircuitexec)
+callback:
 
 ``` python
 from qsample.noise import E2
@@ -614,15 +633,15 @@ sb_sam.run(1_000, callbacks=callbacks)
 
     p_phy=1.00E-02,1.00E-01:   0%|          | 0/1000 [00:00<?, ?it/s]
 
-![](index_files/figure-commonmark/cell-28-output-2.png)
+![](index_files/figure-commonmark/cell-27-output-2.png)
 
-![](index_files/figure-commonmark/cell-28-output-3.png)
+![](index_files/figure-commonmark/cell-27-output-3.png)
 
 ``` python
 sb_sam.tree.draw()
 ```
 
-![](index_files/figure-commonmark/cell-29-output-1.png)
+![](index_files/figure-commonmark/cell-28-output-1.png)
 
 More elaborate examples are given in `directory`.
 
