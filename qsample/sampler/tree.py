@@ -127,7 +127,7 @@ class CountTree:
                 
         for leaf in node.leaves:
             if leaf.marked or all_leaves:
-                if all_leaves and leaf.marked: continue #!!
+                if all_leaves and leaf.marked: continue # !!! var of upper bound: need to ignore fail leaf rates. 
                 
                 prod = 1.0
                 for n in leaf.iter_path_reverse():

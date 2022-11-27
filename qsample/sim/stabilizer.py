@@ -26,6 +26,10 @@ class StabilizerSimulator(ChpSimulator, CircuitRunnerMixin):
         m = self.measure(qubit)
         if m == 1: 
             self.X(qubit)
+            
+    def measure(self, qubit: int) -> "MeasureResult":
+        """Measurement in Z basis"""
+        return super().measure(qubit)
                    
     def S(self, qubit: int) -> None:
         """Phase gate"""
@@ -61,3 +65,42 @@ class StabilizerSimulator(ChpSimulator, CircuitRunnerMixin):
         self.S(qubit)
         self.X(qubit)
         self.S(qubit)
+        
+    def Q(self, qubit: int) -> None:
+        """Q = sqrt(X) = HSH"""
+        self.H(qubit)
+        self.S(qubit)
+        self.H(qubit)
+    
+    def Qd(self, qubit: int) -> None:
+        """Q^(dagger) = Q^3"""
+        self.Q(qubit)
+        self.Q(qubit)
+        self.Q(qubit)
+        
+    def Sd(self, qubit: int) -> None:
+        """S^(dagger) = S^3"""
+        self.S(qubit)
+        self.S(qubit)
+        self.S(qubit)
+    
+    def R(self, qubit: int) -> None:
+        """R = sqrt(XZ) = SQS^(dagger)"""
+        self.Sd(qubit)
+        self.Q(qubit)
+        self.S(qubit)
+        
+    def Rd(self, qubit: int) -> None:
+        """R^(dagger) = R^3"""
+        self.R(qubit)
+        self.R(qubit)
+        self.R(qubit)
+        
+    def MSd(self, qubitA: int, qubitB: int) -> None:
+        """Molmer-Sorensen gate: -pi/2 XX rotation
+        Ref.: Fig. 6 of https://arxiv.org/pdf/2111.12654.pdf"""
+        self.Rd(qubitA)
+        self.CNOT(qubitA, qubitB)
+        self.R(qubitA)
+        self.Qd(qubitA)
+        self.Qd(qubitB)
