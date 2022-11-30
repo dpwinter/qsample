@@ -9,3 +9,4 @@ from .sim.stabilizer import StabilizerSimulator
 from .sim.statevector import StatevectorSimulator
 from .sampler.direct import DirectSampler
 from .sampler.subset import SubsetSampler
+from .sampler.base import Sampler

@@ -275,6 +275,7 @@ def gen_steane0():
 
 
     def logErr(out):
+        import numpy as np
         c = np.array([hamming2(out, i) for i in stabilizerSet])
         d = np.flatnonzero(c <= 1)
         e = np.array([hamming2(out ^ (0b1111111), i) for i in stabilizerSet])

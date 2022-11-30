@@ -8,9 +8,10 @@ qsample
 We are currently in the process to reclaim the name from PyPI, s.t. this
 package can be installed directly via `pip`.
 
-However, for now you need to do the following steps: 1. Clone the
-repository to your computer. 2. `cd` into it. 3. Execute
-`pip install .`.
+However, for now you need to do the following steps:  
+1. Clone the repository to your computer.  
+2. `cd` into it.  
+3. Execute `python setup.py install`.
 
 ## Prerequisites
 

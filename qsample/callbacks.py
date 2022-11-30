@@ -162,8 +162,8 @@ class StatsPerSample(Callback):
             p_L = sampler.tree.rate
             std = np.sqrt(sampler.tree.variance)
             delta = sampler.tree.delta
-            std_delta = np.sqrt(sampler.tree.norm_variance)
-            stats = [p_L, std, delta, std_delta]
+            std_up = np.sqrt(sampler.tree.variance_ub)
+            stats = [p_L, std, delta, std_up]
             stats = [e if not isinstance(e,np.ndarray) else e[0] for e in stats]
             
         self.data.append(stats)
@@ -176,7 +176,7 @@ class StatsPerSample(Callback):
         n_cols = data.shape[0]
             
         fig, ax = plt.subplots(1, n_cols, figsize=(8*n_cols, 5))
-        labels = ['$p_L$', 'std[$p_L$]', '$\delta$', 'std[$\delta$]']
+        labels = ['$p_L$', 'std[$p_L$]', '$\delta$', 'std[$p_L^{up}$]']
         
         for i in range(n_cols):
             ax[i].plot(x, data[i])
