@@ -62,6 +62,7 @@ class Sampler:
         
         assert isinstance(err_probs, dict)
         assert set(err_probs.keys()) == set(self.err_model.groups)
+        self.grp_order = tuple(err_probs.keys())
         self.trees = dict()
         for prob_vec in err_probs_tomatrix(err_probs, self.err_model.groups):
             tree = CountTree(min_path_weight=2 if self.protocol.fault_tolerant else 1)
