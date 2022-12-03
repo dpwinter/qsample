@@ -10,22 +10,19 @@ package can be installed directly via `pip`.
 
 However, for now you need to do the following steps:  
 1. Clone the repository to your computer.  
-2. `cd` into it.  
-3. Execute `python setup.py install`.
+2. Go to `qsample` directory.  
+3. Execute `pip install -e .`
 
 ## Prerequisites
 
-Besides the required python libraries which will be downloaded
-automatically when you install via `pip`, some functions of `qsample`
-have other non-python dependencies: \* All `draw()` functionality was
-designed for usage in Jupyter. Some features might not be available when
-executing directly in the interpreter. \* Additionally, the
-`Circuit.draw()` function uses the package `latextools` which is turn
-requires the `pdflatex` compiler.
+- This package requires Python 3.8 or higher.  
+- All requirements are installed automatically via pip.  
+- External requirements are latex (for circuit rendering)  
+- Preferred usage in Jupyter notebooks
 
 ## When to use
 
-qsam offers efficient and fast estimation of logical failure rates of
+qsample offers efficient and fast estimation of logical failure rates of
 quantum error correction protocols when the fidelity of physical
 operations in the quantum circuits is high, such as in expertimental
 implementations today.
