@@ -11,7 +11,7 @@ Efficient sampling of noisy quantum circuits and protocols
 
 ## Install
 
-At the moment only build from source available:
+At the moment only build from source:
 
     git clone https://github.com/dpwinter/qsample.git
     cd qsample
@@ -24,41 +24,14 @@ At the moment only build from source available:
 
 ## When to use
 
-qsample offers efficient and fast estimation of logical failure rates of
-quantum error correction protocols when the fidelity of physical
-operations in the quantum circuits is high, such as in expertimental
-implementations today.
-
-This package is for you if you want to \* model circuit-level incoherent
-Pauli noise (we don’t do coherent noise here, neither are our auxiliary
-qubits modelled as ideal) \* with high fidelity physical operations aka
-low physical error rates \* for a QEC protocol that consists of
-execution of one or more quantum circuits with in-sequence measurements
-and feed-forward of measurement information \* over a specific range of
-varying physical error rates
-
-It currently offers to \* build quantum circuits from the standard
-quantum gates: H, X, Z, CNOT \* run stabilizer simulations with a
-standard CHP backend \* model multiparameter noise with distinct error
-rates for single- and two-qubit gates: p1, p2 \* estimate logical
-failure rates until uncertainty is lower than a given target confidence
-interval \* choose direct Monte Carlo or Subset Sampling as sampling
-method
-
-Background information:
-
-The predominant method to model incoherent Pauli noise in quantum
-circuits is direct Monte Carlo (MC) sampling. MC is very inefficient for
-low physical error rates since most of the time no actual fault event is
-realized in simulation. Subset sampling circumvents this issue. With
-this method, presented in , fault events are categorized into distinct
-subsets which contribute to a polynomial sum expansion of the logical
-failure rate. In subset sampling, only the subsets that contribute most
-to the logical failure rate are actually estimated via sampling –
-rendering it an importance sampling technique. Both the sampling
-variance and the uncertainty from ignored, i.e. non-sampled, subsets
-stay well-defined and can be held small throughout the sampling
-procedure.
+This package is for you if you want to  
+\* model circuit-level incoherent Pauli noise (we don’t do coherent
+noise here, neither are our auxiliary qubits modelled as ideal)  
+\* with high fidelity physical operations aka low physical error rates  
+\* for a QEC protocol that consists of execution of one or more quantum
+circuits with in-sequence measurements and feed-forward of measurement
+information  
+\* over a specific range of varying physical error rates
 
 ## Getting started
 
@@ -81,9 +54,11 @@ procedure.
 - Each tick is a dictionary, key: gate type, value: set of qubit(s)
 - Recommended: 1 gate type per tick
 
-**Example:** Flagged-GHZ preparation: \* Produce GHZ state on qubits 0-3
-\* Flag-qubit 4, measure: \* 0: error-free* * 1: flip on one data
-qubit\*
+**Example:** Flagged-GHZ preparation: \* Produce GHZ state on qubits
+0-3  
+\* Flag-qubit 4, measure:  
+\* 0: error-free\*  
+\* 1: flip on one data qubit\*
 
 \* Only for max. 1 allowed fault.
 
@@ -121,10 +96,11 @@ ghz.draw()
 \* Exception: Correction functions can return circuits for on-the-fly
 execution. (special case, will not show here)
 
-**Example:** Flagged-GHZ repeat(3)-until-success \* Execute flagged-GHZ
-circuit max. 3 times. \* Only repeat if measured `1`. \* If measured
-flag to be `0` within 3 iteration -\> No fail \* If after 2 iterations
-3rd measurement is also `1` -\> Fail
+**Example:** Flagged-GHZ repeat(3)-until-success  
+\* Execute flagged-GHZ circuit max. 3 times.  
+\* Only repeat if measured `1`.  
+\* If measured flag to be `0` within 3 iteration -\> No fail  
+\* If after 2 iterations 3rd measurement is also `1` -\> Fail
 
 ``` python
 from qsample import Protocol
@@ -148,7 +124,7 @@ ghz3.draw()
 
 ![](index_files/figure-commonmark/cell-8-output-1.png)
 
-- `repeat()` and `logErr()` are user-defined (boolean) check functions
+- `repeat()` and `logErr()` are user-defined (boolean) check functions  
 - Measurement history of circuits stored during for protocol run
   - Can access measurement history of any circuit by passing its name as
     argument
@@ -175,13 +151,13 @@ protocol run, i.e. sample.
 
 - Strategy:
   - Generate *fault* circuit $C_f$ of same length as reference circuit
-    $C$
+    $C$  
   - During simulation iterate $C$ and $C_f$ simulateously and apply to
-    state
+    state  
 - Must include:
-  - `group()`: group circuit locations by key, e.g. all 1-qubit-gates
+  - `group()`: group circuit locations by key, e.g. all 1-qubit-gates  
   - `select()`: picks certain amount of locations from each group (not
-    required by user)
+    required by user)  
   - `generate()`: generator function, returns a Pauli fault operator for
     given location
 
@@ -333,8 +309,11 @@ dsam3.run(10, callbacks=[cb.VerboseCircuitExec()])
     ghz -> Faults: [] -> Msmt: 0
     None
 
-We can also write our own callback. Every sampler has 6 callback hooks:
-\* Begin/End sampler \* Begin/End protocol \* Begin/End circuit
+We can also write our own callback. Every sampler has 6 callback
+hooks:  
+\* Begin/End sampler  
+\* Begin/End protocol  
+\* Begin/End circuit
 
 ### 5.3. Subset Sampler
 
@@ -343,14 +322,15 @@ We can also write our own callback. Every sampler has 6 callback hooks:
 - `pmax` must be chosen in “representative” region
 
 *Note*: 1. For multi-parameter error model `pmax` is a tuple of one
-physical error rate per group. 2. The choice of `pmax` has a direct
-impact of which subsets are sampled.
+physical error rate per group.  
+2. The choice of `pmax` has a direct impact of which subsets are
+sampled.
 
-How to choose `pmax`? What is the heuristic? \* We want to sample, s.t.
-the subset occurence probability is max. for 0-weight subset and
-subsequently falling for higher order subsets. \* We want to have also
-relatively high probability for other (important) subsets,
-i.e. weight-1, weight-2,..
+How to choose `pmax`? What is the heuristic?  
+\* We want to sample, s.t. the subset occurence probability is max. for
+0-weight subset and subsequently falling for higher order subsets.  
+\* We want to have also relatively high probability for other
+(important) subsets, i.e. weight-1, weight-2,..
 
 **Example:** For the Flagged-GHZ circuit we would choose a `pmax` close
 to 0.1:

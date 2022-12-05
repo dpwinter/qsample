@@ -1,0 +1,142 @@
+[
+  {
+    "objectID": "circuit.html",
+    "href": "circuit.html",
+    "title": "Circuit",
+    "section": "",
+    "text": "source\n\nunpack\n\n unpack (seq)\n\nGenerator for all qubits defined in a circuit or tick\n\nsource\n\n\nCircuit\n\n Circuit (ticks=None, noisy=True, ff_det=False)\n\nRepresentation of a quantum circuit"
+  },
+  {
+    "objectID": "sim.statevector.html",
+    "href": "sim.statevector.html",
+    "title": "Statevector Simulator",
+    "section": "",
+    "text": "source\n\nMeasureResult\n\n MeasureResult (value:bool)\n\nInitialize self. See help(type(self)) for accurate signature.\n\nsource\n\n\nStatevectorSimulator\n\n StatevectorSimulator (num_qubits)\n\nSimulator mixin for running quantum circuits"
+  },
+  {
+    "objectID": "CONTRIBUTING.html",
+    "href": "CONTRIBUTING.html",
+    "title": "qsample",
+    "section": "",
+    "text": "Before anything else, please install the git hooks that run automatic scripts during each commit and merge to strip the notebooks of superfluous metadata (and avoid merge conflicts). After cloning the repository, run the following command inside it:\nnbdev_install_git_hooks\n\n\n\n\nEnsure the bug was not already reported by searching on GitHub under Issues.\nIf you’re unable to find an open issue addressing the problem, open a new one. Be sure to include a title and clear description, as much relevant information as possible, and a code sample or an executable test case demonstrating the expected behavior that is not occurring.\nBe sure to add the complete error messages.\n\n\n\n\nOpen a new GitHub pull request with the patch.\nEnsure that your PR includes a test that fails without your patch, and pass with it.\nEnsure the PR description clearly describes the problem and solution. Include the relevant issue number if applicable.\n\n\n\n\n\n\nKeep each PR focused. While it’s more convenient, do not combine several unrelated fixes together. Create as many branches as needing to keep each PR focused.\nDo not mix style changes/fixes with “functional” changes. It’s very difficult to review such PRs and it most likely get rejected.\nDo not add/remove vertical whitespace. Preserve the original style of the file you edit as much as you can.\nDo not turn an already submitted PR into your development playground. If after you submitted PR, you discovered that more work is needed - close the PR, do the required work and then submit a new PR. Otherwise each of your commits requires attention from maintainers of the project.\nIf, however, you submitted a PR and received a request for changes, you should proceed with commits inside that PR, so that the maintainer can see the incremental fixes and won’t need to review the whole PR again. In the exception case where you realize it’ll take many many commits to complete the requests, then it’s probably best to close the PR, do the work and then submit it again. Use common sense where you’d choose one way over another.\n\n\n\n\n\nDocs are automatically created from the notebooks in the nbs folder."
+  },
+  {
+    "objectID": "sim.mixin.html",
+    "href": "sim.mixin.html",
+    "title": "Simulator Mixin",
+    "section": "",
+    "text": "source\n\nCircuitRunnerMixin\n\n CircuitRunnerMixin ()\n\nSimulator mixin for running quantum circuits"
+  },
+  {
+    "objectID": "sampler.tree.html",
+    "href": "sampler.tree.html",
+    "title": "Count Tree",
+    "section": "",
+    "text": "This data structure is based on the Python package anytree (https://github.com/c0fec0de/anytree) which has been extended by the classes Constant, Variable and CountTree.\n\nsource\n\nConstant\n\n Constant (name, parent=None, cid=None, counts=0, is_deterministic=False,\n           **kwargs)\n\nInitialize self. See help(type(self)) for accurate signature.\n\nsource\n\n\nVariable\n\n Variable (name, parent=None, counts=0, marked=False, **kwargs)\n\nInitialize self. See help(type(self)) for accurate signature.\n\nsource\n\n\nNode\n\n Node (name, parent=None, children=None)\n\nInitialize self. See help(type(self)) for accurate signature.\n\nsource\n\n\nCountTree\n\n CountTree (constants=None, min_path_weight=1)\n\nInitialize self. See help(type(self)) for accurate signature."
+  },
+  {
+    "objectID": "protocol.html",
+    "href": "protocol.html",
+    "title": "Protocol",
+    "section": "",
+    "text": "source\n\nProtocol\n\n Protocol (fault_tolerant=False, *args, **kwargs)\n\nRepresentation of a Quantum protocol\n\nfrom qsample.circuit import Circuit\n\n\nghz = Circuit([ {\"init\": {0,1,2,3,4}},\n                {\"H\": {0}},\n                {\"CNOT\": {(0,1)}},\n                {\"CNOT\": {(1,2)}},\n                {\"CNOT\": {(2,3)}},\n                {\"CNOT\": {(3,4)}},\n                {\"CNOT\": {(0,4)}},\n                {\"measure\": {4}}   ], ff_det=True)\n\ndef gen_ghz3():\n    \n    def repeat(m):\n        return len(m) < 3 and m[-1] == 1\n\n    def logErr(m):\n        return len(m) >= 3 and m == [1,1,1]\n\n    functions = {'logErr': logErr, 'repeat': repeat}\n\n    ghz3 = Protocol()\n    ghz3._check_fns.update(functions)\n    ghz3._ft = True\n    \n    ghz3.add_nodes_from(['ghz'], circuits=[ghz])\n    \n    ghz3.add_edge('START', 'ghz', check='True')\n    ghz3.add_edge('ghz', 'ghz', check='repeat(ghz)')\n    ghz3.add_edge('ghz', 'FAIL', check='logErr(ghz)')\n    \n    return ghz3\nghz3 = gen_ghz3()\nghz3.draw()"
+  },
+  {
+    "objectID": "noise.html",
+    "href": "noise.html",
+    "title": "Noise / Error models",
+    "section": "",
+    "text": "Some common error sets\n\nsource\n\nErrorModel\n\n ErrorModel ()\n\nRepresentation of an incoherent error model.\n\nsource\n\n\nE0\n\n E0 ()\n\nNo-Error error model\n\nsource\n\n\nE1\n\n E1 ()\n\nOne prob/weight for all 1- and 2-qubit gates\n\nsource\n\n\nE2\n\n E2 ()\n\nIndividual errors on 1-qubit and 2-qubit gates.\n\nsource\n\n\nE3\n\n E3 ()\n\nErrors on all gates individual + idle.\n\nsource\n\n\nE3_1\n\n E3_1 ()\n\nLike E3, but idle locations split in two subsets.\n\nsource\n\n\nInnsbruckTrap\n\n InnsbruckTrap ()\n\nExtension of E3_1 adding crosstalk and idlem."
+  },
+  {
+    "objectID": "sim.stabilizer.html",
+    "href": "sim.stabilizer.html",
+    "title": "CHP Simulator",
+    "section": "",
+    "text": "source\n\nStabilizerSimulator\n\n StabilizerSimulator (num_qubits)\n\nThe bare minimum needed for the CHP simulation.\nReference: “Improved Simulation of Stabilizer Circuits” Scott Aaronson and Daniel Gottesman https://arxiv.org/abs/quant-ph/0406196\nOriginal author: Craig Gidney https://github.com/Strilanc/python-chp-stabilizer-simulator"
+  },
+  {
+    "objectID": "math.html",
+    "href": "math.html",
+    "title": "Math",
+    "section": "",
+    "text": "source\n\ncomb\n\n comb (n, k)\n\nVectorized combination\n\nsource\n\n\nbinom\n\n binom (k, n, p)\n\nVectorized binomial function\n\nsource\n\n\nWilson_var\n\n Wilson_var (p, N, z=1.96)\n\nWilson estimator of binomial variance\n\nsource\n\n\nWald_var\n\n Wald_var (p, N)\n\nWald estimator of binomial variance (known issues, better use Wilson)"
+  },
+  {
+    "objectID": "sampler.direct.html",
+    "href": "sampler.direct.html",
+    "title": "Direct Monte Carlo sampler",
+    "section": "",
+    "text": "from qsample.examples import ghz3\nfrom qsample.noise import E1, E2\nfrom qsample.sim.stabilizer import StabilizerSimulator as CHP\nfrom qsample.callbacks import *\n\nfrom ipywidgets import interact\nimport ipywidgets as widgets\n\n\ne = E1\n\nsample_range = np.logspace(-3,0,5)\n\nerr_probs = {\n    # \"q1\": 0,\n    \"q\": sample_range\n}\n\nsam = DirectSampler(ghz3, CHP, err_probs=err_probs, err_model=e)\n\nsam.run(1000, callbacks=[PlotStats()])\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\ndef get_tree(i):\n    print(\"p_phy=\", list(sam.trees.keys())[i])\n    return (list(sam.trees.values())[i]).draw()\ninteract(get_tree, i=widgets.IntSlider(min=0, max=len(sam.trees)-1, step=1, value=0));\n\n\n\n\n\nsam.save('./test')\n\n\nsam2 = Sampler.load('./test')\nsam2.run(100)"
+  },
+  {
+    "objectID": "examples.html",
+    "href": "examples.html",
+    "title": "Examples",
+    "section": "",
+    "text": "ghz.draw()\n\n\n\n\n\nghz_stabs.draw(scale=1.2)\n\n\n\n\n\neft.draw(scale=1.5)\n\n\n\n\n\nsz_123.draw()\n\n\n\n\n\nmeas7.draw(scale=1.2)\n\n\n\n\n\nnfs.draw(scale=1)"
+  },
+  {
+    "objectID": "examples.html#ghz-repeat-until-success-protocol",
+    "href": "examples.html#ghz-repeat-until-success-protocol",
+    "title": "Examples",
+    "section": "GHZ repeat until success protocol",
+    "text": "GHZ repeat until success protocol\n\nRepeat GHZ preparation circuit for a maximum of 3 times.\nOnly repeat if a measurement yields 1, i.e. the flag has been triggered.\nIf we measure in all 3 runs three times 1, count a logical failure.\nIn all other cases the protocol completed without logical failure.\n\n\nghz3.draw(figsize=(6,6))"
+  },
+  {
+    "objectID": "examples.html#ghz-stabilizer-measurement",
+    "href": "examples.html#ghz-stabilizer-measurement",
+    "title": "Examples",
+    "section": "GHZ stabilizer measurement",
+    "text": "GHZ stabilizer measurement\n\nPrepare GHZ state with flag measurement 0. (If 1 is measured repeat preparation as often as necessary)\nReset ancilla and measure the stabilizers of the GHZ state (without noise). The stabilizers are:\n\nOne XXXX stab\nand three ZZ stabs\n\nUse syndrom from stabilizer measurements to lookup and perform the correction.\nMeasure stabilizers again.\nNow we have a logical failure if this measurement gives us any syndrome, i.e. if the measurement is anything other than four 0s.\n\n\nghz_stab.draw(figsize=(6,6), legend=True)"
+  },
+  {
+    "objectID": "examples.html#fault-tolerant-color-code-flag-protocol",
+    "href": "examples.html#fault-tolerant-color-code-flag-protocol",
+    "title": "Examples",
+    "section": "Fault-tolerant color code flag protocol",
+    "text": "Fault-tolerant color code flag protocol\n\n…\n\n\nftsteane.draw(figsize=(8,6), label_offset=(0,0.15))"
+  },
+  {
+    "objectID": "examples.html#det.-steane-logical-0-preparation-protocol",
+    "href": "examples.html#det.-steane-logical-0-preparation-protocol",
+    "title": "Examples",
+    "section": "Det. Steane logical 0 preparation protocol",
+    "text": "Det. Steane logical 0 preparation protocol\n\nsteane0.draw(figsize=(6,6), legend=True)"
+  },
+  {
+    "objectID": "examples.html#flag-stabilizer-protocol",
+    "href": "examples.html#flag-stabilizer-protocol",
+    "title": "Examples",
+    "section": "Flag stabilizer protocol",
+    "text": "Flag stabilizer protocol\n\n…\n\n\nflagstab.draw(legend=True, figsize=(15,5))"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "qsample",
+    "section": "",
+    "text": "Efficient sampling of noisy quantum circuits and protocols\n\nDocs: https://dpwinter.github.io/qsample/\n\n\n\nAt the moment only build from source available:\ngit clone https://github.com/dpwinter/qsample.git\ncd qsample\npython setup.py install\n\n\n\n\nThis package requires Python 3.8 or higher.\n\npdflatex (for circuit rendering)\n\n\n\n\nqsample offers efficient and fast estimation of logical failure rates of quantum error correction protocols when the fidelity of physical operations in the quantum circuits is high, such as in expertimental implementations today.\nThis package is for you if you want to * model circuit-level incoherent Pauli noise (we don’t do coherent noise here, neither are our auxiliary qubits modelled as ideal) * with high fidelity physical operations aka low physical error rates * for a QEC protocol that consists of execution of one or more quantum circuits with in-sequence measurements and feed-forward of measurement information * over a specific range of varying physical error rates\nIt currently offers to * build quantum circuits from the standard quantum gates: H, X, Z, CNOT * run stabilizer simulations with a standard CHP backend * model multiparameter noise with distinct error rates for single- and two-qubit gates: p1, p2 * estimate logical failure rates until uncertainty is lower than a given target confidence interval * choose direct Monte Carlo or Subset Sampling as sampling method\nBackground information:\nThe predominant method to model incoherent Pauli noise in quantum circuits is direct Monte Carlo (MC) sampling. MC is very inefficient for low physical error rates since most of the time no actual fault event is realized in simulation. Subset sampling circumvents this issue. With this method, presented in , fault events are categorized into distinct subsets which contribute to a polynomial sum expansion of the logical failure rate. In subset sampling, only the subsets that contribute most to the logical failure rate are actually estimated via sampling – rendering it an importance sampling technique. Both the sampling variance and the uncertainty from ignored, i.e. non-sampled, subsets stay well-defined and can be held small throughout the sampling procedure.\n\n\n\n\n\n\n\nCircuit\nProtocol\nError Model\nSimulator\nSampler\n5.1. Direct Sampler\n5.2. Interlude: Callbacks\n5.3. Subset Sampler\n\n\n\n\n\nList of ticks\nEach tick is a dictionary, key: gate type, value: set of qubit(s)\nRecommended: 1 gate type per tick\n\nExample: Flagged-GHZ preparation: * Produce GHZ state on qubits 0-3 * Flag-qubit 4, measure: * 0: error-free  1: flip on one data qubit*\n* Only for max. 1 allowed fault.\n\nfrom qsample import Circuit\n\n\nghz = Circuit([ {\"init\": {0,1,2,3,4}},\n                {\"H\": {0}},\n                {\"CNOT\": {(0,1)}},\n                {\"CNOT\": {(1,2)}},\n                {\"CNOT\": {(2,3)}},\n                {\"CNOT\": {(3,4)}},\n                {\"CNOT\": {(0,4)}},\n                {\"measure\": {4}}], ff_det=True)\n\nff_det: fault-free deterministic. Set to True if circuit gives unique measurement result when executed without faults.\n\nghz.draw()\n\n\n\n\n\n\n\n\nGraph (can be cyclic)\n\nVertices: Circuits\nEdges: transition rules = boolean* functions (checks)\nMust include start and end nodes.\n\n\n* Exception: Correction functions can return circuits for on-the-fly execution. (special case, will not show here)\nExample: Flagged-GHZ repeat(3)-until-success * Execute flagged-GHZ circuit max. 3 times. * Only repeat if measured 1. * If measured flag to be 0 within 3 iteration -> No fail * If after 2 iterations 3rd measurement is also 1 -> Fail\n\nfrom qsample import Protocol\n\n\nghz3 = Protocol(fault_tolerant=True)\n\nghz3.add_node('ghz', circuit=ghz) # Add node with corresponding circuit\nghz3.add_edge('START', 'ghz', check='True') # Transition START -> first circuit node always True\nghz3.add_edge('ghz', 'ghz', check='repeat(ghz)') # Transition to ghz if repeat(ghz) True.\nghz3.add_edge('ghz', 'FAIL', check='logErr(ghz)') # Transition to final node FAIL if logErr(ghz) True.\n\nfault_tolerant: Define all weight-1 paths (circuit sequence with max. 1 fault) to never result in a logical fail.\n\nghz3.draw()\n\n\n\n\n\nrepeat() and logErr() are user-defined (boolean) check functions\nMeasurement history of circuits stored during for protocol run\n\nCan access measurement history of any circuit by passing its name as argument\n\n\nNext, we define what the two check functions should do:\n\ndef repeat(msmt_list): # arg: list of ghz's measurment history\n    return len(msmt_list) < 3 and msmt_list[-1] == 1 # If True repeat ghz\n\ndef logErr(msmt_list):\n    return len(msmt_list) == 3 and msmt_list[-1] == 1 # If True transition to `FAIL`\n\nfunctions = {'logErr': logErr, 'repeat': repeat}\nghz3._check_fns.update(functions) # Let protocol know about user-defined checks\n\nNote: It is also possible that all checks are false. In this case the protocol exits “insignficantly”.\nHere: “insignificant” when Flag=0 within 3 protocol runs -> Go to next protocol run, i.e. sample.\n\n\n\n\nStrategy:\n\nGenerate fault circuit \\(C_f\\) of same length as reference circuit \\(C\\)\nDuring simulation iterate \\(C\\) and \\(C_f\\) simulateously and apply to state\n\nMust include:\n\ngroup(): group circuit locations by key, e.g. all 1-qubit-gates\nselect(): picks certain amount of locations from each group (not required by user)\ngenerate(): generator function, returns a Pauli fault operator for given location\n\n\n\nfrom qsample import E1\n\nE1.groups, E1().group(ghz) # All gates in group `q`\n\n(['q'],\n {'q': [(1, 0),\n   (2, (0, 1)),\n   (3, (1, 2)),\n   (4, (2, 3)),\n   (5, (3, 4)),\n   (6, (0, 4))]})\n\n\n\n\n\n\nTwo types available: Stabilizer (CHP) and Statevectors (ProjectQ port), both well-tested\n\nhttps://github.com/Strilanc/python-chp-stabilizer-simulator\nhttps://github.com/ProjectQ-Framework/ProjectQ\n\nStatevector simulator has more available gates and functions\n\n\nfrom qsample import StabilizerSimulator as CHP\n\n\n\n\n\nTwo types: Direct (Monte Carlo) and Subset sampler\nAll relevant information stored in CountTree data structure\n\n\n\n\n\nfrom qsample import DirectSampler\nimport numpy as np\nimport matplotlib.pyplot as plt\n\nLet’s define some physical error rates at which to sample:\n\nsample_range = np.logspace(-3,0,5)\nerr_probs = {'q': sample_range} # Note: Must provide rate(s) for each group specified in `ErrorModel`\nerr_probs\n\n{'q': array([0.001     , 0.00562341, 0.03162278, 0.17782794, 1.        ])}\n\n\n\ndsam = DirectSampler(protocol=ghz3, simulator=CHP, err_probs=err_probs, err_model=E1)\ndsam.run(10000)\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\np_L, std = dsam.stats()\n\nplt.errorbar(sample_range, p_L, fmt='--', c=\"black\", yerr=std, label=\"Direct MC\")\nplt.plot(sample_range, sample_range,'k:', alpha=0.5)\nplt.xscale('log')\nplt.yscale('log')\nplt.xlabel('$p_{phy}$(q)')\nplt.ylabel('$p_L$');\n\n\n\n\nCheck what has been sampled for the last (1e0) physical error rate:\n\ndsam.trees[(1.0,)].draw()\n\n\n\n\n\n\n\n\nUsed to receive intermediate results inside sampling process\nE.g. we might want to avoid unnecessary samples (at large \\(p_{phy}\\))\n\nWe can use the callback RelStdTarget\n\n\n\nfrom qsample import callbacks as cb\n\ndsam2 = DirectSampler(protocol=ghz3, simulator=CHP, err_probs=err_probs, err_model=E1)\ndsam2.run(10000, callbacks=[cb.RelStdTarget(target=0.2)])\n\n\n\n\n\n\n\n\n\n\n\n\n\nRel. std target of 0.2 reached. Sampling stopped.\n\n\n\n\n\nRel. std target of 0.2 reached. Sampling stopped.\n\n\nAnother callback is VerboseCircuitExec, which gives a detailed log of which circuits, faults and measurements took place:\n\ndsam3 = DirectSampler(protocol=ghz3, simulator=CHP, err_probs={'q': 0.1}, err_model=E1)\ndsam3.run(10, callbacks=[cb.VerboseCircuitExec()])\n\n\n\n\nghz -> Faults: [] -> Msmt: 0\nNone\nghz -> Faults: [] -> Msmt: 0\nNone\nghz -> Faults: [(6, {'Y': {0}})] -> Msmt: 0\nNone\nghz -> Faults: [] -> Msmt: 0\nNone\nghz -> Faults: [(4, {'Z': {2}})] -> Msmt: 0\nNone\nghz -> Faults: [(1, {'Z': {0}})] -> Msmt: 0\nNone\nghz -> Faults: [] -> Msmt: 0\nNone\nghz -> Faults: [] -> Msmt: 0\nNone\nghz -> Faults: [(4, {'X': {2}})] -> Msmt: 0\nNone\nghz -> Faults: [(2, {'Y': {0}, 'Z': {1}}), (5, {'Z': {3}})] -> Msmt: 1\nghz -> Faults: [] -> Msmt: 0\nNone\n\n\nWe can also write our own callback. Every sampler has 6 callback hooks: * Begin/End sampler * Begin/End protocol * Begin/End circuit\n\n\n\n\nSamples only at one physical error rate pmax\nScaling obtained analytically\npmax must be chosen in “representative” region\n\nNote: 1. For multi-parameter error model pmax is a tuple of one physical error rate per group. 2. The choice of pmax has a direct impact of which subsets are sampled.\nHow to choose pmax? What is the heuristic? * We want to sample, s.t. the subset occurence probability is max. for 0-weight subset and subsequently falling for higher order subsets. * We want to have also relatively high probability for other (important) subsets, i.e. weight-1, weight-2,..\nExample: For the Flagged-GHZ circuit we would choose a pmax close to 0.1:\n\nfrom qsample.sampler.base import subset_occurence, all_subsets, err_probs_tomatrix\n\ngrp = E1().group(ghz).values()\nwgts_combis = all_subsets(grp)\n\nfor p_phy in [0.01, 0.1, 0.3]:\n    Aws = subset_occurence(grp, wgts_combis, p_phy)\n    plt.figure()\n    plt.title(\"Subset occurence prob. $A_w$ at $p_{phy}$=%.2f\" % p_phy)\n    plt.bar(range(len(Aws)), Aws)\n    plt.ylabel(\"$A_w$\")\n    plt.xlabel(\"Subsets\")\n\n\n\n\n\n\n\n\n\n\n\nfrom qsample import SubsetSampler\n\n\npmax = {'q': 0.1}\n\nss_sam = SubsetSampler(ghz3, CHP,  pmax=pmax, err_probs=err_probs, err_model=E1)\nss_sam.run(300)\n\n\n\n\nNote: Although we passed err_probs those are not used for sampling. Only when we call stats() those probs are used:\n\np_L_low, std_low, p_L_up, std_up = ss_sam.stats()\n\nplt.errorbar(sample_range, p_L, fmt='--', c=\"black\", yerr=std, label=\"Direct MC\")\nplt.loglog(sample_range, p_L_low, label='SS low')\nplt.fill_between(sample_range, p_L_low - std_low, p_L_low + std_low, alpha=0.2)\nplt.loglog(sample_range, p_L_up, label='SS low')\nplt.fill_between(sample_range, p_L_up - std_up, p_L_up + std_up, alpha=0.2)\nplt.plot(sample_range, sample_range,'k:', alpha=0.5)\nplt.xlabel('$p_{phy}$(q)')\nplt.ylabel('$p_L$')\nplt.legend();\n\n\n\n\nWe sampled at a single error rate with much less samples and get a much better bound on the logical error rate. Let’s inspect what has been sampled:\n\nss_sam.tree.draw() # only one tree\n\n\n\n\nWe can store and later reload our sample results:\n\nss_sam.save('ghz3ss.samp')\n\nfrom qsample import Sampler\nstored_sam = Sampler.load('ghz3ss.samp')\ncounts_before = stored_sam.tree.root.counts\n\nstored_sam.run(200) # After loading we can for example run a few more samples.\ncounts_after = stored_sam.tree.root.counts\n\nprint(counts_before, counts_after)\n\n\n\n\n300 500\n\n\nMore complex examples can be found here: https://github.com/dpwinter/qsample/blob/master/08_examples.ipynb\n\n\n\n\n\nsubmit your feature request via github issue\n\n\n\n\nqsample was developed by Don Winter based on and in collaboration with Sascha Heußen under supervision of Prof. Dr. Markus Müller."
+  },
+  {
+    "objectID": "sampler.base.html",
+    "href": "sampler.base.html",
+    "title": "Sampler base class",
+    "section": "",
+    "text": "Definitions: * A circuit location (cloc) is a tuple (tick_index,qubit(s)) which specifies a location in a circuit. In the simplest case this tuple can be understood as a Euclidean coordinate in tick-qubit-space, for example (1,2) for a circuit element at tick 1 on qubit 2, for example a single-qubit gate. However, the second entry in the tuple can also be a tuple of qubits, i.e. (tick_index, (qubitA, qubitB)), for example (1,(2,3)) for a 2-qubit gate in tick 1 from qubit 2 (control) to qubit 3 (target). It is important that (1,(2,3)) \\(\\neq\\) (1,(3,2)) \\(\\neq\\) (1,2)+(1,3). * Common circuit locations can be grouped into a location group (locgrp), for example the set of all 1-qubit gate locations or the set of all idle qubits or all neighboring qubits of 1-qubit gates. A location group is defined by the error model, which sweeps through a circuit and extracts all elements belonging to a certain group. Note that circuit locations can appear in more than one location group and the union of all location groups must not necessarily give all possible circuit locations. This is for example the case for error models which only define errors on gates but not on idle qubits. * By location group weight (locgrp_wgt) we refer to an integer number specifying the amount of location group elements on which to place faults. Note that the weight only specifies the amount, neither the specific element on which the fault is placed (this will be choosen uniformly random) nor the specific error which will be placed (this will be drawn uniformly random from a set of group errors (locgrp_errsets) defined by the error model). * By location group probability (locgrp_prob) on the other hand, we refer to the probability of placing faults on each element of a group. Thus, during circuit execution it will be decided for each element of a location group if an error is placed based on the group probability. * Both the above can be written as vectors over all location groups an error model specifies. The vector of location group weights (locgrp_wgts) thereby characterizes a so-called fault-weight subset, i.e. a particular amount of faults on each location group defined in an error model. These subsets form the sampling space on which we apply importance sampling during subset sampling. * For subset sampling we analytically calculate the subset occurence probability (Aws) as a function of location group probabilities locgrp_probsfor each location group. As a subset occurence probability results from a binomial distribution binom(locgrp_wts, locgrp_lens, locgrp_probs) we also refer to it as binomial weight of a subset, or simply \\(A_w\\), as this is the symbol used in the paper. * If one of the above quantities is preceeded by a protocol_ we have a dictionary with circuit ids (cids) as keys and the given quantity for a circuit as value. Note that locgrp_probs are defined equally for each circuit in the protocol as those represent physical error rates of a (faulty) device which also won’t be different for different circuits in reality. To sample from more than physical error rate a range locgrp_probs_range can be specified which contains a range of error rates for each location group. * locgrp_wgts_combis are all possible locgrp_wgts vectors up to the total number of elements (locgrp_len) in each location group.\n\nsource\n\nprotocol_subset_occurence\n\n protocol_subset_occurence (protocol_groups, protocol_subsets,\n                            group_probs)\n\n\nsource\n\n\nprotocol_all_subsets\n\n protocol_all_subsets (protocol_groups)\n\n\nsource\n\n\nall_subsets\n\n all_subsets (groups)\n\n\nsource\n\n\nsubset_occurence\n\n subset_occurence (groups, subsets, group_prob_range)\n\n\nsource\n\n\nerr_probs_tomatrix\n\n err_probs_tomatrix (err_probs:dict, groups:list)\n\n\nsource\n\n\ntomatrix\n\n tomatrix (mixed_list)\n\n\nsource\n\n\nSampler\n\n Sampler (protocol, simulator, err_probs={'0': {}}, err_model=None)\n\nInitialize self. See help(type(self)) for accurate signature."
+  },
+  {
+    "objectID": "callbacks.html",
+    "href": "callbacks.html",
+    "title": "Sampler Callbacks",
+    "section": "",
+    "text": "source\n\nCallbackList\n\n CallbackList (sampler, callbacks=[])\n\nInitialize self. See help(type(self)) for accurate signature.\n\nsource\n\n\nCallback\n\n Callback ()\n\nInitialize self. See help(type(self)) for accurate signature.\n\nsource\n\n\nPlotStats\n\n PlotStats ()\n\nInitialize self. See help(type(self)) for accurate signature.\n\nsource\n\n\nRelStdTarget\n\n RelStdTarget (target=0.1, include_delta=True)\n\nInitialize self. See help(type(self)) for accurate signature.\n\nsource\n\n\nStatsPerSample\n\n StatsPerSample (log_dir=None)\n\nInitialize self. See help(type(self)) for accurate signature.\n\nsource\n\n\nVerboseCircuitExec\n\n VerboseCircuitExec ()\n\nInitialize self. See help(type(self)) for accurate signature.\n\nsource\n\n\nErvPerSample\n\n ErvPerSample (log_dir=None)\n\nInitialize self. See help(type(self)) for accurate signature."
+  },
+  {
+    "objectID": "sampler.subset.html",
+    "href": "sampler.subset.html",
+    "title": "Subset Monte Carlo sampler",
+    "section": "",
+    "text": "from qsample.examples import ghz3\nfrom qsample.noise import E3\nimport qsample.callbacks as cb\nfrom qsample import StabilizerSimulator as CHP\nimport numpy as np\n\nsample_range = np.logspace(-3,0,5)\n\nerr_probs = {\n    'q1': 0,\n    'q2': sample_range,\n    'init': sample_range,\n    'meas': sample_range,\n    'idle': 0\n}\npmax = {\n    'q1': 0.1,\n    'q2': 0.1,\n    'init': 0.1,\n    'meas': 0.1,\n    'idle': 0\n}\nsam = SubsetSampler(ghz3, CHP,  pmax=pmax, err_probs=err_probs, err_model=E3)\nsam.run(100, [cb.PlotStats()])"
+  }
+]

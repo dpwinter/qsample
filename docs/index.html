@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.269">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Efficient sampling of noisy quantum circuits and protocols">
+
+<title>qsample</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+<script src="https://unpkg.com/@jupyter-widgets/html-manager@*/dist/embed-amd.js" crossorigin="anonymous"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<link rel="stylesheet" href="styles.css">
+<meta property="og:title" content="qsample">
+<meta property="og:description" content="Efficient sampling of noisy quantum circuits and protocols">
+<meta property="og:site-name" content="qsample">
+<meta name="twitter:title" content="qsample">
+<meta name="twitter:description" content="Efficient sampling of noisy quantum circuits and protocols">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">qsample</span>
+    </a>
+  </div>
+          <div id="quarto-search" class="" title="Search"></div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+    <div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title">qsample</h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link active">qsample</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./math.html" class="sidebar-item-text sidebar-link">Math</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./circuit.html" class="sidebar-item-text sidebar-link">Circuit</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./protocol.html" class="sidebar-item-text sidebar-link">Protocol</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./sim.mixin.html" class="sidebar-item-text sidebar-link">Simulator Mixin</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./sim.stabilizer.html" class="sidebar-item-text sidebar-link">CHP Simulator</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./sim.statevector.html" class="sidebar-item-text sidebar-link">Statevector Simulator</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./callbacks.html" class="sidebar-item-text sidebar-link">Sampler Callbacks</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./sampler.tree.html" class="sidebar-item-text sidebar-link">Count Tree</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./sampler.base.html" class="sidebar-item-text sidebar-link">Sampler base class</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./sampler.direct.html" class="sidebar-item-text sidebar-link">Direct Monte Carlo sampler</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./sampler.subset.html" class="sidebar-item-text sidebar-link">Subset Monte Carlo sampler</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./noise.html" class="sidebar-item-text sidebar-link">Noise / Error models</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./examples.html" class="sidebar-item-text sidebar-link">Examples</a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#qsample" id="toc-qsample" class="nav-link active" data-scroll-target="#qsample">qsample</a>
+  <ul class="collapse">
+  <li><a href="#install" id="toc-install" class="nav-link" data-scroll-target="#install">Install</a></li>
+  <li><a href="#prerequisites" id="toc-prerequisites" class="nav-link" data-scroll-target="#prerequisites">Prerequisites</a></li>
+  <li><a href="#when-to-use" id="toc-when-to-use" class="nav-link" data-scroll-target="#when-to-use">When to use</a></li>
+  <li><a href="#getting-started" id="toc-getting-started" class="nav-link" data-scroll-target="#getting-started">Getting started</a>
+  <ul class="collapse">
+  <li><a href="#library-overview" id="toc-library-overview" class="nav-link" data-scroll-target="#library-overview">Library overview</a></li>
+  <li><a href="#circuit" id="toc-circuit" class="nav-link" data-scroll-target="#circuit">1. Circuit</a></li>
+  <li><a href="#protocol" id="toc-protocol" class="nav-link" data-scroll-target="#protocol">2. Protocol</a></li>
+  <li><a href="#error-model" id="toc-error-model" class="nav-link" data-scroll-target="#error-model">3. Error model</a></li>
+  <li><a href="#simulator" id="toc-simulator" class="nav-link" data-scroll-target="#simulator">4. Simulator</a></li>
+  <li><a href="#sampler" id="toc-sampler" class="nav-link" data-scroll-target="#sampler">5. Sampler</a></li>
+  <li><a href="#direct-sampler" id="toc-direct-sampler" class="nav-link" data-scroll-target="#direct-sampler">5.1. Direct sampler</a></li>
+  <li><a href="#interlude-callbacks" id="toc-interlude-callbacks" class="nav-link" data-scroll-target="#interlude-callbacks">5.2. Interlude: Callbacks</a></li>
+  <li><a href="#subset-sampler" id="toc-subset-sampler" class="nav-link" data-scroll-target="#subset-sampler">5.3. Subset Sampler</a></li>
+  </ul></li>
+  <li><a href="#contribute" id="toc-contribute" class="nav-link" data-scroll-target="#contribute">Contribute</a></li>
+  <li><a href="#team" id="toc-team" class="nav-link" data-scroll-target="#team">Team</a></li>
+  </ul></li>
+  </ul>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/dpwinter/qsample/tree/master/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title d-none d-lg-block">qsample</h1>
+</div>
+
+<div>
+  <div class="description">
+    Efficient sampling of noisy quantum circuits and protocols
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<section id="qsample" class="level1">
+<h1>qsample</h1>
+<p>Efficient sampling of noisy quantum circuits and protocols</p>
+<ul>
+<li>Docs: https://dpwinter.github.io/qsample/</li>
+</ul>
+<section id="install" class="level2">
+<h2 class="anchored" data-anchor-id="install">Install</h2>
+<p>At the moment only build from source available:</p>
+<pre><code>git clone https://github.com/dpwinter/qsample.git
+cd qsample
+python setup.py install</code></pre>
+</section>
+<section id="prerequisites" class="level2">
+<h2 class="anchored" data-anchor-id="prerequisites">Prerequisites</h2>
+<ul>
+<li>This package requires Python 3.8 or higher.<br>
+</li>
+<li>pdflatex (for circuit rendering)</li>
+</ul>
+</section>
+<section id="when-to-use" class="level2">
+<h2 class="anchored" data-anchor-id="when-to-use">When to use</h2>
+<p>qsample offers efficient and fast estimation of logical failure rates of quantum error correction protocols when the fidelity of physical operations in the quantum circuits is high, such as in expertimental implementations today.</p>
+<p>This package is for you if you want to * model circuit-level incoherent Pauli noise (we don’t do coherent noise here, neither are our auxiliary qubits modelled as ideal) * with high fidelity physical operations aka low physical error rates * for a QEC protocol that consists of execution of one or more quantum circuits with in-sequence measurements and feed-forward of measurement information * over a specific range of varying physical error rates</p>
+<p>It currently offers to * build quantum circuits from the standard quantum gates: H, X, Z, CNOT * run stabilizer simulations with a standard CHP backend * model multiparameter noise with distinct error rates for single- and two-qubit gates: p1, p2 * estimate logical failure rates until uncertainty is lower than a given target confidence interval * choose direct Monte Carlo or Subset Sampling as sampling method</p>
+<p>Background information:</p>
+<p>The predominant method to model incoherent Pauli noise in quantum circuits is direct Monte Carlo (MC) sampling. MC is very inefficient for low physical error rates since most of the time no actual fault event is realized in simulation. Subset sampling circumvents this issue. With this method, presented in , fault events are categorized into distinct subsets which contribute to a polynomial sum expansion of the logical failure rate. In subset sampling, only the subsets that contribute most to the logical failure rate are actually estimated via sampling – rendering it an importance sampling technique. Both the sampling variance and the uncertainty from ignored, i.e.&nbsp;non-sampled, subsets stay well-defined and can be held small throughout the sampling procedure.</p>
+</section>
+<section id="getting-started" class="level2">
+<h2 class="anchored" data-anchor-id="getting-started">Getting started</h2>
+<hr>
+<section id="library-overview" class="level3">
+<h3 class="anchored" data-anchor-id="library-overview">Library overview</h3>
+<ol type="1">
+<li>Circuit</li>
+<li>Protocol</li>
+<li>Error Model</li>
+<li>Simulator</li>
+<li>Sampler<br>
+5.1. Direct Sampler<br>
+5.2. Interlude: Callbacks<br>
+5.3. Subset Sampler</li>
+</ol>
+</section>
+<section id="circuit" class="level3">
+<h3 class="anchored" data-anchor-id="circuit">1. Circuit</h3>
+<ul>
+<li>List of ticks</li>
+<li>Each tick is a dictionary, key: gate type, value: set of qubit(s)</li>
+<li>Recommended: 1 gate type per tick</li>
+</ul>
+<p><strong>Example:</strong> Flagged-GHZ preparation: * Produce GHZ state on qubits 0-3 * Flag-qubit 4, measure: * 0: error-free<em> </em> 1: flip on one data qubit*</p>
+<p>* Only for max. 1 allowed fault.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> qsample <span class="im">import</span> Circuit</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>ghz <span class="op">=</span> Circuit([ {<span class="st">"init"</span>: {<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>}},</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>                {<span class="st">"H"</span>: {<span class="dv">0</span>}},</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>                {<span class="st">"CNOT"</span>: {(<span class="dv">0</span>,<span class="dv">1</span>)}},</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>                {<span class="st">"CNOT"</span>: {(<span class="dv">1</span>,<span class="dv">2</span>)}},</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>                {<span class="st">"CNOT"</span>: {(<span class="dv">2</span>,<span class="dv">3</span>)}},</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>                {<span class="st">"CNOT"</span>: {(<span class="dv">3</span>,<span class="dv">4</span>)}},</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>                {<span class="st">"CNOT"</span>: {(<span class="dv">0</span>,<span class="dv">4</span>)}},</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>                {<span class="st">"measure"</span>: {<span class="dv">4</span>}}], ff_det<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>ff_det</strong>: fault-free deterministic. Set to <code>True</code> if circuit gives unique measurement result when executed without faults.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>ghz.draw()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="index_files/figure-html/cell-5-output-1.svg" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="protocol" class="level3">
+<h3 class="anchored" data-anchor-id="protocol">2. Protocol</h3>
+<ul>
+<li>Graph (can be cyclic)
+<ul>
+<li>Vertices: Circuits</li>
+<li>Edges: transition rules = boolean* functions (<em>checks</em>)</li>
+<li>Must include <strong>start</strong> and <strong>end</strong> nodes.</li>
+</ul></li>
+</ul>
+<p>* Exception: Correction functions can return circuits for on-the-fly execution. (special case, will not show here)</p>
+<p><strong>Example:</strong> Flagged-GHZ repeat(3)-until-success * Execute flagged-GHZ circuit max. 3 times. * Only repeat if measured <code>1</code>. * If measured flag to be <code>0</code> within 3 iteration -&gt; No fail * If after 2 iterations 3rd measurement is also <code>1</code> -&gt; Fail</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> qsample <span class="im">import</span> Protocol</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>ghz3 <span class="op">=</span> Protocol(fault_tolerant<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>ghz3.add_node(<span class="st">'ghz'</span>, circuit<span class="op">=</span>ghz) <span class="co"># Add node with corresponding circuit</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>ghz3.add_edge(<span class="st">'START'</span>, <span class="st">'ghz'</span>, check<span class="op">=</span><span class="st">'True'</span>) <span class="co"># Transition START -&gt; first circuit node always True</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>ghz3.add_edge(<span class="st">'ghz'</span>, <span class="st">'ghz'</span>, check<span class="op">=</span><span class="st">'repeat(ghz)'</span>) <span class="co"># Transition to ghz if repeat(ghz) True.</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>ghz3.add_edge(<span class="st">'ghz'</span>, <span class="st">'FAIL'</span>, check<span class="op">=</span><span class="st">'logErr(ghz)'</span>) <span class="co"># Transition to final node FAIL if logErr(ghz) True.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>fault_tolerant:</strong> Define all weight-1 paths (circuit sequence with max. 1 fault) to never result in a logical fail.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>ghz3.draw()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="index_files/figure-html/cell-8-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<ul>
+<li><code>repeat()</code> and <code>logErr()</code> are user-defined (boolean) check functions</li>
+<li>Measurement history of circuits stored during for protocol run
+<ul>
+<li>Can access measurement history of any circuit by passing its name as argument</li>
+</ul></li>
+</ul>
+<p>Next, we define what the two check functions should do:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> repeat(msmt_list): <span class="co"># arg: list of ghz's measurment history</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">len</span>(msmt_list) <span class="op">&lt;</span> <span class="dv">3</span> <span class="kw">and</span> msmt_list[<span class="op">-</span><span class="dv">1</span>] <span class="op">==</span> <span class="dv">1</span> <span class="co"># If True repeat ghz</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> logErr(msmt_list):</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">len</span>(msmt_list) <span class="op">==</span> <span class="dv">3</span> <span class="kw">and</span> msmt_list[<span class="op">-</span><span class="dv">1</span>] <span class="op">==</span> <span class="dv">1</span> <span class="co"># If True transition to `FAIL`</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>functions <span class="op">=</span> {<span class="st">'logErr'</span>: logErr, <span class="st">'repeat'</span>: repeat}</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>ghz3._check_fns.update(functions) <span class="co"># Let protocol know about user-defined checks</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Note</strong>: It is also possible that <strong>all checks are false</strong>. In this case the protocol exits “insignficantly”.<br>
+Here: “insignificant” when Flag=0 within 3 protocol runs -&gt; Go to next protocol run, i.e.&nbsp;sample.</p>
+</section>
+<section id="error-model" class="level3">
+<h3 class="anchored" data-anchor-id="error-model">3. Error model</h3>
+<ul>
+<li>Strategy:
+<ul>
+<li>Generate <em>fault</em> circuit <span class="math inline">\(C_f\)</span> of same length as reference circuit <span class="math inline">\(C\)</span></li>
+<li>During simulation iterate <span class="math inline">\(C\)</span> and <span class="math inline">\(C_f\)</span> simulateously and apply to state</li>
+</ul></li>
+<li>Must include:
+<ul>
+<li><code>group()</code>: group circuit locations by key, e.g.&nbsp;all 1-qubit-gates</li>
+<li><code>select()</code>: picks certain amount of locations from each group (not required by user)</li>
+<li><code>generate()</code>: generator function, returns a Pauli fault operator for given location</li>
+</ul></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> qsample <span class="im">import</span> E1</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>E1.groups, E1().group(ghz) <span class="co"># All gates in group `q`</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>(['q'],
+ {'q': [(1, 0),
+   (2, (0, 1)),
+   (3, (1, 2)),
+   (4, (2, 3)),
+   (5, (3, 4)),
+   (6, (0, 4))]})</code></pre>
+</div>
+</div>
+</section>
+<section id="simulator" class="level3">
+<h3 class="anchored" data-anchor-id="simulator">4. Simulator</h3>
+<ul>
+<li>Two types available: Stabilizer (CHP) and Statevectors (ProjectQ port), both well-tested
+<ul>
+<li>https://github.com/Strilanc/python-chp-stabilizer-simulator</li>
+<li>https://github.com/ProjectQ-Framework/ProjectQ</li>
+</ul></li>
+<li>Statevector simulator has more available gates and functions</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> qsample <span class="im">import</span> StabilizerSimulator <span class="im">as</span> CHP</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="sampler" class="level3">
+<h3 class="anchored" data-anchor-id="sampler">5. Sampler</h3>
+<ul>
+<li>Two types: Direct (Monte Carlo) and Subset sampler</li>
+<li>All relevant information stored in <a href="https://dpwinter.github.io/qsample/sampler.tree.html#counttree"><code>CountTree</code></a> data structure</li>
+</ul>
+</section>
+<section id="direct-sampler" class="level3">
+<h3 class="anchored" data-anchor-id="direct-sampler">5.1. Direct sampler</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> qsample <span class="im">import</span> DirectSampler</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s define some physical error rates at which to sample:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>sample_range <span class="op">=</span> np.logspace(<span class="op">-</span><span class="dv">3</span>,<span class="dv">0</span>,<span class="dv">5</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>err_probs <span class="op">=</span> {<span class="st">'q'</span>: sample_range} <span class="co"># Note: Must provide rate(s) for each group specified in `ErrorModel`</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>err_probs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>{'q': array([0.001     , 0.00562341, 0.03162278, 0.17782794, 1.        ])}</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>dsam <span class="op">=</span> DirectSampler(protocol<span class="op">=</span>ghz3, simulator<span class="op">=</span>CHP, err_probs<span class="op">=</span>err_probs, err_model<span class="op">=</span>E1)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>dsam.run(<span class="dv">10000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"3e83b20fc84e45ab838fe983ef4ce5fe","version_major":2,"version_minor":0}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"ed5d09f678b84ebe80bc112d350289b0","version_major":2,"version_minor":0}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"c1a6a0223e054d2eb5fcd0a7fdcd1365","version_major":2,"version_minor":0}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"19a4370152fb4b0b84f6ac33040fdac6","version_major":2,"version_minor":0}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"2f9fc543c5814d8e92402c8699db30b7","version_major":2,"version_minor":0}
+</script>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>p_L, std <span class="op">=</span> dsam.stats()</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>plt.errorbar(sample_range, p_L, fmt<span class="op">=</span><span class="st">'--'</span>, c<span class="op">=</span><span class="st">"black"</span>, yerr<span class="op">=</span>std, label<span class="op">=</span><span class="st">"Direct MC"</span>)</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>plt.plot(sample_range, sample_range,<span class="st">'k:'</span>, alpha<span class="op">=</span><span class="fl">0.5</span>)</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>plt.xscale(<span class="st">'log'</span>)</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>plt.yscale(<span class="st">'log'</span>)</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'$p_</span><span class="sc">{phy}</span><span class="st">$(q)'</span>)</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'$p_L$'</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="index_files/figure-html/cell-15-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<p>Check what has been sampled for the last (1e0) physical error rate:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>dsam.trees[(<span class="fl">1.0</span>,)].draw()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="index_files/figure-html/cell-16-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="interlude-callbacks" class="level3">
+<h3 class="anchored" data-anchor-id="interlude-callbacks">5.2. Interlude: Callbacks</h3>
+<ul>
+<li>Used to receive intermediate results inside sampling process</li>
+<li>E.g. we might want to avoid unnecessary samples (at large <span class="math inline">\(p_{phy}\)</span>)
+<ul>
+<li>We can use the callback <code>RelStdTarget</code></li>
+</ul></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> qsample <span class="im">import</span> callbacks <span class="im">as</span> cb</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>dsam2 <span class="op">=</span> DirectSampler(protocol<span class="op">=</span>ghz3, simulator<span class="op">=</span>CHP, err_probs<span class="op">=</span>err_probs, err_model<span class="op">=</span>E1)</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>dsam2.run(<span class="dv">10000</span>, callbacks<span class="op">=</span>[cb.RelStdTarget(target<span class="op">=</span><span class="fl">0.2</span>)])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"82cffc2bf25049fa935879e0b3fc7848","version_major":2,"version_minor":0}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"fbef8048c0d642eeb3584150d0a34af9","version_major":2,"version_minor":0}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"170c7c82b424409c908613c67a16abd3","version_major":2,"version_minor":0}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"f03d02e0da4e4a18ab85a023d590ce62","version_major":2,"version_minor":0}
+</script>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rel. std target of 0.2 reached. Sampling stopped.</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"4562e56f0f6e4a7793e4d8ed01c5c1e0","version_major":2,"version_minor":0}
+</script>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rel. std target of 0.2 reached. Sampling stopped.</code></pre>
+</div>
+</div>
+<p>Another callback is <a href="https://dpwinter.github.io/qsample/callbacks.html#verbosecircuitexec"><code>VerboseCircuitExec</code></a>, which gives a detailed log of which circuits, faults and measurements took place:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>dsam3 <span class="op">=</span> DirectSampler(protocol<span class="op">=</span>ghz3, simulator<span class="op">=</span>CHP, err_probs<span class="op">=</span>{<span class="st">'q'</span>: <span class="fl">0.1</span>}, err_model<span class="op">=</span>E1)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>dsam3.run(<span class="dv">10</span>, callbacks<span class="op">=</span>[cb.VerboseCircuitExec()])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"a72c2fb1b74b420287a20acf0ee8e337","version_major":2,"version_minor":0}
+</script>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>ghz -&gt; Faults: [] -&gt; Msmt: 0
+None
+ghz -&gt; Faults: [] -&gt; Msmt: 0
+None
+ghz -&gt; Faults: [(6, {'Y': {0}})] -&gt; Msmt: 0
+None
+ghz -&gt; Faults: [] -&gt; Msmt: 0
+None
+ghz -&gt; Faults: [(4, {'Z': {2}})] -&gt; Msmt: 0
+None
+ghz -&gt; Faults: [(1, {'Z': {0}})] -&gt; Msmt: 0
+None
+ghz -&gt; Faults: [] -&gt; Msmt: 0
+None
+ghz -&gt; Faults: [] -&gt; Msmt: 0
+None
+ghz -&gt; Faults: [(4, {'X': {2}})] -&gt; Msmt: 0
+None
+ghz -&gt; Faults: [(2, {'Y': {0}, 'Z': {1}}), (5, {'Z': {3}})] -&gt; Msmt: 1
+ghz -&gt; Faults: [] -&gt; Msmt: 0
+None</code></pre>
+</div>
+</div>
+<p>We can also write our own callback. Every sampler has 6 callback hooks: * Begin/End sampler * Begin/End protocol * Begin/End circuit</p>
+</section>
+<section id="subset-sampler" class="level3">
+<h3 class="anchored" data-anchor-id="subset-sampler">5.3. Subset Sampler</h3>
+<ul>
+<li>Samples only at one physical error rate <code>pmax</code></li>
+<li>Scaling obtained analytically</li>
+<li><code>pmax</code> must be chosen in “representative” region</li>
+</ul>
+<p><em>Note</em>: 1. For multi-parameter error model <code>pmax</code> is a tuple of one physical error rate per group. 2. The choice of <code>pmax</code> has a direct impact of which subsets are sampled.</p>
+<p>How to choose <code>pmax</code>? What is the heuristic? * We want to sample, s.t. the subset occurence probability is max. for 0-weight subset and subsequently falling for higher order subsets. * We want to have also relatively high probability for other (important) subsets, i.e.&nbsp;weight-1, weight-2,..</p>
+<p><strong>Example:</strong> For the Flagged-GHZ circuit we would choose a <code>pmax</code> close to 0.1:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> qsample.sampler.base <span class="im">import</span> subset_occurence, all_subsets, err_probs_tomatrix</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>grp <span class="op">=</span> E1().group(ghz).values()</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>wgts_combis <span class="op">=</span> all_subsets(grp)</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> p_phy <span class="kw">in</span> [<span class="fl">0.01</span>, <span class="fl">0.1</span>, <span class="fl">0.3</span>]:</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>    Aws <span class="op">=</span> subset_occurence(grp, wgts_combis, p_phy)</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>    plt.figure()</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>    plt.title(<span class="st">"Subset occurence prob. $A_w$ at $p_</span><span class="sc">{phy}</span><span class="st">$=</span><span class="sc">%.2f</span><span class="st">"</span> <span class="op">%</span> p_phy)</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>    plt.bar(<span class="bu">range</span>(<span class="bu">len</span>(Aws)), Aws)</span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>    plt.ylabel(<span class="st">"$A_w$"</span>)</span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>    plt.xlabel(<span class="st">"Subsets"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="index_files/figure-html/cell-19-output-1.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="index_files/figure-html/cell-19-output-2.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="index_files/figure-html/cell-19-output-3.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> qsample <span class="im">import</span> SubsetSampler</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>pmax <span class="op">=</span> {<span class="st">'q'</span>: <span class="fl">0.1</span>}</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>ss_sam <span class="op">=</span> SubsetSampler(ghz3, CHP,  pmax<span class="op">=</span>pmax, err_probs<span class="op">=</span>err_probs, err_model<span class="op">=</span>E1)</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>ss_sam.run(<span class="dv">300</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"11f6df2f04f4412ea46b733c96c37162","version_major":2,"version_minor":0}
+</script>
+</div>
+</div>
+<p><em>Note</em>: Although we passed <code>err_probs</code> those are not used for sampling. Only when we call <code>stats()</code> those probs are used:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>p_L_low, std_low, p_L_up, std_up <span class="op">=</span> ss_sam.stats()</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>plt.errorbar(sample_range, p_L, fmt<span class="op">=</span><span class="st">'--'</span>, c<span class="op">=</span><span class="st">"black"</span>, yerr<span class="op">=</span>std, label<span class="op">=</span><span class="st">"Direct MC"</span>)</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>plt.loglog(sample_range, p_L_low, label<span class="op">=</span><span class="st">'SS low'</span>)</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>plt.fill_between(sample_range, p_L_low <span class="op">-</span> std_low, p_L_low <span class="op">+</span> std_low, alpha<span class="op">=</span><span class="fl">0.2</span>)</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>plt.loglog(sample_range, p_L_up, label<span class="op">=</span><span class="st">'SS low'</span>)</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>plt.fill_between(sample_range, p_L_up <span class="op">-</span> std_up, p_L_up <span class="op">+</span> std_up, alpha<span class="op">=</span><span class="fl">0.2</span>)</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>plt.plot(sample_range, sample_range,<span class="st">'k:'</span>, alpha<span class="op">=</span><span class="fl">0.5</span>)</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'$p_</span><span class="sc">{phy}</span><span class="st">$(q)'</span>)</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'$p_L$'</span>)</span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>plt.legend()<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="index_files/figure-html/cell-22-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<p>We sampled at a single error rate with much less samples and get a much better bound on the logical error rate. Let’s inspect what has been sampled:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>ss_sam.tree.draw() <span class="co"># only one tree</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="index_files/figure-html/cell-23-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<p>We can store and later reload our sample results:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>ss_sam.save(<span class="st">'ghz3ss.samp'</span>)</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> qsample <span class="im">import</span> Sampler</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>stored_sam <span class="op">=</span> Sampler.load(<span class="st">'ghz3ss.samp'</span>)</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>counts_before <span class="op">=</span> stored_sam.tree.root.counts</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>stored_sam.run(<span class="dv">200</span>) <span class="co"># After loading we can for example run a few more samples.</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>counts_after <span class="op">=</span> stored_sam.tree.root.counts</span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(counts_before, counts_after)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"cfcfe77448ad4944ba8d148d0e38548b","version_major":2,"version_minor":0}
+</script>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>300 500</code></pre>
+</div>
+</div>
+<p>More complex examples can be found here: https://github.com/dpwinter/qsample/blob/master/08_examples.ipynb</p>
+</section>
+</section>
+<section id="contribute" class="level2">
+<h2 class="anchored" data-anchor-id="contribute">Contribute</h2>
+<ul>
+<li>submit your feature request via github issue</li>
+</ul>
+</section>
+<section id="team" class="level2">
+<h2 class="anchored" data-anchor-id="team">Team</h2>
+<p><code>qsample</code> was developed by Don Winter based on and in collaboration with Sascha Heußen under supervision of Prof.&nbsp;Dr.&nbsp;Markus Müller.</p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script type="application/vnd.jupyter.widget-state+json">
+{"state":{},"version_major":2,"version_minor":0}
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
