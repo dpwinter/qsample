@@ -212,17 +212,17 @@ class ErvPerSample(Callback):
         self.n_calls = 0
         
     def on_protocol_begin(self, **kwargs):
-        self.current_erv = []
+        self.erv_vals = []
         
     def on_circuit_end(self, local_vars, **kwargs):
-        erv_subset = local_vars.get("grp_wgts", None)
+        subset = local_vars.get("subset", None)
         name = local_vars.get("name", None)
-        if erv_subset:
-            erv = local_vars["erv"]
-            self.current_erv.append((name,erv_subset,erv))
+        if subset:
+            erv_val = local_vars["erv"]
+            self.erv_vals.append((name,subset,erv_val))
         
     def on_protocol_end(self, **kwargs):
-        self.data.append(self.current_erv)
+        self.data.append(self.erv_vals)
         self.n_calls += 1
         
     def on_sampler_end(self, **kwargs):
@@ -231,19 +231,19 @@ class ErvPerSample(Callback):
             for j, (name, subset, erv) in enumerate(erv_sel):
                 key = (j, name, subset)
                 data[key] = data.get(key, []) + [(i,erv)]
-
+        
         max_levels = max([k[0] for k in data.keys()])
         max_subset_weight = max([sum(k[-1]) for k in data.keys()])
         cmap = lambda p1, p2: (p1, 0, p2)
 
         plt.figure(figsize=(6,4))
         for k,vlist in sorted(data.items()):
-            p1 = k[0] / max_levels
+            p1 = k[0] / (max_levels + 1)
             p2 = sum(k[-1]) / max_subset_weight
 
             xs = [x for x,_ in vlist]
             ys = [np.nan if np.ma.is_masked(y) else y for _,y in vlist]
-            plt.plot(xs, ys, '.-',label=k, color=cmap(p1,p2))
+            plt.plot(xs, ys, '.',label=k)#, color=cmap(p1,p2))
             
         plt.yscale('log')
         plt.legend(ncol=3, loc='center left', bbox_to_anchor=(1, 0.5))
