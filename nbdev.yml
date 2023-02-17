@@ -1,0 +1,9 @@
+project:
+  output-dir: docs
+
+website:
+  title: "qsample"
+  site-url: "https://dpwinter.github.io/qsample/"
+  description: "Efficient sampling of noisy quantum circuits and protocols"
+  repo-branch: master
+  repo-url: "https://github.com/dpwinter/qsample/tree/master/"
