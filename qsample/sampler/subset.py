@@ -15,6 +15,12 @@ class SubsetSampler(Sampler):
     def stats(self, err_probs=None):
         _protocol_Aws = self.tree.constants
         
+        if set(self.protocol._circuits.keys()) != set(self.protocol_subsets.keys()):
+            # Update subsets if circuits were added during runtime.
+            # protocol_groups = {cid: self.err_model.group(circuit) for cid, circuit in self.protocol._circuits.items()}
+            # self.protocol_subsets = protocol_all_subsets(self.protocol_groups)
+            self._set_subsets()
+        
         if err_probs is not None:
             assert isinstance(err_probs, dict)
             err_probs = err_probs_tomatrix(err_probs, self.err_model.groups)
@@ -22,13 +28,13 @@ class SubsetSampler(Sampler):
         else:
             self.tree.constants = protocol_subset_occurence(self.protocol_groups, self.protocol_subsets, self.err_probs)
         
-        v_L = self.tree.variance
-        p_L = self.tree.rate
-        delta = self.tree.delta
-        v_L_up_var = self.tree.variance_ub #norm_variance
+        v_L = self.tree.uncertainty_propagated_variance(mode=1)
+        p_L = self.tree.path_sum(self.tree.root, mode=1)
+        delta = 1 - self.tree.path_sum(self.tree.root, mode=2)
+        v_L_up_var = self.tree.uncertainty_propagated_variance(mode=0)
         
         self.tree.constants = _protocol_Aws
-        return tomatrix([p_L, np.sqrt(v_L), p_L+delta, np.sqrt(v_L_up_var)])#np.sqrt(v_L+delta_var)])
+        return tomatrix([p_L, np.sqrt(v_L), p_L+delta, np.sqrt(v_L_up_var)])
         
     def __init__(self, protocol, simulator, pmax, err_model=None, err_probs=None):
         super().__init__(protocol, simulator, err_probs=pmax, err_model=err_model)

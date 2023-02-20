@@ -17,7 +17,7 @@ import dill as pickle
 
 from collections.abc import Iterable
 
-# %% ../../nbs/06b_sampler.base.ipynb 5
+# %% ../../nbs/06b_sampler.base.ipynb 6
 tolists = lambda l: [e if isinstance(e,Iterable) else [e] for e in l]
 lens = lambda list_of_lists: list(map(len,list_of_lists))
 maxlen = lambda list_of_lists: max(lens(list_of_lists))
@@ -48,7 +48,7 @@ def protocol_subset_occurence(protocol_groups, protocol_subsets, group_probs):
     return {cid: {subset: Aw for subset, Aw in zip(subsets, subset_occurence(protocol_groups[cid].values(),subsets,group_probs))}
                   for cid,subsets in protocol_subsets.items()}
 
-# %% ../../nbs/06b_sampler.base.ipynb 6
+# %% ../../nbs/06b_sampler.base.ipynb 8
 class Sampler:
     
     def __init__(self, protocol, simulator, err_probs={"0":{}}, err_model=None):
@@ -57,18 +57,23 @@ class Sampler:
         self.n_qubits = protocol.n_qubits
         self.err_model = err_model() if err_model else E0()
         
-        self.protocol_groups = {cid: self.err_model.group(circuit) for cid, circuit in self.protocol._circuits.items()}
-        self.protocol_subsets = protocol_all_subsets(self.protocol_groups)
+        # self.protocol_groups = {cid: self.err_model.group(circuit) for cid, circuit in self.protocol._circuits.items()}
+        # self.protocol_subsets = protocol_all_subsets(self.protocol_groups)
+        self._set_subsets()
         
         assert isinstance(err_probs, dict)
         assert set(err_probs.keys()) == set(self.err_model.groups)
         # self.grp_order = tuple(err_probs.keys())
         self.trees = dict()
         for prob_vec in err_probs_tomatrix(err_probs, self.err_model.groups):
-            tree = CountTree(min_path_weight=2 if self.protocol.fault_tolerant else 1)
-            tree.constants = protocol_subset_occurence(self.protocol_groups, self.protocol_subsets, prob_vec)
+            tree = CountTree(fault_tolerance_level=2 if self.protocol.fault_tolerant else 1,
+                             constants=protocol_subset_occurence(self.protocol_groups, self.protocol_subsets, prob_vec))
             self.trees[tuple(prob_vec)] = tree
          
+    def _set_subsets(self):
+        self.protocol_groups = {cid: self.err_model.group(circuit) for cid, circuit in self.protocol._circuits.items()}
+        self.protocol_subsets = protocol_all_subsets(self.protocol_groups)
+        
     def save(self, path):
         with open(path, 'wb') as fp:
             pickle.dump(self, fp)
@@ -83,7 +88,7 @@ class Sampler:
         """Must be overwritten by child class."""
         raise NotImplemented
             
-    def run(self, n_samples: int, callbacks=[]) -> None:
+    def run(self, n_shots: int, callbacks=[]) -> None:
             
         if not isinstance(callbacks, CallbackList):
             callbacks = CallbackList(sampler=self, callbacks=callbacks)
@@ -93,7 +98,7 @@ class Sampler:
             self.stop_sampling = False
             self.tree_idx = prob_vec
    
-            for _ in tqdm(range(n_samples), desc=f'p_phy={",".join(list(f"{p:.2E}" for p in prob_vec))}', leave=True):
+            for _ in tqdm(range(n_shots), desc=f'p_phy={",".join(list(f"{p:.2E}" for p in prob_vec))}', leave=True):
                 callbacks.on_protocol_begin()
 
                 state = self.simulator(self.n_qubits)
@@ -102,25 +107,29 @@ class Sampler:
                 for name, circuit in self.protocol:
                     callbacks.on_circuit_begin()
 
-                    tree_node = tree.add(name=name, parent=tree_node, nodetype=Variable)
-                    tree_node.counts += 1
+                    tree_node = tree.add(name=name, parent=tree_node, node_type=Variable)
+                    tree_node.count += 1
                     opt_out = dict()
 
                     if circuit:
                         if not circuit._noisy:
                             msmt = state.run(circuit)
+                            subset = (0,)
+                            # tree_node = tree.add(name=(0,), parent=tree_node, node_type=Constant, circuit_id=circuit.id, det=True) # add circuit id.
                         else:
                             opt_out = self.optimize(tree_node, circuit, prob_vec)
-                            tree_node = tree.add(name=opt_out['subset'], parent=tree_node, nodetype=Constant, cid=circuit.id,
-                                                 is_deterministic=True if circuit._ff_det and not any(opt_out['subset']) else False)
-                            tree_node.counts += 1
                             fault_circuit = self.err_model.run(circuit, opt_out['flocs'])
-
                             msmt = state.run(circuit, fault_circuit)
+                            subset = opt_out['subset']
+                            
+                        tree_node = tree.add(name=subset, parent=tree_node, node_type=Constant, circuit_id=circuit.id,
+                                             det=True if circuit._ff_det and not any(subset) else False)
+                        tree_node.count += 1
+                              
                         self.protocol.send(msmt)
 
                     elif name != None:
-                        tree_node.marked = True
+                        tree.marked_leaves.add(tree_node)
                     
                     callbacks.on_circuit_end(locals() | opt_out)
 

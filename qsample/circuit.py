@@ -36,7 +36,6 @@ class Circuit(MutableSequence):
         self._ticks = ticks if ticks else []
         self._noisy = noisy
         self._ff_det = ff_det # fault-free deterministic
-        self.id = sha1((repr(self)).encode('UTF-8')).hexdigest()[:5]
         
     def __getitem__(self, tick_index):
         return self._ticks[tick_index]
@@ -76,6 +75,10 @@ class Circuit(MutableSequence):
     def n_ticks(self):
         """Number of ticks"""
         return len(self._ticks)
+    
+    @property
+    def id(self):
+        return sha1((repr(self)).encode('UTF-8')).hexdigest()[:5]
 
     def draw(self, path=None, scale=2):
 

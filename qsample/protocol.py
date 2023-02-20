@@ -108,8 +108,8 @@ class Protocol:
         
         pos = nx.kamada_kawai_layout(self.graph)
         size = max([len(n)**2 * 100 for n in pos.keys()])
-        col = ['#ff9999' if not self.graph.out_edges(n) else '#d3d3d3' if not self.graph.in_edges(n) else 'white' for n in self.graph.nodes]
-        nx.draw(self.graph, pos=pos, with_labels=True, node_color=col, node_size=size, edgecolors='black')
+        col = ['#ff0000' if not self.graph.out_edges(n) else '#0080ff' if not self.graph.in_edges(n) else 'black' for n in self.graph.nodes]
+        nx.draw(self.graph, pos=pos, with_labels=True, node_color='white', node_size=size, edgecolors=col)
         
         edge_lbls = nx.get_edge_attributes(self.graph, 'check')
         if legend:

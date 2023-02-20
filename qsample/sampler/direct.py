@@ -16,13 +16,13 @@ class DirectSampler(Sampler):
     
     def stats(self, tree_idx=None):
         if tree_idx:
-            p_L = self.trees[tree_idx].direct_rate
-            v_L = self.trees[tree_idx].direct_variance
+            p_L = self.trees[tree_idx].root_leaf_rate
+            v_L = self.trees[tree_idx].root_leaf_variance
         else:
             p_L, v_L = [], []
             for tree in self.trees.values():
-                p_L.append(tree.direct_rate)
-                v_L.append(tree.direct_variance)
+                p_L.append(tree.root_leaf_rate)
+                v_L.append(tree.root_leaf_variance)
         return p_L, np.sqrt(v_L)
     
     def optimize(self, tree_node, circuit, grp_probs):

@@ -74,8 +74,6 @@ unique measurement result when executed without faults.
 ghz.draw()
 ```
 
-![](index_files/figure-commonmark/cell-5-output-1.svg)
-
 ### 2. Protocol
 
 - Graph (can be cyclic)
@@ -111,8 +109,6 @@ max. 1 fault) to never result in a logical fail.
 ``` python
 ghz3.draw()
 ```
-
-![](index_files/figure-commonmark/cell-8-output-1.png)
 
 - `repeat()` and `logErr()` are user-defined (boolean) check functions  
 - Measurement history of circuits stored during for protocol run
@@ -157,14 +153,6 @@ from qsample import E1
 E1.groups, E1().group(ghz) # All gates in group `q`
 ```
 
-    (['q'],
-     {'q': [(1, 0),
-       (2, (0, 1)),
-       (3, (1, 2)),
-       (4, (2, 3)),
-       (5, (3, 4)),
-       (6, (0, 4))]})
-
 ### 4. Simulator
 
 - Two types available: Stabilizer (CHP) and Statevectors (ProjectQ
@@ -180,9 +168,7 @@ from qsample import StabilizerSimulator as CHP
 ### 5. Sampler
 
 - Two types: Direct (Monte Carlo) and Subset sampler
-- All relevant information stored in
-  [`CountTree`](https://dpwinter.github.io/qsample/sampler.tree.html#counttree)
-  data structure
+- All relevant information stored in `CountTree` data structure
 
 ### 5.1. Direct sampler
 
@@ -200,22 +186,10 @@ err_probs = {'q': sample_range} # Note: Must provide rate(s) for each group spec
 err_probs
 ```
 
-    {'q': array([0.001     , 0.00562341, 0.03162278, 0.17782794, 1.        ])}
-
 ``` python
 dsam = DirectSampler(protocol=ghz3, simulator=CHP, err_probs=err_probs, err_model=E1)
 dsam.run(10000)
 ```
-
-    p_phy=1.00E-03:   0%|          | 0/10000 [00:00<?, ?it/s]
-
-    p_phy=5.62E-03:   0%|          | 0/10000 [00:00<?, ?it/s]
-
-    p_phy=3.16E-02:   0%|          | 0/10000 [00:00<?, ?it/s]
-
-    p_phy=1.78E-01:   0%|          | 0/10000 [00:00<?, ?it/s]
-
-    p_phy=1.00E+00:   0%|          | 0/10000 [00:00<?, ?it/s]
 
 ``` python
 p_L, std = dsam.stats()
@@ -228,15 +202,11 @@ plt.xlabel('$p_{phy}$(q)')
 plt.ylabel('$p_L$');
 ```
 
-![](index_files/figure-commonmark/cell-15-output-1.png)
-
 Check what has been sampled for the last (1e0) physical error rate:
 
 ``` python
 dsam.trees[(1.0,)].draw()
 ```
-
-![](index_files/figure-commonmark/cell-16-output-1.png)
 
 ### 5.2. Interlude: Callbacks
 
@@ -251,53 +221,13 @@ dsam2 = DirectSampler(protocol=ghz3, simulator=CHP, err_probs=err_probs, err_mod
 dsam2.run(10000, callbacks=[cb.RelStdTarget(target=0.2)])
 ```
 
-    p_phy=1.00E-03:   0%|          | 0/10000 [00:00<?, ?it/s]
-
-    p_phy=5.62E-03:   0%|          | 0/10000 [00:00<?, ?it/s]
-
-    p_phy=3.16E-02:   0%|          | 0/10000 [00:00<?, ?it/s]
-
-    p_phy=1.78E-01:   0%|          | 0/10000 [00:00<?, ?it/s]
-
-    Rel. std target of 0.2 reached. Sampling stopped.
-
-    p_phy=1.00E+00:   0%|          | 0/10000 [00:00<?, ?it/s]
-
-    Rel. std target of 0.2 reached. Sampling stopped.
-
-Another callback is
-[`VerboseCircuitExec`](https://dpwinter.github.io/qsample/callbacks.html#verbosecircuitexec),
-which gives a detailed log of which circuits, faults and measurements
-took place:
+Another callback is `VerboseCircuitExec`, which gives a detailed log of
+which circuits, faults and measurements took place:
 
 ``` python
 dsam3 = DirectSampler(protocol=ghz3, simulator=CHP, err_probs={'q': 0.1}, err_model=E1)
 dsam3.run(10, callbacks=[cb.VerboseCircuitExec()])
 ```
-
-    p_phy=1.00E-01:   0%|          | 0/10 [00:00<?, ?it/s]
-
-    ghz -> Faults: [] -> Msmt: 0
-    None
-    ghz -> Faults: [] -> Msmt: 0
-    None
-    ghz -> Faults: [(6, {'Y': {0}})] -> Msmt: 0
-    None
-    ghz -> Faults: [] -> Msmt: 0
-    None
-    ghz -> Faults: [(4, {'Z': {2}})] -> Msmt: 0
-    None
-    ghz -> Faults: [(1, {'Z': {0}})] -> Msmt: 0
-    None
-    ghz -> Faults: [] -> Msmt: 0
-    None
-    ghz -> Faults: [] -> Msmt: 0
-    None
-    ghz -> Faults: [(4, {'X': {2}})] -> Msmt: 0
-    None
-    ghz -> Faults: [(2, {'Y': {0}, 'Z': {1}}), (5, {'Z': {3}})] -> Msmt: 1
-    ghz -> Faults: [] -> Msmt: 0
-    None
 
 We can also write our own callback. Every sampler has 6 callback
 hooks:  
@@ -340,12 +270,6 @@ for p_phy in [0.01, 0.1, 0.3]:
     plt.xlabel("Subsets")
 ```
 
-![](index_files/figure-commonmark/cell-19-output-1.png)
-
-![](index_files/figure-commonmark/cell-19-output-2.png)
-
-![](index_files/figure-commonmark/cell-19-output-3.png)
-
 ``` python
 from qsample import SubsetSampler
 ```
@@ -356,8 +280,6 @@ pmax = {'q': 0.1}
 ss_sam = SubsetSampler(ghz3, CHP,  pmax=pmax, err_probs=err_probs, err_model=E1)
 ss_sam.run(300)
 ```
-
-    p_phy=1.00E-01:   0%|          | 0/300 [00:00<?, ?it/s]
 
 *Note*: Although we passed `err_probs` those are not used for sampling.
 Only when we call `stats()` those probs are used:
@@ -376,8 +298,6 @@ plt.ylabel('$p_L$')
 plt.legend();
 ```
 
-![](index_files/figure-commonmark/cell-22-output-1.png)
-
 We sampled at a single error rate with much less samples and get a much
 better bound on the logical error rate. Let’s inspect what has been
 sampled:
@@ -385,8 +305,6 @@ sampled:
 ``` python
 ss_sam.tree.draw() # only one tree
 ```
-
-![](index_files/figure-commonmark/cell-23-output-1.png)
 
 We can store and later reload our sample results:
 
@@ -402,10 +320,6 @@ counts_after = stored_sam.tree.root.counts
 
 print(counts_before, counts_after)
 ```
-
-    p_phy=1.00E-01:   0%|          | 0/200 [00:00<?, ?it/s]
-
-    300 500
 
 More complex examples can be found here:
 https://github.com/dpwinter/qsample/blob/master/08_examples.ipynb
