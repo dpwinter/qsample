@@ -5,7 +5,7 @@ __all__ = ['tolists', 'lens', 'maxlen', 'pad', 'tomatrix', 'err_probs_tomatrix',
            'all_subsets', 'protocol_all_subsets', 'protocol_subset_occurence', 'Sampler']
 
 # %% ../../nbs/06b_sampler.base.ipynb 3
-from .tree import CountTree, Variable, Constant
+from .tree import CountTree, Variable, Constant, dict_to_count_tree, count_tree_to_dict
 
 from ..callbacks import CallbackList
 from tqdm.auto import tqdm
@@ -57,8 +57,6 @@ class Sampler:
         self.n_qubits = protocol.n_qubits
         self.err_model = err_model() if err_model else E0()
         
-        # self.protocol_groups = {cid: self.err_model.group(circuit) for cid, circuit in self.protocol._circuits.items()}
-        # self.protocol_subsets = protocol_all_subsets(self.protocol_groups)
         self._set_subsets()
         
         assert isinstance(err_probs, dict)
@@ -75,14 +73,23 @@ class Sampler:
         self.protocol_subsets = protocol_all_subsets(self.protocol_groups)
         
     def save(self, path):
+        data = {'trees': {tree_name: count_tree_to_dict(tree_obj) for tree_name, tree_obj in self.trees.items()}}
+        data['protocol'] = self.protocol
+        data['simulator'] = self.simulator
+        data['n_qubits'] = self.n_qubits
+        data['err_model'] = self.err_model
         with open(path, 'wb') as fp:
-            pickle.dump(self, fp)
-    
-    @staticmethod
-    def load(path):
+            pickle.dump(data, fp)
+     
+    def load(self, path): # This is BS. Want to load without need to instantiate.
         with open(path, 'rb') as fp:
-            res = pickle.load(fp)
-        return res
+            data = pickle.load(fp)
+        self.protocol = data['procotol']
+        self.simulator = data['simulator']
+        self.n_qubits = data['n_qubits']
+        self.err_model = data['err_model']
+        self._set_subsets()
+        self.trees = {tree_name: dict_to_count_tree(tree_dict) for tree_name, tree_dict in data['trees'].items()}
     
     def optimize(self, tree_node, circuit):
         """Must be overwritten by child class."""
