@@ -601,343 +601,43 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb17-32"><a href="#cb17-32" aria-hidden="true" tabindex="-1"></a>fail_c2_1_0 <span class="op">=</span> tree.add(name<span class="op">=</span><span class="st">'fail'</span>, node_type<span class="op">=</span>Variable, parent<span class="op">=</span>c2_1_0, count<span class="op">=</span><span class="dv">10</span>)</span>
 <span id="cb17-33"><a href="#cb17-33" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-34"><a href="#cb17-34" aria-hidden="true" tabindex="-1"></a>tree.marked_leaves <span class="op">=</span> <span class="bu">set</span>([fail_c1_0_1, fail_c1_1_1, fail_c2_1_0])</span>
-<span id="cb17-35"><a href="#cb17-35" aria-hidden="true" tabindex="-1"></a>tree.draw()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display">
-<p><img src="06a_sampler.tree_files/figure-html/cell-15-output-1.png" class="img-fluid"></p>
+<span id="cb17-35"><a href="#cb17-35" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tree)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>c0 (100, 0.00e+00)
+├── (0,) (70)
+│   ├── c1 (50, 2.92e-03)
+│   │   ├── (0,) (40)
+│   │   │   └── None (40, 0.00e+00)
+│   │   └── (1,) (10)
+│   │       ├── None (5, 2.50e-02)
+│   │       └── fail (5, 2.50e-02)
+│   └── c2 (20, 2.92e-03)
+│       └── (0,) (20)
+│           └── None (20, 0.00e+00)
+└── (1,) (30)
+    ├── c1 (20, 7.41e-03)
+    │   ├── (0,) (15)
+    │   │   └── None (15, 0.00e+00)
+    │   └── (1,) (5)
+    │       ├── None (3, 4.80e-02)
+    │       └── fail (2, 4.80e-02)
+    └── c2 (10, 7.41e-03)
+        └── (0,) (10)
+            └── fail (10, 0.00e+00)</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Test numerics 2-level tree</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>test_eq(tree.root_leaf_rate, <span class="dv">5</span><span class="op">/</span><span class="dv">100</span> <span class="op">+</span> <span class="dv">2</span><span class="op">/</span><span class="dv">100</span> <span class="op">+</span> <span class="dv">10</span><span class="op">/</span><span class="dv">100</span>)</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>test_eq(tree.path_sum(tree.root, mode<span class="op">=</span><span class="dv">1</span>), <span class="fl">0.8</span> <span class="op">*</span> <span class="dv">50</span><span class="op">/</span><span class="dv">70</span> <span class="op">*</span> <span class="fl">0.2</span> <span class="op">*</span> <span class="dv">5</span><span class="op">/</span><span class="dv">10</span> <span class="op">+</span> <span class="fl">0.1</span> <span class="op">*</span> (<span class="dv">20</span><span class="op">/</span><span class="dv">30</span> <span class="op">*</span> <span class="fl">0.2</span> <span class="op">*</span> <span class="dv">2</span><span class="op">/</span><span class="dv">5</span> <span class="op">+</span> <span class="dv">10</span><span class="op">/</span><span class="dv">30</span> <span class="op">*</span> <span class="fl">1.0</span> <span class="op">*</span> <span class="dv">1</span>))</span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>test_close(tree.path_sum(tree.root, mode<span class="op">=</span><span class="dv">2</span>), <span class="fl">0.8</span> <span class="op">*</span> (<span class="dv">50</span><span class="op">/</span><span class="dv">70</span> <span class="op">*</span> <span class="fl">0.9</span> <span class="op">+</span> <span class="dv">20</span><span class="op">/</span><span class="dv">70</span>) <span class="op">+</span> <span class="fl">0.1</span> <span class="op">*</span> (<span class="dv">20</span><span class="op">/</span><span class="dv">30</span> <span class="op">*</span> <span class="fl">0.9</span> <span class="op">+</span> <span class="dv">10</span><span class="op">/</span><span class="dv">30</span>), eps<span class="op">=</span><span class="fl">1e-05</span>)</span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="co"># var1 = (0.8 * 0.2 * 5/10)**2 * c1_0.variance + (0.8 * 50/70 * 0.2)**2 * fail_c1_0_1.variance + (0.1 * 0.2 * 2/5 - 0.1 * 1)**2 * c1_1.variance + (0.1 * 0.2 * 20/30)**2 * fail_c1_1_1.variance</span></span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>var1 <span class="op">=</span> (<span class="fl">0.8</span> <span class="op">*</span> <span class="dv">50</span><span class="op">/</span><span class="dv">70</span> <span class="op">*</span> <span class="fl">0.2</span>)<span class="op">**</span><span class="dv">2</span> <span class="op">*</span> fail_c1_0_1.variance <span class="op">+</span> (<span class="fl">0.1</span> <span class="op">*</span> <span class="fl">0.2</span> <span class="op">*</span> <span class="dv">2</span><span class="op">/</span><span class="dv">5</span> <span class="op">-</span> <span class="fl">0.1</span> <span class="op">*</span> <span class="dv">1</span>)<span class="op">**</span><span class="dv">2</span> <span class="op">*</span> c1_1.variance <span class="op">+</span> (<span class="fl">0.1</span> <span class="op">*</span> <span class="fl">0.2</span> <span class="op">*</span> <span class="dv">20</span><span class="op">/</span><span class="dv">30</span>)<span class="op">**</span><span class="dv">2</span> <span class="op">*</span> fail_c1_1_1.variance <span class="co"># ignore all (intermediate) w=0 paths</span></span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>test_close(tree.uncertainty_propagated_variance(mode<span class="op">=</span><span class="dv">1</span>), var1, eps<span class="op">=</span><span class="fl">1e-05</span>)</span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a><span class="co"># var2 = (0.8 * (0.7 * 1 + 0.2 * 5/10 - 1))**2 * c1_0.variance + (0.8 * 50/70 * 0.2)**2 * fail_c1_0_1.variance + (0.1 * (0.7 + 0.2*3/5))**2 * c1_1.variance + (0.1 * 20/30 * 0.2)**2 * fail_c1_1_1.variance</span></span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>var2 <span class="op">=</span> (<span class="fl">0.8</span> <span class="op">*</span> <span class="dv">50</span><span class="op">/</span><span class="dv">70</span> <span class="op">*</span> <span class="fl">0.2</span>)<span class="op">**</span><span class="dv">2</span> <span class="op">*</span> fail_c1_0_1.variance <span class="op">+</span> (<span class="fl">0.1</span> <span class="op">*</span> (<span class="fl">0.7</span> <span class="op">+</span> <span class="fl">0.2</span><span class="op">*</span><span class="dv">3</span><span class="op">/</span><span class="dv">5</span>))<span class="op">**</span><span class="dv">2</span> <span class="op">*</span> c1_1.variance <span class="op">+</span> (<span class="fl">0.1</span> <span class="op">*</span> <span class="dv">20</span><span class="op">/</span><span class="dv">30</span> <span class="op">*</span> <span class="fl">0.2</span>)<span class="op">**</span><span class="dv">2</span> <span class="op">*</span> fail_c1_1_1.variance <span class="co"># ignore all (intermediate) w=0 paths</span></span>
-<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>test_close(tree.uncertainty_propagated_variance(mode<span class="op">=</span><span class="dv">0</span>), var2, eps<span class="op">=</span><span class="fl">1e-05</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># class CountNode(NodeMixin):</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="co">#     """Class to represent a tree node of a `CountTree`.</span></span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="co">#     A node in a tree is a uniquely identifiable object containing references</span></span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="co">#     to at most one parent and possibly many children. The root node has no </span></span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="co">#     parent and leaf nodes have not children.</span></span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="co">#     The `CountNode` class complements the common tree node by a `count` attribute</span></span>
-<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a><span class="co">#     which represents the number of times a node has been visited during sampling.</span></span>
-<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a><span class="co">#     Attributes</span></span>
-<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a><span class="co">#     ----------</span></span>
-<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a><span class="co">#     name : str</span></span>
-<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a><span class="co">#         The (not necessarily unique) name of the node</span></span>
-<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a><span class="co">#     id : int</span></span>
-<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a><span class="co">#         Unique Python object identifier for this node</span></span>
-<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a><span class="co">#     count : int</span></span>
-<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a><span class="co">#         Node visit counter variable</span></span>
-<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a><span class="co">#     parent : Node, optional</span></span>
-<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a><span class="co">#         Reference to parent node object</span></span>
-<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a><span class="co">#     children : list of Node, optional</span></span>
-<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a><span class="co">#         List of references to children Node objects</span></span>
-<span id="cb19-23"><a href="#cb19-23" aria-hidden="true" tabindex="-1"></a><span class="co">#     """</span></span>
-<span id="cb19-24"><a href="#cb19-24" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb19-25"><a href="#cb19-25" aria-hidden="true" tabindex="-1"></a><span class="co">#     def __init__(self, name, init_count=0, parent=None, children=None):</span></span>
-<span id="cb19-26"><a href="#cb19-26" aria-hidden="true" tabindex="-1"></a><span class="co">#         """</span></span>
-<span id="cb19-27"><a href="#cb19-27" aria-hidden="true" tabindex="-1"></a><span class="co">#         Parameters</span></span>
-<span id="cb19-28"><a href="#cb19-28" aria-hidden="true" tabindex="-1"></a><span class="co">#         ----------</span></span>
-<span id="cb19-29"><a href="#cb19-29" aria-hidden="true" tabindex="-1"></a><span class="co">#         name : str</span></span>
-<span id="cb19-30"><a href="#cb19-30" aria-hidden="true" tabindex="-1"></a><span class="co">#             The (not necessarily unique) name of the node</span></span>
-<span id="cb19-31"><a href="#cb19-31" aria-hidden="true" tabindex="-1"></a><span class="co">#         init_count : int, optional</span></span>
-<span id="cb19-32"><a href="#cb19-32" aria-hidden="true" tabindex="-1"></a><span class="co">#             Initial value of visit counter variable</span></span>
-<span id="cb19-33"><a href="#cb19-33" aria-hidden="true" tabindex="-1"></a><span class="co">#         parent : Node, optional</span></span>
-<span id="cb19-34"><a href="#cb19-34" aria-hidden="true" tabindex="-1"></a><span class="co">#             Reference to parent node object</span></span>
-<span id="cb19-35"><a href="#cb19-35" aria-hidden="true" tabindex="-1"></a><span class="co">#         children : list of Node, optional</span></span>
-<span id="cb19-36"><a href="#cb19-36" aria-hidden="true" tabindex="-1"></a><span class="co">#             List of references to children Node objects</span></span>
-<span id="cb19-37"><a href="#cb19-37" aria-hidden="true" tabindex="-1"></a><span class="co">#         """</span></span>
-<span id="cb19-38"><a href="#cb19-38" aria-hidden="true" tabindex="-1"></a><span class="co">#         self.name = name</span></span>
-<span id="cb19-39"><a href="#cb19-39" aria-hidden="true" tabindex="-1"></a><span class="co">#         self.parent = parent</span></span>
-<span id="cb19-40"><a href="#cb19-40" aria-hidden="true" tabindex="-1"></a><span class="co">#         self.count = init_count</span></span>
-<span id="cb19-41"><a href="#cb19-41" aria-hidden="true" tabindex="-1"></a><span class="co">#         self.id = id(self)</span></span>
-<span id="cb19-42"><a href="#cb19-42" aria-hidden="true" tabindex="-1"></a><span class="co">#         if children:</span></span>
-<span id="cb19-43"><a href="#cb19-43" aria-hidden="true" tabindex="-1"></a><span class="co">#             self.children = children</span></span>
-<span id="cb19-44"><a href="#cb19-44" aria-hidden="true" tabindex="-1"></a>            </span>
-<span id="cb19-45"><a href="#cb19-45" aria-hidden="true" tabindex="-1"></a><span class="co"># class Variable(Node):</span></span>
-<span id="cb19-46"><a href="#cb19-46" aria-hidden="true" tabindex="-1"></a><span class="co">#     """Subclass of Node to represent a node of variable type.</span></span>
-<span id="cb19-47"><a href="#cb19-47" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb19-48"><a href="#cb19-48" aria-hidden="true" tabindex="-1"></a><span class="co">#     Variable nodes represent differentiable rates `qi` in a tree.</span></span>
-<span id="cb19-49"><a href="#cb19-49" aria-hidden="true" tabindex="-1"></a><span class="co">#     Differentiability refers to the partial derivatives in the </span></span>
-<span id="cb19-50"><a href="#cb19-50" aria-hidden="true" tabindex="-1"></a><span class="co">#     propagation of uncertainty formula for the lower and upper bound</span></span>
-<span id="cb19-51"><a href="#cb19-51" aria-hidden="true" tabindex="-1"></a><span class="co">#     of the logical failure rate `pL`.</span></span>
-<span id="cb19-52"><a href="#cb19-52" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb19-53"><a href="#cb19-53" aria-hidden="true" tabindex="-1"></a><span class="co">#     Attributes</span></span>
-<span id="cb19-54"><a href="#cb19-54" aria-hidden="true" tabindex="-1"></a><span class="co">#     ----------</span></span>
-<span id="cb19-55"><a href="#cb19-55" aria-hidden="true" tabindex="-1"></a><span class="co">#     marked : bool</span></span>
-<span id="cb19-56"><a href="#cb19-56" aria-hidden="true" tabindex="-1"></a><span class="co">#         ...</span></span>
-<span id="cb19-57"><a href="#cb19-57" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb19-58"><a href="#cb19-58" aria-hidden="true" tabindex="-1"></a><span class="co">#     """</span></span>
-<span id="cb19-59"><a href="#cb19-59" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb19-60"><a href="#cb19-60" aria-hidden="true" tabindex="-1"></a><span class="co">#     def __init__(self, name, parent=None, counts=0, marked=False, **kwargs):</span></span>
-<span id="cb19-61"><a href="#cb19-61" aria-hidden="true" tabindex="-1"></a><span class="co">#         super().__init__(name, parent)</span></span>
-<span id="cb19-62"><a href="#cb19-62" aria-hidden="true" tabindex="-1"></a><span class="co">#         self.counts = counts</span></span>
-<span id="cb19-63"><a href="#cb19-63" aria-hidden="true" tabindex="-1"></a><span class="co">#         self.marked = marked</span></span>
-<span id="cb19-64"><a href="#cb19-64" aria-hidden="true" tabindex="-1"></a>       </span>
-<span id="cb19-65"><a href="#cb19-65" aria-hidden="true" tabindex="-1"></a><span class="co">#     @property</span></span>
-<span id="cb19-66"><a href="#cb19-66" aria-hidden="true" tabindex="-1"></a><span class="co">#     def rate(self):</span></span>
-<span id="cb19-67"><a href="#cb19-67" aria-hidden="true" tabindex="-1"></a><span class="co">#         if self.parent.counts == 0: return 0</span></span>
-<span id="cb19-68"><a href="#cb19-68" aria-hidden="true" tabindex="-1"></a><span class="co">#         else: return self.counts / self.parent.counts</span></span>
-<span id="cb19-69"><a href="#cb19-69" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb19-70"><a href="#cb19-70" aria-hidden="true" tabindex="-1"></a><span class="co">#     def __str__(self):</span></span>
-<span id="cb19-71"><a href="#cb19-71" aria-hidden="true" tabindex="-1"></a><span class="co">#         """str: """</span></span>
-<span id="cb19-72"><a href="#cb19-72" aria-hidden="true" tabindex="-1"></a><span class="co">#         return f"{self.name} ({self.counts}/{self.parent.counts})"</span></span>
-<span id="cb19-73"><a href="#cb19-73" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb19-74"><a href="#cb19-74" aria-hidden="true" tabindex="-1"></a><span class="co"># class Constant(Node):</span></span>
-<span id="cb19-75"><a href="#cb19-75" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb19-76"><a href="#cb19-76" aria-hidden="true" tabindex="-1"></a><span class="co">#     def __init__(self, name, parent=None, cid=None, counts=0, is_deterministic=False, **kwargs):</span></span>
-<span id="cb19-77"><a href="#cb19-77" aria-hidden="true" tabindex="-1"></a><span class="co">#         super().__init__(name, parent)</span></span>
-<span id="cb19-78"><a href="#cb19-78" aria-hidden="true" tabindex="-1"></a><span class="co">#         self.cid = cid</span></span>
-<span id="cb19-79"><a href="#cb19-79" aria-hidden="true" tabindex="-1"></a><span class="co">#         self.counts = counts</span></span>
-<span id="cb19-80"><a href="#cb19-80" aria-hidden="true" tabindex="-1"></a><span class="co">#         self.is_deterministic = is_deterministic</span></span>
-<span id="cb19-81"><a href="#cb19-81" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb19-82"><a href="#cb19-82" aria-hidden="true" tabindex="-1"></a><span class="co">#     @property</span></span>
-<span id="cb19-83"><a href="#cb19-83" aria-hidden="true" tabindex="-1"></a><span class="co">#     def variance(self):</span></span>
-<span id="cb19-84"><a href="#cb19-84" aria-hidden="true" tabindex="-1"></a><span class="co">#         """Variance of children (Variable) nodes."""</span></span>
-<span id="cb19-85"><a href="#cb19-85" aria-hidden="true" tabindex="-1"></a><span class="co">#         if self.is_root or self.counts == 0: return 0</span></span>
-<span id="cb19-86"><a href="#cb19-86" aria-hidden="true" tabindex="-1"></a><span class="co">#         else: return math.Wilson_var(self.children[0].rate, self.counts)</span></span>
-<span id="cb19-87"><a href="#cb19-87" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb19-88"><a href="#cb19-88" aria-hidden="true" tabindex="-1"></a><span class="co">#     def __str__(self):</span></span>
-<span id="cb19-89"><a href="#cb19-89" aria-hidden="true" tabindex="-1"></a><span class="co">#         return f"{self.name} ({self.counts}, {self.variance:.2e})"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># class CountTree:</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="co">#     def __init__(self, constants=None, min_path_weight=1):</span></span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="co">#         self.constants = constants</span></span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="co">#         self.root = None</span></span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="co">#         self.min_path_weight = min_path_weight</span></span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="co">#     def add(self, name, nodetype=None, parent=None, **kwargs):</span></span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="co">#         if parent is None:</span></span>
-<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a><span class="co">#             if self.root is None:</span></span>
-<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a><span class="co">#                 self.root = Constant(name, **kwargs)</span></span>
-<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a><span class="co">#             return self.root</span></span>
-<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a><span class="co">#         childmatch = [node for node in parent.children if node.name == name]</span></span>
-<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a><span class="co">#         if childmatch:</span></span>
-<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a><span class="co">#             return childmatch[0]</span></span>
-<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a><span class="co">#         else:</span></span>
-<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a><span class="co">#             return nodetype(name, parent=parent, **kwargs)</span></span>
-<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a><span class="co">#     def detach(self, node):</span></span>
-<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a><span class="co">#         node.parent = None</span></span>
-<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a><span class="co">#     def multiplier(self, node):</span></span>
-<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a><span class="co">#         if node.is_root: return 1</span></span>
-<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a><span class="co">#         elif isinstance(node, Variable): return node.rate</span></span>
-<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a><span class="co">#         elif isinstance(node, Constant): return self.constants[node.cid][node.name]</span></span>
-<span id="cb20-27"><a href="#cb20-27" aria-hidden="true" tabindex="-1"></a><span class="co">#         else: raise TypeError(f"Node of type {node.__class__} not recognized.")</span></span>
-<span id="cb20-28"><a href="#cb20-28" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb20-29"><a href="#cb20-29" aria-hidden="true" tabindex="-1"></a><span class="co">#     @property</span></span>
-<span id="cb20-30"><a href="#cb20-30" aria-hidden="true" tabindex="-1"></a><span class="co">#     def direct_rate(self):</span></span>
-<span id="cb20-31"><a href="#cb20-31" aria-hidden="true" tabindex="-1"></a><span class="co">#         cnts = self.root.counts</span></span>
-<span id="cb20-32"><a href="#cb20-32" aria-hidden="true" tabindex="-1"></a><span class="co">#         fail_cnts = sum([n.counts for n in self.root.leaves if n.marked])</span></span>
-<span id="cb20-33"><a href="#cb20-33" aria-hidden="true" tabindex="-1"></a><span class="co">#         return fail_cnts / cnts</span></span>
-<span id="cb20-34"><a href="#cb20-34" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb20-35"><a href="#cb20-35" aria-hidden="true" tabindex="-1"></a><span class="co">#     @property</span></span>
-<span id="cb20-36"><a href="#cb20-36" aria-hidden="true" tabindex="-1"></a><span class="co">#     def direct_variance(self):</span></span>
-<span id="cb20-37"><a href="#cb20-37" aria-hidden="true" tabindex="-1"></a><span class="co">#         return math.Wilson_var(self.direct_rate, self.root.counts)</span></span>
-<span id="cb20-38"><a href="#cb20-38" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb20-39"><a href="#cb20-39" aria-hidden="true" tabindex="-1"></a><span class="co">#     @property</span></span>
-<span id="cb20-40"><a href="#cb20-40" aria-hidden="true" tabindex="-1"></a><span class="co">#     def norm(self):</span></span>
-<span id="cb20-41"><a href="#cb20-41" aria-hidden="true" tabindex="-1"></a><span class="co">#         acc = 0.0</span></span>
-<span id="cb20-42"><a href="#cb20-42" aria-hidden="true" tabindex="-1"></a><span class="co">#         for leaf in self.root.leaves:</span></span>
-<span id="cb20-43"><a href="#cb20-43" aria-hidden="true" tabindex="-1"></a><span class="co">#             if not leaf.is_root:</span></span>
-<span id="cb20-44"><a href="#cb20-44" aria-hidden="true" tabindex="-1"></a><span class="co">#                 prod = 1.0</span></span>
-<span id="cb20-45"><a href="#cb20-45" aria-hidden="true" tabindex="-1"></a><span class="co">#                 for node in leaf.path:</span></span>
-<span id="cb20-46"><a href="#cb20-46" aria-hidden="true" tabindex="-1"></a><span class="co">#                     prod *= self.multiplier(node)</span></span>
-<span id="cb20-47"><a href="#cb20-47" aria-hidden="true" tabindex="-1"></a><span class="co">#                 acc += prod</span></span>
-<span id="cb20-48"><a href="#cb20-48" aria-hidden="true" tabindex="-1"></a><span class="co">#         return acc</span></span>
-<span id="cb20-49"><a href="#cb20-49" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb20-50"><a href="#cb20-50" aria-hidden="true" tabindex="-1"></a><span class="co">#     @property</span></span>
-<span id="cb20-51"><a href="#cb20-51" aria-hidden="true" tabindex="-1"></a><span class="co">#     def delta(self):</span></span>
-<span id="cb20-52"><a href="#cb20-52" aria-hidden="true" tabindex="-1"></a><span class="co">#         return 1.0 - self.norm</span></span>
-<span id="cb20-53"><a href="#cb20-53" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb20-54"><a href="#cb20-54" aria-hidden="true" tabindex="-1"></a><span class="co">#     @property</span></span>
-<span id="cb20-55"><a href="#cb20-55" aria-hidden="true" tabindex="-1"></a><span class="co">#     def rate(self):</span></span>
-<span id="cb20-56"><a href="#cb20-56" aria-hidden="true" tabindex="-1"></a><span class="co">#         acc = 0.0</span></span>
-<span id="cb20-57"><a href="#cb20-57" aria-hidden="true" tabindex="-1"></a><span class="co">#         for leaf in self.root.leaves:</span></span>
-<span id="cb20-58"><a href="#cb20-58" aria-hidden="true" tabindex="-1"></a><span class="co">#             if leaf.marked:</span></span>
-<span id="cb20-59"><a href="#cb20-59" aria-hidden="true" tabindex="-1"></a><span class="co">#                 prod = 1.0</span></span>
-<span id="cb20-60"><a href="#cb20-60" aria-hidden="true" tabindex="-1"></a><span class="co">#                 for node in leaf.path:</span></span>
-<span id="cb20-61"><a href="#cb20-61" aria-hidden="true" tabindex="-1"></a><span class="co">#                     prod *= self.multiplier(node)</span></span>
-<span id="cb20-62"><a href="#cb20-62" aria-hidden="true" tabindex="-1"></a><span class="co">#                 acc += prod</span></span>
-<span id="cb20-63"><a href="#cb20-63" aria-hidden="true" tabindex="-1"></a><span class="co">#         return acc</span></span>
-<span id="cb20-64"><a href="#cb20-64" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb20-65"><a href="#cb20-65" aria-hidden="true" tabindex="-1"></a><span class="co">#     def twig(self, node):</span></span>
-<span id="cb20-66"><a href="#cb20-66" aria-hidden="true" tabindex="-1"></a><span class="co">#         twig = 1.0</span></span>
-<span id="cb20-67"><a href="#cb20-67" aria-hidden="true" tabindex="-1"></a><span class="co">#         for node in node.path:</span></span>
-<span id="cb20-68"><a href="#cb20-68" aria-hidden="true" tabindex="-1"></a><span class="co">#             twig *= self.multiplier(node)</span></span>
-<span id="cb20-69"><a href="#cb20-69" aria-hidden="true" tabindex="-1"></a><span class="co">#         return twig</span></span>
-<span id="cb20-70"><a href="#cb20-70" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb20-71"><a href="#cb20-71" aria-hidden="true" tabindex="-1"></a><span class="co">#     def subtree(self, node, all_leaves=False):</span></span>
-<span id="cb20-72"><a href="#cb20-72" aria-hidden="true" tabindex="-1"></a><span class="co">#         path_sum = 0.0</span></span>
-<span id="cb20-73"><a href="#cb20-73" aria-hidden="true" tabindex="-1"></a>                </span>
-<span id="cb20-74"><a href="#cb20-74" aria-hidden="true" tabindex="-1"></a><span class="co">#         for leaf in node.leaves:</span></span>
-<span id="cb20-75"><a href="#cb20-75" aria-hidden="true" tabindex="-1"></a><span class="co">#             if leaf.marked or all_leaves:</span></span>
-<span id="cb20-76"><a href="#cb20-76" aria-hidden="true" tabindex="-1"></a><span class="co">#                 if all_leaves and leaf.marked: continue # !!! var of upper bound: need to ignore fail leaf rates. </span></span>
-<span id="cb20-77"><a href="#cb20-77" aria-hidden="true" tabindex="-1"></a>                </span>
-<span id="cb20-78"><a href="#cb20-78" aria-hidden="true" tabindex="-1"></a><span class="co">#                 prod = 1.0</span></span>
-<span id="cb20-79"><a href="#cb20-79" aria-hidden="true" tabindex="-1"></a><span class="co">#                 for n in leaf.iter_path_reverse():</span></span>
-<span id="cb20-80"><a href="#cb20-80" aria-hidden="true" tabindex="-1"></a><span class="co">#                     if n == node:</span></span>
-<span id="cb20-81"><a href="#cb20-81" aria-hidden="true" tabindex="-1"></a><span class="co">#                         break</span></span>
-<span id="cb20-82"><a href="#cb20-82" aria-hidden="true" tabindex="-1"></a><span class="co">#                     else:</span></span>
-<span id="cb20-83"><a href="#cb20-83" aria-hidden="true" tabindex="-1"></a><span class="co">#                         prod *= self.multiplier(n)</span></span>
-<span id="cb20-84"><a href="#cb20-84" aria-hidden="true" tabindex="-1"></a><span class="co">#                 path_sum += prod</span></span>
-<span id="cb20-85"><a href="#cb20-85" aria-hidden="true" tabindex="-1"></a>        <span class="co"># return path_sum</span></span>
-<span id="cb20-86"><a href="#cb20-86" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb20-87"><a href="#cb20-87" aria-hidden="true" tabindex="-1"></a><span class="co">#     def subtreediff(self, node, all_leaves):</span></span>
-<span id="cb20-88"><a href="#cb20-88" aria-hidden="true" tabindex="-1"></a><span class="co">#         assert( isinstance(node, Constant) )</span></span>
-<span id="cb20-89"><a href="#cb20-89" aria-hidden="true" tabindex="-1"></a><span class="co">#         subtrees = []</span></span>
-<span id="cb20-90"><a href="#cb20-90" aria-hidden="true" tabindex="-1"></a><span class="co">#         for child in node.children:</span></span>
-<span id="cb20-91"><a href="#cb20-91" aria-hidden="true" tabindex="-1"></a><span class="co">#             subtree = self.subtree(child, all_leaves)</span></span>
-<span id="cb20-92"><a href="#cb20-92" aria-hidden="true" tabindex="-1"></a><span class="co">#             subtrees.append(subtree)</span></span>
-<span id="cb20-93"><a href="#cb20-93" aria-hidden="true" tabindex="-1"></a><span class="co">#         if len(subtrees) == 1: </span></span>
-<span id="cb20-94"><a href="#cb20-94" aria-hidden="true" tabindex="-1"></a><span class="co">#             return subtrees[0]</span></span>
-<span id="cb20-95"><a href="#cb20-95" aria-hidden="true" tabindex="-1"></a><span class="co">#         elif len(subtrees) == 2: return subtrees[0] - subtrees[1]</span></span>
-<span id="cb20-96"><a href="#cb20-96" aria-hidden="true" tabindex="-1"></a><span class="co">#         else: raise Exception(f"Node {node.name} must have &lt;= 2 children.")</span></span>
-<span id="cb20-97"><a href="#cb20-97" aria-hidden="true" tabindex="-1"></a>            </span>
-<span id="cb20-98"><a href="#cb20-98" aria-hidden="true" tabindex="-1"></a><span class="co">#     def partial_variance(self, node, all_leaves=False):</span></span>
-<span id="cb20-99"><a href="#cb20-99" aria-hidden="true" tabindex="-1"></a><span class="co">#         assert isinstance(node, Constant)</span></span>
-<span id="cb20-100"><a href="#cb20-100" aria-hidden="true" tabindex="-1"></a><span class="co">#         subtreediff = self.subtreediff(node, all_leaves)</span></span>
-<span id="cb20-101"><a href="#cb20-101" aria-hidden="true" tabindex="-1"></a><span class="co">#         return node.variance * subtreediff**2</span></span>
-<span id="cb20-102"><a href="#cb20-102" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb20-103"><a href="#cb20-103" aria-hidden="true" tabindex="-1"></a><span class="co">#     def is_invariant_path(self, leaf):</span></span>
-<span id="cb20-104"><a href="#cb20-104" aria-hidden="true" tabindex="-1"></a><span class="co">#         path_weight = sum([sum(n.name) for n in leaf.path[1:] if isinstance(n,Constant)])</span></span>
-<span id="cb20-105"><a href="#cb20-105" aria-hidden="true" tabindex="-1"></a><span class="co">#         return path_weight &lt; self.min_path_weight</span></span>
-<span id="cb20-106"><a href="#cb20-106" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb20-107"><a href="#cb20-107" aria-hidden="true" tabindex="-1"></a><span class="co">#     @property</span></span>
-<span id="cb20-108"><a href="#cb20-108" aria-hidden="true" tabindex="-1"></a><span class="co">#     def variance(self):</span></span>
-<span id="cb20-109"><a href="#cb20-109" aria-hidden="true" tabindex="-1"></a><span class="co">#         acc = 0.0</span></span>
-<span id="cb20-110"><a href="#cb20-110" aria-hidden="true" tabindex="-1"></a><span class="co">#         constants = [node for node in self.root.descendants if isinstance(node, Constant)]</span></span>
-<span id="cb20-111"><a href="#cb20-111" aria-hidden="true" tabindex="-1"></a><span class="co">#         for node in constants:</span></span>
-<span id="cb20-112"><a href="#cb20-112" aria-hidden="true" tabindex="-1"></a>            </span>
-<span id="cb20-113"><a href="#cb20-113" aria-hidden="true" tabindex="-1"></a><span class="co">#             if node.is_deterministic or (all([c.is_leaf for c in node.children]) and self.is_invariant_path(node)):</span></span>
-<span id="cb20-114"><a href="#cb20-114" aria-hidden="true" tabindex="-1"></a><span class="co">#                 continue # exclude deterministic nodes and invariant paths</span></span>
-<span id="cb20-115"><a href="#cb20-115" aria-hidden="true" tabindex="-1"></a>                </span>
-<span id="cb20-116"><a href="#cb20-116" aria-hidden="true" tabindex="-1"></a><span class="co">#             twig = self.twig(node)</span></span>
-<span id="cb20-117"><a href="#cb20-117" aria-hidden="true" tabindex="-1"></a><span class="co">#             if len(node.children) == 1 and node.children[0].is_leaf:</span></span>
-<span id="cb20-118"><a href="#cb20-118" aria-hidden="true" tabindex="-1"></a><span class="co">#                 acc += twig**2 * node.variance</span></span>
-<span id="cb20-119"><a href="#cb20-119" aria-hidden="true" tabindex="-1"></a><span class="co">#             else:</span></span>
-<span id="cb20-120"><a href="#cb20-120" aria-hidden="true" tabindex="-1"></a><span class="co">#                 acc += twig**2 * self.partial_variance(node)</span></span>
-<span id="cb20-121"><a href="#cb20-121" aria-hidden="true" tabindex="-1"></a><span class="co">#         return acc</span></span>
-<span id="cb20-122"><a href="#cb20-122" aria-hidden="true" tabindex="-1"></a>            </span>
-<span id="cb20-123"><a href="#cb20-123" aria-hidden="true" tabindex="-1"></a>    <span class="co"># @property</span></span>
-<span id="cb20-124"><a href="#cb20-124" aria-hidden="true" tabindex="-1"></a>    <span class="co"># def norm_variance(self):</span></span>
-<span id="cb20-125"><a href="#cb20-125" aria-hidden="true" tabindex="-1"></a>    <span class="co">#     acc = 0.0</span></span>
-<span id="cb20-126"><a href="#cb20-126" aria-hidden="true" tabindex="-1"></a>    <span class="co">#     constants = [node for node in self.root.descendants if isinstance(node, Constant)]</span></span>
-<span id="cb20-127"><a href="#cb20-127" aria-hidden="true" tabindex="-1"></a>    <span class="co">#     for node in constants:</span></span>
-<span id="cb20-128"><a href="#cb20-128" aria-hidden="true" tabindex="-1"></a>    <span class="co">#         if node.is_deterministic or self.is_invariant_path(node):</span></span>
-<span id="cb20-129"><a href="#cb20-129" aria-hidden="true" tabindex="-1"></a>    <span class="co">#             continue</span></span>
-<span id="cb20-130"><a href="#cb20-130" aria-hidden="true" tabindex="-1"></a>    <span class="co">#         elif all([n.is_leaf for n in node.children]): </span></span>
-<span id="cb20-131"><a href="#cb20-131" aria-hidden="true" tabindex="-1"></a>    <span class="co">#             continue</span></span>
-<span id="cb20-132"><a href="#cb20-132" aria-hidden="true" tabindex="-1"></a>    <span class="co">#         twig = self.twig(node)</span></span>
-<span id="cb20-133"><a href="#cb20-133" aria-hidden="true" tabindex="-1"></a>    <span class="co">#         acc += twig**2 * self.partial_variance(node, all_leaves=True)</span></span>
-<span id="cb20-134"><a href="#cb20-134" aria-hidden="true" tabindex="-1"></a>    <span class="co">#     return acc</span></span>
-<span id="cb20-135"><a href="#cb20-135" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb20-136"><a href="#cb20-136" aria-hidden="true" tabindex="-1"></a>    <span class="co"># @property</span></span>
-<span id="cb20-137"><a href="#cb20-137" aria-hidden="true" tabindex="-1"></a>    <span class="co"># def variance_ub(self):</span></span>
-<span id="cb20-138"><a href="#cb20-138" aria-hidden="true" tabindex="-1"></a>    <span class="co">#     acc = 0.0</span></span>
-<span id="cb20-139"><a href="#cb20-139" aria-hidden="true" tabindex="-1"></a>    <span class="co">#     constants = [node for node in self.root.descendants if isinstance(node, Constant)]</span></span>
-<span id="cb20-140"><a href="#cb20-140" aria-hidden="true" tabindex="-1"></a>    <span class="co">#     for node in constants:</span></span>
-<span id="cb20-141"><a href="#cb20-141" aria-hidden="true" tabindex="-1"></a>    <span class="co">#         if node.is_deterministic:</span></span>
-<span id="cb20-142"><a href="#cb20-142" aria-hidden="true" tabindex="-1"></a>    <span class="co">#             continue</span></span>
-<span id="cb20-143"><a href="#cb20-143" aria-hidden="true" tabindex="-1"></a>    <span class="co">#         if all([n.is_leaf for n in node.children]) and not any([n.marked for n in node.children]): </span></span>
-<span id="cb20-144"><a href="#cb20-144" aria-hidden="true" tabindex="-1"></a>    <span class="co">#             continue</span></span>
-<span id="cb20-145"><a href="#cb20-145" aria-hidden="true" tabindex="-1"></a>    <span class="co">#         twig = self.twig(node)</span></span>
-<span id="cb20-146"><a href="#cb20-146" aria-hidden="true" tabindex="-1"></a>    <span class="co">#         acc += twig**2 * self.partial_variance(node, all_leaves=True)</span></span>
-<span id="cb20-147"><a href="#cb20-147" aria-hidden="true" tabindex="-1"></a>    <span class="co">#     return acc</span></span>
-<span id="cb20-148"><a href="#cb20-148" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb20-149"><a href="#cb20-149" aria-hidden="true" tabindex="-1"></a><span class="co">#     def __str__(self):</span></span>
-<span id="cb20-150"><a href="#cb20-150" aria-hidden="true" tabindex="-1"></a><span class="co">#         return '\n'.join([f'{pre}{node}' for pre, _, node in RenderTree(self.root)])</span></span>
-<span id="cb20-151"><a href="#cb20-151" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb20-152"><a href="#cb20-152" aria-hidden="true" tabindex="-1"></a><span class="co">#     def save(self, path):</span></span>
-<span id="cb20-153"><a href="#cb20-153" aria-hidden="true" tabindex="-1"></a><span class="co">#         import numpy as np</span></span>
-<span id="cb20-154"><a href="#cb20-154" aria-hidden="true" tabindex="-1"></a><span class="co">#         data = self.to_dict()</span></span>
-<span id="cb20-155"><a href="#cb20-155" aria-hidden="true" tabindex="-1"></a><span class="co">#         data["constants"] = {k: v.tolist() if isinstance(v, np.ndarray) else v for k,v in self.constants.items()}</span></span>
-<span id="cb20-156"><a href="#cb20-156" aria-hidden="true" tabindex="-1"></a><span class="co">#         with open(path, 'wb') as fp:</span></span>
-<span id="cb20-157"><a href="#cb20-157" aria-hidden="true" tabindex="-1"></a><span class="co">#             pickle.dump(data, fp)</span></span>
-<span id="cb20-158"><a href="#cb20-158" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb20-159"><a href="#cb20-159" aria-hidden="true" tabindex="-1"></a><span class="co">#     def load(self, path):</span></span>
-<span id="cb20-160"><a href="#cb20-160" aria-hidden="true" tabindex="-1"></a><span class="co">#         with open(path, 'rb') as fp:</span></span>
-<span id="cb20-161"><a href="#cb20-161" aria-hidden="true" tabindex="-1"></a><span class="co">#             data = pickle.load(fp)</span></span>
-<span id="cb20-162"><a href="#cb20-162" aria-hidden="true" tabindex="-1"></a><span class="co">#         self.constants = data.pop("constants")</span></span>
-<span id="cb20-163"><a href="#cb20-163" aria-hidden="true" tabindex="-1"></a><span class="co">#         self.from_dict(data)</span></span>
-<span id="cb20-164"><a href="#cb20-164" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb20-165"><a href="#cb20-165" aria-hidden="true" tabindex="-1"></a><span class="co">#     def to_dict(self, node=None):</span></span>
-<span id="cb20-166"><a href="#cb20-166" aria-hidden="true" tabindex="-1"></a><span class="co">#         if node == None: node = self.root</span></span>
-<span id="cb20-167"><a href="#cb20-167" aria-hidden="true" tabindex="-1"></a><span class="co">#         data = dict( list(self._iter_node_attr(node)) )</span></span>
-<span id="cb20-168"><a href="#cb20-168" aria-hidden="true" tabindex="-1"></a><span class="co">#         data["node_cls"] = node.__class__.__name__</span></span>
-<span id="cb20-169"><a href="#cb20-169" aria-hidden="true" tabindex="-1"></a><span class="co">#         children = list( self.to_dict(child) for child in node.children )</span></span>
-<span id="cb20-170"><a href="#cb20-170" aria-hidden="true" tabindex="-1"></a><span class="co">#         if children:</span></span>
-<span id="cb20-171"><a href="#cb20-171" aria-hidden="true" tabindex="-1"></a><span class="co">#             data["children"] = children</span></span>
-<span id="cb20-172"><a href="#cb20-172" aria-hidden="true" tabindex="-1"></a><span class="co">#         return data</span></span>
-<span id="cb20-173"><a href="#cb20-173" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb20-174"><a href="#cb20-174" aria-hidden="true" tabindex="-1"></a><span class="co">#     def from_dict(self, data):</span></span>
-<span id="cb20-175"><a href="#cb20-175" aria-hidden="true" tabindex="-1"></a><span class="co">#         self.root = self.__import(data)</span></span>
-<span id="cb20-176"><a href="#cb20-176" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb20-177"><a href="#cb20-177" aria-hidden="true" tabindex="-1"></a><span class="co">#     @staticmethod</span></span>
-<span id="cb20-178"><a href="#cb20-178" aria-hidden="true" tabindex="-1"></a><span class="co">#     def __import(data, parent=None):</span></span>
-<span id="cb20-179"><a href="#cb20-179" aria-hidden="true" tabindex="-1"></a><span class="co">#         assert isinstance(data, dict)</span></span>
-<span id="cb20-180"><a href="#cb20-180" aria-hidden="true" tabindex="-1"></a><span class="co">#         assert "parent" not in data</span></span>
-<span id="cb20-181"><a href="#cb20-181" aria-hidden="true" tabindex="-1"></a><span class="co">#         children = data.pop("children", [])</span></span>
-<span id="cb20-182"><a href="#cb20-182" aria-hidden="true" tabindex="-1"></a><span class="co">#         node_name = data.pop("name")</span></span>
-<span id="cb20-183"><a href="#cb20-183" aria-hidden="true" tabindex="-1"></a><span class="co">#         node_cls = globals()[ data.pop("node_cls") ]</span></span>
-<span id="cb20-184"><a href="#cb20-184" aria-hidden="true" tabindex="-1"></a><span class="co">#         node = node_cls(node_name, parent=parent, **data)</span></span>
-<span id="cb20-185"><a href="#cb20-185" aria-hidden="true" tabindex="-1"></a><span class="co">#         for child in children:</span></span>
-<span id="cb20-186"><a href="#cb20-186" aria-hidden="true" tabindex="-1"></a><span class="co">#             CountTree.__import(child, parent=node)</span></span>
-<span id="cb20-187"><a href="#cb20-187" aria-hidden="true" tabindex="-1"></a><span class="co">#         return node</span></span>
-<span id="cb20-188"><a href="#cb20-188" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb20-189"><a href="#cb20-189" aria-hidden="true" tabindex="-1"></a><span class="co">#     @staticmethod</span></span>
-<span id="cb20-190"><a href="#cb20-190" aria-hidden="true" tabindex="-1"></a><span class="co">#     def _iter_node_attr(node):</span></span>
-<span id="cb20-191"><a href="#cb20-191" aria-hidden="true" tabindex="-1"></a><span class="co">#         for k, v in node.__dict__.items():</span></span>
-<span id="cb20-192"><a href="#cb20-192" aria-hidden="true" tabindex="-1"></a><span class="co">#             if k in ("_NodeMixin__children", "_NodeMixin__parent"):</span></span>
-<span id="cb20-193"><a href="#cb20-193" aria-hidden="true" tabindex="-1"></a><span class="co">#                 continue</span></span>
-<span id="cb20-194"><a href="#cb20-194" aria-hidden="true" tabindex="-1"></a><span class="co">#             yield k, v</span></span>
-<span id="cb20-195"><a href="#cb20-195" aria-hidden="true" tabindex="-1"></a>            </span>
-<span id="cb20-196"><a href="#cb20-196" aria-hidden="true" tabindex="-1"></a><span class="co">#     def draw(self, path=None, scale_percent=100):</span></span>
-<span id="cb20-197"><a href="#cb20-197" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb20-198"><a href="#cb20-198" aria-hidden="true" tabindex="-1"></a><span class="co">#         def gen_node(node):</span></span>
-<span id="cb20-199"><a href="#cb20-199" aria-hidden="true" tabindex="-1"></a><span class="co">#             if isinstance(node, Variable):</span></span>
-<span id="cb20-200"><a href="#cb20-200" aria-hidden="true" tabindex="-1"></a><span class="co">#                 color = "#ff9999" if node.marked else "white"</span></span>
-<span id="cb20-201"><a href="#cb20-201" aria-hidden="true" tabindex="-1"></a><span class="co">#                 return pydot.Node(hex(node.id), label=str(node.name), style="filled", fillcolor=color, shape="ellipse")</span></span>
-<span id="cb20-202"><a href="#cb20-202" aria-hidden="true" tabindex="-1"></a><span class="co">#             if isinstance(node, Constant):</span></span>
-<span id="cb20-203"><a href="#cb20-203" aria-hidden="true" tabindex="-1"></a><span class="co">#                 return pydot.Node(hex(node.id), label=str(node.name), style="filled", fillcolor="white", shape="box")</span></span>
-<span id="cb20-204"><a href="#cb20-204" aria-hidden="true" tabindex="-1"></a>            </span>
-<span id="cb20-205"><a href="#cb20-205" aria-hidden="true" tabindex="-1"></a><span class="co">#         def edgeattrfunc(node, child):</span></span>
-<span id="cb20-206"><a href="#cb20-206" aria-hidden="true" tabindex="-1"></a><span class="co">#             weight = 0 if self.root.counts == 0 else 10.0 * child.counts / self.root.counts </span></span>
-<span id="cb20-207"><a href="#cb20-207" aria-hidden="true" tabindex="-1"></a><span class="co">#             weight = min(weight, 5.0) if weight &gt; 5.0 else max(weight, 0.2)</span></span>
-<span id="cb20-208"><a href="#cb20-208" aria-hidden="true" tabindex="-1"></a><span class="co">#             return {"penwidth": str(weight)}</span></span>
-<span id="cb20-209"><a href="#cb20-209" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb20-210"><a href="#cb20-210" aria-hidden="true" tabindex="-1"></a><span class="co">#         G = pydot.Dot(graph_type="digraph")</span></span>
-<span id="cb20-211"><a href="#cb20-211" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb20-212"><a href="#cb20-212" aria-hidden="true" tabindex="-1"></a><span class="co">#         for node in PreOrderIter(self.root):</span></span>
-<span id="cb20-213"><a href="#cb20-213" aria-hidden="true" tabindex="-1"></a><span class="co">#             nodeA = gen_node(node)</span></span>
-<span id="cb20-214"><a href="#cb20-214" aria-hidden="true" tabindex="-1"></a><span class="co">#             G.add_node(nodeA)</span></span>
-<span id="cb20-215"><a href="#cb20-215" aria-hidden="true" tabindex="-1"></a><span class="co">#             for child in node.children:</span></span>
-<span id="cb20-216"><a href="#cb20-216" aria-hidden="true" tabindex="-1"></a><span class="co">#                 nodeB = gen_node(child)</span></span>
-<span id="cb20-217"><a href="#cb20-217" aria-hidden="true" tabindex="-1"></a><span class="co">#                 edge = pydot.Edge(nodeA,nodeB,**edgeattrfunc(node,child))</span></span>
-<span id="cb20-218"><a href="#cb20-218" aria-hidden="true" tabindex="-1"></a><span class="co">#                 G.add_edge(edge)</span></span>
-<span id="cb20-219"><a href="#cb20-219" aria-hidden="true" tabindex="-1"></a>                </span>
-<span id="cb20-220"><a href="#cb20-220" aria-hidden="true" tabindex="-1"></a><span class="co">#         if path is not None:</span></span>
-<span id="cb20-221"><a href="#cb20-221" aria-hidden="true" tabindex="-1"></a><span class="co">#             G.write_png(path)</span></span>
-<span id="cb20-222"><a href="#cb20-222" aria-hidden="true" tabindex="-1"></a><span class="co">#         else:</span></span>
-<span id="cb20-223"><a href="#cb20-223" aria-hidden="true" tabindex="-1"></a><span class="co">#             try:</span></span>
-<span id="cb20-224"><a href="#cb20-224" aria-hidden="true" tabindex="-1"></a><span class="co">#                 from IPython.display import Image, display</span></span>
-<span id="cb20-225"><a href="#cb20-225" aria-hidden="true" tabindex="-1"></a><span class="co">#                 return display( Image(G.create_png()) )</span></span>
-<span id="cb20-226"><a href="#cb20-226" aria-hidden="true" tabindex="-1"></a><span class="co">#             except:</span></span>
-<span id="cb20-227"><a href="#cb20-227" aria-hidden="true" tabindex="-1"></a><span class="co">#                 print('Image can only be drawn in Jupyter notebook.')</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Test numerics 2-level tree</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>test_eq(tree.root_leaf_rate, <span class="dv">5</span><span class="op">/</span><span class="dv">100</span> <span class="op">+</span> <span class="dv">2</span><span class="op">/</span><span class="dv">100</span> <span class="op">+</span> <span class="dv">10</span><span class="op">/</span><span class="dv">100</span>)</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>test_eq(tree.path_sum(tree.root, mode<span class="op">=</span><span class="dv">1</span>), <span class="fl">0.8</span> <span class="op">*</span> <span class="dv">50</span><span class="op">/</span><span class="dv">70</span> <span class="op">*</span> <span class="fl">0.2</span> <span class="op">*</span> <span class="dv">5</span><span class="op">/</span><span class="dv">10</span> <span class="op">+</span> <span class="fl">0.1</span> <span class="op">*</span> (<span class="dv">20</span><span class="op">/</span><span class="dv">30</span> <span class="op">*</span> <span class="fl">0.2</span> <span class="op">*</span> <span class="dv">2</span><span class="op">/</span><span class="dv">5</span> <span class="op">+</span> <span class="dv">10</span><span class="op">/</span><span class="dv">30</span> <span class="op">*</span> <span class="fl">1.0</span> <span class="op">*</span> <span class="dv">1</span>))</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>test_close(tree.path_sum(tree.root, mode<span class="op">=</span><span class="dv">2</span>), <span class="fl">0.8</span> <span class="op">*</span> (<span class="dv">50</span><span class="op">/</span><span class="dv">70</span> <span class="op">*</span> <span class="fl">0.9</span> <span class="op">+</span> <span class="dv">20</span><span class="op">/</span><span class="dv">70</span>) <span class="op">+</span> <span class="fl">0.1</span> <span class="op">*</span> (<span class="dv">20</span><span class="op">/</span><span class="dv">30</span> <span class="op">*</span> <span class="fl">0.9</span> <span class="op">+</span> <span class="dv">10</span><span class="op">/</span><span class="dv">30</span>), eps<span class="op">=</span><span class="fl">1e-05</span>)</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="co"># var1 = (0.8 * 0.2 * 5/10)**2 * c1_0.variance + (0.8 * 50/70 * 0.2)**2 * fail_c1_0_1.variance + (0.1 * 0.2 * 2/5 - 0.1 * 1)**2 * c1_1.variance + (0.1 * 0.2 * 20/30)**2 * fail_c1_1_1.variance</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>var1 <span class="op">=</span> (<span class="fl">0.8</span> <span class="op">*</span> <span class="dv">50</span><span class="op">/</span><span class="dv">70</span> <span class="op">*</span> <span class="fl">0.2</span>)<span class="op">**</span><span class="dv">2</span> <span class="op">*</span> fail_c1_0_1.variance <span class="op">+</span> (<span class="fl">0.1</span> <span class="op">*</span> <span class="fl">0.2</span> <span class="op">*</span> <span class="dv">2</span><span class="op">/</span><span class="dv">5</span> <span class="op">-</span> <span class="fl">0.1</span> <span class="op">*</span> <span class="dv">1</span>)<span class="op">**</span><span class="dv">2</span> <span class="op">*</span> c1_1.variance <span class="op">+</span> (<span class="fl">0.1</span> <span class="op">*</span> <span class="fl">0.2</span> <span class="op">*</span> <span class="dv">20</span><span class="op">/</span><span class="dv">30</span>)<span class="op">**</span><span class="dv">2</span> <span class="op">*</span> fail_c1_1_1.variance <span class="co"># ignore all (intermediate) w=0 paths</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>test_close(tree.uncertainty_propagated_variance(mode<span class="op">=</span><span class="dv">1</span>), var1, eps<span class="op">=</span><span class="fl">1e-05</span>)</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a><span class="co"># var2 = (0.8 * (0.7 * 1 + 0.2 * 5/10 - 1))**2 * c1_0.variance + (0.8 * 50/70 * 0.2)**2 * fail_c1_0_1.variance + (0.1 * (0.7 + 0.2*3/5))**2 * c1_1.variance + (0.1 * 20/30 * 0.2)**2 * fail_c1_1_1.variance</span></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>var2 <span class="op">=</span> (<span class="fl">0.8</span> <span class="op">*</span> <span class="dv">50</span><span class="op">/</span><span class="dv">70</span> <span class="op">*</span> <span class="fl">0.2</span>)<span class="op">**</span><span class="dv">2</span> <span class="op">*</span> fail_c1_0_1.variance <span class="op">+</span> (<span class="fl">0.1</span> <span class="op">*</span> (<span class="fl">0.7</span> <span class="op">+</span> <span class="fl">0.2</span><span class="op">*</span><span class="dv">3</span><span class="op">/</span><span class="dv">5</span>))<span class="op">**</span><span class="dv">2</span> <span class="op">*</span> c1_1.variance <span class="op">+</span> (<span class="fl">0.1</span> <span class="op">*</span> <span class="dv">20</span><span class="op">/</span><span class="dv">30</span> <span class="op">*</span> <span class="fl">0.2</span>)<span class="op">**</span><span class="dv">2</span> <span class="op">*</span> fail_c1_1_1.variance <span class="co"># ignore all (intermediate) w=0 paths</span></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>test_close(tree.uncertainty_propagated_variance(mode<span class="op">=</span><span class="dv">0</span>), var2, eps<span class="op">=</span><span class="fl">1e-05</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 
 
