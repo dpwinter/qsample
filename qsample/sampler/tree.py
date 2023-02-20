@@ -41,7 +41,7 @@ def draw_tree(tree, path=None):
         Returns
         -------
         pydot.Node
-            Graphical representation of `node`
+            Graphical representation of node
         """
         label=f"{node.name} : {node.count}"
         if isinstance(node, Variable):
@@ -138,7 +138,7 @@ def dict_to_count_tree(data):
         File path to stored tree object
     
     Returns
-    --------
+    -------
     CountTree
         Tree object
     """
