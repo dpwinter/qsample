@@ -4,7 +4,7 @@
 __all__ = ['SubsetSampler', 'SubsetSamplerERV']
 
 # %% ../../nbs/06d_sampler.subset.ipynb 3
-from .base import Sampler, protocol_subset_occurence, err_probs_tomatrix, tomatrix
+from .base import Sampler, protocol_subset_occurence, err_probs_tomatrix, equalize_lens
 from .tree import Variable, Constant
 
 import numpy as np
@@ -17,8 +17,6 @@ class SubsetSampler(Sampler):
         
         if set(self.protocol._circuits.keys()) != set(self.protocol_subsets.keys()):
             # Update subsets if circuits were added during runtime.
-            # protocol_groups = {cid: self.err_model.group(circuit) for cid, circuit in self.protocol._circuits.items()}
-            # self.protocol_subsets = protocol_all_subsets(self.protocol_groups)
             self._set_subsets()
         
         if err_probs is not None:
@@ -34,7 +32,7 @@ class SubsetSampler(Sampler):
         v_L_up_var = self.tree.uncertainty_propagated_variance(mode=0)
         
         self.tree.constants = _protocol_Aws
-        return tomatrix([p_L, np.sqrt(v_L), p_L+delta, np.sqrt(v_L_up_var)])
+        return equalize_lens([p_L, np.sqrt(v_L), p_L+delta, np.sqrt(v_L_up_var)])
         
     def __init__(self, protocol, simulator, pmax, err_model=None, err_probs=None):
         super().__init__(protocol, simulator, err_probs=pmax, err_model=err_model)

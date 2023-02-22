@@ -218,6 +218,33 @@ ul.task-list li input[type="checkbox"] {
 <pre><code> comb (n, k)</code></pre>
 </blockquote>
 <p>Vectorized combination</p>
+<p>.. math:: comb(n,k) = n! / ((n-k)!k!)</p>
+<table class="table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>n</td>
+<td>int or np.array of int</td>
+<td>First parameter of combination</td>
+</tr>
+<tr class="even">
+<td>k</td>
+<td>int or np.array of int</td>
+<td>Second parameter of combination</td>
+</tr>
+<tr class="odd">
+<td><strong>Returns</strong></td>
+<td><strong>np.array</strong></td>
+<td><strong>Combination (choose k out of n)</strong></td>
+</tr>
+</tbody>
+</table>
 <hr>
 </section>
 <section id="binom" class="level3">
@@ -225,15 +252,86 @@ ul.task-list li input[type="checkbox"] {
 <blockquote class="blockquote">
 <pre><code> binom (k, n, p)</code></pre>
 </blockquote>
-<p>Vectorized binomial function</p>
+<p>Vectorized binomial distribution</p>
+<table class="table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 38%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>k</td>
+<td>int or list of int</td>
+<td>Second parameter of combination</td>
+</tr>
+<tr class="even">
+<td>n</td>
+<td>int or list of int</td>
+<td>First parameter of combination</td>
+</tr>
+<tr class="odd">
+<td>p</td>
+<td>float or list of float</td>
+<td>Probability</td>
+</tr>
+<tr class="even">
+<td><strong>Returns</strong></td>
+<td><strong>np.array</strong></td>
+<td><strong>value(s) of binomial distribution evaulated at k,n,p.</strong></td>
+</tr>
+</tbody>
+</table>
 <hr>
 </section>
 <section id="wilson_var" class="level3">
 <h3 class="anchored" data-anchor-id="wilson_var">Wilson_var</h3>
 <blockquote class="blockquote">
-<pre><code> Wilson_var (p, N, z=1.96)</code></pre>
+<pre><code> Wilson_var (p, N)</code></pre>
 </blockquote>
 <p>Wilson estimator of binomial variance</p>
+<p>The formula for the Wilson interval is:</p>
+<p>.. math:: CI = p+z^2/(2n) z/(1 + z^2/n)</p>
+<p>which we assume symmetric, s.t. we can extract the std (z=1), thus:</p>
+<p>.. math: Var[p] = (CI/2)^2 = (npq + 0.25) / (1 + n)^2</p>
+<table class="table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 38%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>p</td>
+<td>float</td>
+<td>Estimator of probability</td>
+</tr>
+<tr class="even">
+<td>N</td>
+<td>int</td>
+<td>Sample size</td>
+</tr>
+<tr class="odd">
+<td><strong>Returns</strong></td>
+<td><strong>float</strong></td>
+<td><strong>Estimated variance of Wilson CI (assumed symmetric)</strong></td>
+</tr>
+</tbody>
+</table>
 <hr>
 </section>
 <section id="wald_var" class="level3">
@@ -241,7 +339,33 @@ ul.task-list li input[type="checkbox"] {
 <blockquote class="blockquote">
 <pre><code> Wald_var (p, N)</code></pre>
 </blockquote>
-<p>Wald estimator of binomial variance (known issues, better use Wilson)</p>
+<p>Wald estimation of binomial variance</p>
+<table class="table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>p</td>
+<td>float</td>
+<td>Estimator of probability</td>
+</tr>
+<tr class="even">
+<td>N</td>
+<td>int</td>
+<td>Sample size</td>
+</tr>
+<tr class="odd">
+<td><strong>Returns</strong></td>
+<td><strong>float</strong></td>
+<td><strong>Estimated variance of Wald CI</strong></td>
+</tr>
+</tbody>
+</table>
 
 
 </section>

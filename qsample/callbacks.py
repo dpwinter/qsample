@@ -77,7 +77,6 @@ class PlotStats(Callback):
         
         stats = sampler.stats()
         xs = sampler.err_probs.T     
-        # x_label = sampler.grp_order
         x_label = sampler.err_model.groups
         
         def pop(stats_len, ax):

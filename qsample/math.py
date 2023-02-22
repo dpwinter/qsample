@@ -9,27 +9,85 @@ from scipy.special import factorial
 
 # %% ../nbs/01_math.ipynb 4
 def comb(n, k):
-    """Vectorized combination"""
+    """Vectorized combination
+    
+    .. math:: comb(n,k) = n! / ((n-k)!k!)
+    
+    Parameters
+    ----------
+    n : int or np.array of int
+        First parameter of combination
+    k : int or np.array of int
+        Second parameter of combination
+        
+    Returns
+    -------
+    np.array
+        Combination (choose k out of n)
+    """
     return factorial(n) / (factorial(k) * factorial(n-k))
 
 # %% ../nbs/01_math.ipynb 5
 def binom(k, n, p):
-    """Vectorized binomial function"""
+    """Vectorized binomial distribution
+    
+    Parameters
+    ----------
+    n : int or list of int
+        First parameter of combination
+    k : int or list of int
+        Second parameter of combination
+    p : float or list of float
+        Probability 
+    
+    Returns
+    -------
+    np.array
+        value(s) of binomial distribution evaulated at k,n,p.
+    """
     k, n, p = np.array(k), np.array(n), np.array(p)
     return comb(n,k) * p**k * (1-p)**(n-k)
 
 # %% ../nbs/01_math.ipynb 6
-def Wilson_var(p, N, z=1.96):
-    """Wilson estimator of binomial variance"""
-    return z**2 * (p*(1-p)/N + z**2/(4*N**2)) / (1+z**2/N)**2
-
-#hide
-# We arrive at the Wilson var from :
-# `wilson_max = (p + z**2/(2*N) + z*np.sqrt(p*(1-p)/N+z**2/(4*N**2)))/(1+z**2/N)`
-# `wilson_min = (p + z**2/(2*N) - z*np.sqrt(p*(1-p)/N+z**2/(4*N**2)))/(1+z**2/N)`
-# `return (wilson_max - wilson_min) / 2 # assume symmetric C.I. => take std as half.`
+def Wilson_var(p, N):
+    """Wilson estimator of binomial variance
+    
+    The formula for the Wilson interval is:
+    
+    .. math:: CI = p+z^2/(2n) \pm z\sqrt{pq/n + z^2/(4n^2)}/(1 + z^2/n)
+    
+    which we assume symmetric, s.t. we can extract the std (z=1), thus:
+    
+    .. math: Var[p] = (CI/2)^2 = (npq + 0.25) / (1 + n)^2
+    
+    Parameters
+    ----------
+    p : float
+        Estimator of probability
+    N : int
+        Sample size
+        
+    Returns
+    -------
+    float
+        Estimated variance of Wilson CI (assumed symmetric)
+    """
+    return (N*p*(1-p) + 0.25)  / (N**2 + 2*N + 1)
 
 # %% ../nbs/01_math.ipynb 7
 def Wald_var(p, N):
-    """Wald estimator of binomial variance (known issues, better use Wilson)"""
+    """Wald estimation of binomial variance
+    
+    Parameters
+    ----------
+    p : float
+        Estimator of probability
+    N : int
+        Sample size
+        
+    Returns
+    -------
+    float
+        Estimated variance of Wald CI
+    """
     return p * (1-p) / N
