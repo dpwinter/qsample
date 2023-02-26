@@ -278,26 +278,61 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <blockquote class="blockquote">
 <pre><code> unpack (seq)</code></pre>
 </blockquote>
-<p>Generator for all qubits defined in a circuit or tick</p>
+<p>Generator to unpack all values of dicts inside a list of dicts</p>
+<table class="table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>seq</td>
+<td>Iterable</td>
+<td>Iterable to recursively unpack</td>
+</tr>
+</tbody>
+</table>
+<pre><code>/home/dw/.local/lib/python3.10/site-packages/fastcore/docscrape.py:225: UserWarning: Unknown section Attributes
+  else: warn(msg)</code></pre>
 <hr>
 </section>
 <section id="circuit" class="level3">
 <h3 class="anchored" data-anchor-id="circuit">Circuit</h3>
 <blockquote class="blockquote">
-<pre><code> Circuit (ticks=None, noisy=True, ff_det=False)</code></pre>
+<pre><code> Circuit (ticks=[], noisy=True, ff_det=False)</code></pre>
 </blockquote>
 <p>Representation of a quantum circuit</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Tests</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>c1 <span class="op">=</span> Circuit(ticks<span class="op">=</span>[{<span class="st">'Z'</span>: {<span class="dv">0</span>}}])</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>c2 <span class="op">=</span> Circuit(ticks<span class="op">=</span>[{<span class="st">'X'</span>: {<span class="dv">3</span>}}])</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>c3 <span class="op">=</span> Circuit(ticks<span class="op">=</span>[{<span class="st">'X'</span>: {<span class="dv">3</span>}}, {<span class="st">'Z'</span>: {<span class="dv">0</span>}}])</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>c4 <span class="op">=</span> Circuit(ticks<span class="op">=</span>[])</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span>(c1.<span class="bu">id</span> <span class="op">!=</span> c2.<span class="bu">id</span> <span class="op">!=</span> c3.<span class="bu">id</span> <span class="op">!=</span> c4.<span class="bu">id</span>)</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>c1.<span class="bu">id</span>, c2.<span class="bu">id</span>, c3.<span class="bu">id</span>, c4.<span class="bu">id</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">list</span>(unpack([{<span class="st">'X'</span>: {<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>}},{<span class="st">'CNOT'</span>: {(<span class="dv">0</span>,<span class="dv">1</span>), (<span class="dv">1</span>,<span class="dv">3</span>)}}]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>[1, 2, 3, 0, 1, 1, 3]</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Tests</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>c1 <span class="op">=</span> Circuit(ticks<span class="op">=</span>[{<span class="st">'Z'</span>: {<span class="dv">0</span>}}])</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>c2 <span class="op">=</span> Circuit(ticks<span class="op">=</span>[{<span class="st">'X'</span>: {<span class="dv">3</span>}}])</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>c3 <span class="op">=</span> Circuit(ticks<span class="op">=</span>[{<span class="st">'X'</span>: {<span class="dv">3</span>}}, {<span class="st">'Z'</span>: {<span class="dv">0</span>}}])</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>c4 <span class="op">=</span> Circuit(ticks<span class="op">=</span>[])</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span>(c1.<span class="bu">id</span> <span class="op">!=</span> c2.<span class="bu">id</span> <span class="op">!=</span> c3.<span class="bu">id</span> <span class="op">!=</span> c4.<span class="bu">id</span>)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>c1.<span class="bu">id</span>, c2.<span class="bu">id</span>, c3.<span class="bu">id</span>, c4.<span class="bu">id</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <pre><code>('bceb2', '04f89', 'b597e', 'da39a')</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># c = Circuit(ticks=[{'init': {0,1,2,3}}, {'X': {0,1}}, {'CNOT': {(0,3)}}, {'measure': {1,3}}])</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># c.partition</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>{'init': [(0, 0), (0, 1), (0, 2), (0, 3)],
+ 'q1': [(1, 0), (1, 1)],
+ 'q2': [(2, (0, 3))],
+ 'meas': [(3, 1), (3, 3)],
+ 'idle': [(1, 2), (1, 3), (2, 1), (2, 2), (3, 0), (3, 2)]}</code></pre>
 </div>
 </div>
 
