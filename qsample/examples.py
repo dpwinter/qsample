@@ -149,7 +149,7 @@ def gen_ghz1():
     ghz1.add_nodes_from(['ghz'], circuits=[ghz])
     ghz1.add_edge('START', 'ghz', check='True')
     ghz1.add_edge('ghz', 'FAIL', check='ghz[-1]==1')
-    ghz1.fault_tolerant = True
+    ghz1.ft_level = 1
     
     return ghz1
 ghz1 = gen_ghz1()
@@ -166,16 +166,13 @@ def gen_ghz3():
 
     functions = {'logErr': logErr, 'repeat': repeat}
 
-    ghz3 = Protocol()
-    ghz3._check_fns.update(functions)
+    ghz3 = Protocol(check_functions=functions)
     ghz3.add_nodes_from(['ghz'], circuits=[ghz])
-
     ghz3.add_edge('START', 'ghz', check='True')
-
     ghz3.add_edge('ghz', 'ghz', check='repeat(ghz)')
     ghz3.add_edge('ghz', 'FAIL', check='logErr(ghz)')
     
-    ghz3.fault_tolerant = True
+    ghz3.ft_level = 1
     
     return ghz3
 ghz3 = gen_ghz3()
@@ -204,11 +201,10 @@ def gen_ghz_stab():
 
     functions = {'logErr': logErr, 'lut': lut}
 
-    ghz_stab = Protocol()
-    ghz_stab._check_fns.update(functions)
+    ghz_stab = Protocol(check_functions=functions)
     ghz_stab.add_nodes_from(['ghz', 'meas_1', 'meas_2'], circuits=[ghz, ghz_stabs, ghz_stabs])
 
-    ghz_stab.add_node('COR', circuit=Circuit(noisy=False))
+    ghz_stab.add_node('COR')
     ghz_stab.add_edge('START', 'ghz', check='True')
     ghz_stab.add_edge('ghz', 'ghz', check='ghz[-1]==1')
     ghz_stab.add_edge('ghz', 'meas_1', check='ghz[-1]==0')
@@ -216,7 +212,7 @@ def gen_ghz_stab():
     ghz_stab.add_edge('COR', 'meas_2', check='True')
     ghz_stab.add_edge('meas_2', 'FAIL', check='logErr(meas_2[-1])')
     
-    ghz_stab.fault_tolerant = True
+    ghz_stab.ft_level = 1
     
     return ghz_stab
 ghz_stab = gen_ghz_stab()
@@ -251,8 +247,7 @@ def gen_ftsteane():
 
     # Define protocol
 
-    ftsteane = Protocol()
-    ftsteane._check_fns.update(functions)
+    ftsteane = Protocol(check_functions=functions)
     ftsteane.add_nodes_from(['ENC', 'meas'], circuits=[eft, meas7])
 
     ftsteane.add_edge('START', 'ENC', check='True')
@@ -262,7 +257,7 @@ def gen_ftsteane():
 
     ftsteane.add_edge('meas', 'FAIL', check='logErr(meas[-1])')
     
-    ftsteane.fault_tolerant = True
+    ftsteane.ft_level = 1
     
     return ftsteane
 ftsteane = gen_ftsteane()
@@ -310,8 +305,8 @@ def gen_steane0():
 
     functions = {"logErr": logErr, "lut": flagged_z_look_up_table_1}
 
-    init = Protocol()
-    init._check_fns.update(functions)
+    init = Protocol(check_functions=functions)
+
     init.add_nodes_from(['ENC', 'Z2', 'meas'], circuits=[eft, sz_123, meas7])
     init.add_node('X_COR', circuit=Circuit([{'X': {6}}], noisy=False))
 
@@ -326,7 +321,7 @@ def gen_steane0():
 
     init.add_edge('meas', 'FAIL', check='logErr(meas[-1])')
     
-    init.fault_tolerant = True
+    init.ft_level = 1
     
     return init
 
@@ -397,8 +392,8 @@ def gen_flagstab():
 
     # Define protocol
 
-    flagstab = Protocol()
-    flagstab._check_fns.update(functions)
+    flagstab = Protocol(check_functions=functions)
+
     flagstab.add_nodes_from(['X1', 'X2', 'X3', 'nonFT', 'meas'], circuits=[fmx_1, fmx_2, fmx_3, nfs, meas7])
     flagstab.add_node('COR', circuit=Circuit(noisy=False))
 
@@ -426,7 +421,7 @@ def gen_flagstab():
 
     flagstab.add_edge('meas', 'FAIL', check='logErr(meas[-1])')
     
-    flagstab.fault_tolerant = True
+    flagstab.ft_level = 1
     
     return flagstab
 

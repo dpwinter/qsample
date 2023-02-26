@@ -19,7 +19,14 @@ GATES = {
 
 # %% ../nbs/02_circuit.ipynb 5
 def unpack(seq):
-    """Generator for all qubits defined in a circuit or tick"""
+    """Generator to unpack all values of dicts inside
+    a list of dicts
+    
+    Parameters
+    ----------
+    seq : Iterable
+        Iterable to recursively unpack
+    """
     
     if isinstance(seq, (tuple,set,list,Circuit)):
         yield from (x for y in seq for x in unpack(y))
@@ -30,10 +37,40 @@ def unpack(seq):
 
 # %% ../nbs/02_circuit.ipynb 6
 class Circuit(MutableSequence):
-    """Representation of a quantum circuit"""
+    """Representation of a quantum circuit
     
-    def __init__(self, ticks=None, noisy=True, ff_det=False):
-        self._ticks = ticks if ticks else []
+    Attributes
+    ----------
+    _ticks : list of dict
+        List of ticks in the circuit
+    _noisy : bool
+        If true, circuit is subject to noise during sampling
+    _ff_det : bool
+        If true, the measurement result of the circuit in the
+        fault-free case is always deterministic
+    qubits : set
+        Set of qubits "touched" by circuit
+    n_qubits : int
+        Numbers of qubits "touched" by circuit
+    n_ticks : int
+        Number of ticks in circuit
+    id : str
+        Unique circuit identifier
+    """
+    
+    def __init__(self, ticks=[], noisy=True, ff_det=False):
+        """
+        Parameters
+        ----------
+        ticks : list
+            List of ticks defining a circuit
+        noisy : bool
+            If true, circuit is subject to noise during sampling
+        ff_det : bool
+            If true, the measurement result of the circuit in the
+            fault-free case is always deterministic
+        """
+        self._ticks = ticks
         self._noisy = noisy
         self._ff_det = ff_det # fault-free deterministic
         
@@ -50,6 +87,15 @@ class Circuit(MutableSequence):
         return len(self._ticks)
     
     def insert(self, tick_index, tick):
+        """Insert a tick into a circuit
+        
+        Parameters
+        ----------
+        tick_index : int
+            Index at which tick is inserted (tick indices to right incremented by 1)
+        tick : dict
+            Tick dictionary to insert
+        """
         self._ticks.insert(tick_index, tick)
     
     def __str__(self):
@@ -60,6 +106,22 @@ class Circuit(MutableSequence):
     
     def __repr__(self):
         return self.__str__()
+    
+#     @cached_property
+#     def partition(self):
+#         """Generate canonical partition of a circuit into `1q`,`2q`,`init`,`meas`,`idle`
+        
+#         Returns
+#         -------
+#         dict
+#             Partition of the circuit, key: name of partition subset, value: set of (tick,qb/s)
+#             locations of circuit elements belonging to partition subset
+#         """
+#         res = {name : set([(ti, qb) for ti, tick in enumerate(self) for gate, qbs in tick.items()
+#                        for qb in qbs if gate in gates]) for name, gates in GATES.items()}
+#         qbs = set(unpack(self))
+#         res['idle'] = set([(ti,qb) for ti, tick in enumerate(self) for qb in qbs.difference(set(unpack(tick)))])
+#         return res
     
     @cached_property
     def qubits(self):  
@@ -78,10 +140,11 @@ class Circuit(MutableSequence):
     
     @property
     def id(self):
+        """Unique circuit identifier"""
         return sha1((repr(self)).encode('UTF-8')).hexdigest()[:5]
 
     def draw(self, path=None, scale=2):
-
+        """Draw the circuit"""
         n_qubits = max(unpack(self)) + 1
         cmat = [["",""] + [r"\qw" for _ in range(self.n_ticks - 1)] for _ in range(n_qubits)]
 

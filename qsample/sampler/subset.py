@@ -4,58 +4,193 @@
 __all__ = ['SubsetSampler', 'SubsetSamplerERV']
 
 # %% ../../nbs/06d_sampler.subset.ipynb 3
-from .base import Sampler, protocol_subset_occurence, err_probs_tomatrix, equalize_lens
-from .tree import Variable, Constant
+# from qsample.sampler.base import Sampler, protocol_subset_occurence, err_probs_tomatrix, equalize_lens
+from .tree import CountTree, CircuitCountNode, SubsetCountNode
+import qsample.math as math
+
+from ..callbacks import CallbackList
+from tqdm.auto import tqdm
 
 import numpy as np
 
-# %% ../../nbs/06d_sampler.subset.ipynb 4
-class SubsetSampler(Sampler):
+# %% ../../nbs/06d_sampler.subset.ipynb 5
+class SubsetSampler:
+    """Class to represent subset sampler
+    
+    References
+    ----------
+    ...
+    
+    Attributes
+    ----------
+    protocol : Protocol
+        Protocol to sample from
+    simulator : StabilizerSimulator or StatevectorSimulator
+        Simulator used during sampling
+    err_model : ErrorModel
+        Error model used during sampling
+    p_max : dict
+        Error probabilities per faulty partition member (one float per member)
+    tree : CountTree
+        Tree data structure to keep track of sampled events
+    """
+    def __init__(self, protocol, simulator, p_max, err_model, err_params=None):
+        """
+        Parameters
+        ----------
+        protocol : Protocol
+            The protocol to sample from
+        simulator : ChpSimulator or StatevectorSimulator
+            The simulator used in sampling process
+        p_max : dict
+            Physical error rates per faulty partition group at which we sample
+        err_model : ErrorModel
+            Error model used in sampling process
+        err_params : dict
+            Physical error rates per faulty partition group at which plots generated.
+            Should be less than p_max and it should be checked that at p_max all subsets
+            scale similar. Only in this region can we use the subset sampler results.
+        """
+        self.protocol = protocol
+        self.simulator = simulator
+        self.err_model = err_model()
+        self.p_max = self.__err_params_to_matrix(p_max)
+        self.err_params = self.__err_params_to_matrix(err_params)
         
-    def stats(self, err_probs=None):
-        _protocol_Aws = self.tree.constants
+        self.partitions = {cid: self.err_model.group(circuit) for cid, circuit in self.protocol.circuits.items()}
+        self.tree = CountTree(constants={cid: self.__get_subset_probs(partition.values(), self.p_max) for cid, partition in self.partitions.items()})
         
-        if set(self.protocol._circuits.keys()) != set(self.protocol_subsets.keys()):
-            # Update subsets if circuits were added during runtime.
-            self._set_subsets()
+    def __get_subset_probs(self, list_of_sets, prob):
+        cards = list(map(len, list_of_sets))
+        cp_subset_cards = math.cartesian_product([math.subset_cards(s) for s in list_of_sets])
+        return {cp : math.joint_binom(cp, cards, prob) for cp in cp_subset_cards}
         
-        if err_probs is not None:
-            assert isinstance(err_probs, dict)
-            err_probs = err_probs_tomatrix(err_probs, self.err_model.groups)
-            self.tree.constants = protocol_subset_occurence(self.protocol_groups, self.protocol_subsets, err_probs)
-        else:
-            self.tree.constants = protocol_subset_occurence(self.protocol_groups, self.protocol_subsets, self.err_probs)
+    def __err_params_to_matrix(self, err_params):
+        sorted_params = [err_params[k] for k in self.err_model.groups]
+        return np.array(np.broadcast_arrays(*sorted_params)).T
         
-        v_L = self.tree.uncertainty_propagated_variance(mode=1)
+    def stats(self, err_params=None):
+        """Calculate statistics of sample tree wrt `err_params`
+        
+        Parameters
+        ----------
+        err_params : dict or None
+            Parameter range wrt to which statistics are calculated
+        """                    
+        _constants = self.tree.constants
+        prob = self.err_params if err_params == None else self.__err_params_to_matrix(err_params)
+        self.tree.constants = {cid: self.__get_subset_probs(partition.values(), prob) for cid, partition in self.partitions.items()}
+        
         p_L = self.tree.path_sum(self.tree.root, mode=1)
         delta = 1 - self.tree.path_sum(self.tree.root, mode=2)
-        v_L_up_var = self.tree.uncertainty_propagated_variance(mode=0)
+        var = self.tree.uncertainty_propagated_variance(mode=1)
+        var_up = self.tree.uncertainty_propagated_variance(mode=0)
         
-        self.tree.constants = _protocol_Aws
-        return equalize_lens([p_L, np.sqrt(v_L), p_L+delta, np.sqrt(v_L_up_var)])
+        self.tree.constants = _constants
+        return np.broadcast_arrays(p_L, np.sqrt(var), p_L+delta, np.sqrt(var_up))
         
-    def __init__(self, protocol, simulator, pmax, err_model=None, err_probs=None):
-        super().__init__(protocol, simulator, err_probs=pmax, err_model=err_model)
-        probs = err_probs if err_probs else pmax
-        self.err_probs = err_probs_tomatrix(probs, self.err_model.groups)
+    
+    def save(self, path):
+        """Save sampler to path
         
-    def optimize(self, tree_node, circuit, prob_vec):
+        Parameters
+        ----------
+        path : str
+            File path to save to
+        """
+        with open(path, 'wb') as fp:
+            pickle.dump(self, fp)
+            
+    def __explore_weight0_subset(self):
+        pass
+
+    def __choose_subset(self, tnode, circuit):
+        """Choose a subset for `circuit`, based on current `tnode`
         
+        Choice is based on subset occurence probability (Aws).
+        Exclude 0-weight-subsets if a circuit is fault-free determinstic and
+        the 0-weight-subset has already been sampled in the past.
+        
+        Parameters
+        ----------
+        tnode : CircuitCountNode
+            Current tree node we want to sample from
+        circuit : Circuit
+            Current circuit associated with tree node
+        
+        Returns
+        -------
+        tuple
+            Next subset to choose for `tnode`
+        """
         subsets, Aws = zip(*self.tree.constants[circuit.id].items())
-        if circuit._ff_det and subsets[0] in {n.name for n in tree_node.children}: 
+        if circuit._ff_det and subsets[0] in {n.name for n in tnode.children}:
             Aws = np.ma.masked_array(Aws)
             Aws[0] = np.ma.masked
-        subset = subsets[ np.random.choice(len(subsets), p=Aws) ]
+        return subsets[ np.random.choice(len(subsets), p=Aws) ]
         
-        locgrps = self.protocol_groups[circuit.id]
-        flocs = self.err_model.choose_w(locgrps, subset)
-        return {'subset': subset, 'flocs': flocs}
-    
-    @property
-    def tree(self):
-        return list(self.trees.values())[0]
+    def run(self, n_shots, callbacks=[]):
+        """Execute n_shots of subset sampling
+        
+        Parameters
+        ----------
+        n_shots : int
+            Number of shots sampled in total
+        callbacks : list of Callback
+            Callback instances executed during sampling
+        """
+        if not isinstance(callbacks, CallbackList):
+            callbacks = CallbackList(sampler=self, callbacks=callbacks)
+            
+        self.__explore_weight0_subset() # always explore weight-0 subset first
+        
+        self.stop_sampling = False # Flag can be controlled in callbacks
+        callbacks.on_sampler_begin()
+        
+        for _ in tqdm(range(n_shots), leave=True):
+            callbacks.on_protocol_begin()
+            pnode = self.protocol.root # get protocol start node
+            state = self.simulator(len(self.protocol.qubits)) # init state
+            msmt_hist = {} # init measurement history
+            tnode = None # init tree node
+            
+            while True:
+                callbacks.on_circuit_begin()
+                pnode, circuit = self.protocol.successor(pnode, msmt_hist)
+                tnode = self.tree.add(name=pnode, parent=tnode, node_type=CircuitCountNode)
+                if self.tree.path_weight(tnode) == 0: # !!! THIS SHOULD BE REPLACED BY EXPLORE WEIGHT0 ROUTINE.. JUST FOR TESTING!
+                    tnode.invariant = True
+                tnode.count += 1
+                if circuit:
+                    if not circuit._noisy:
+                        msmt = state.run(circuit)
+                        tnode.invariant = True
+                    else:
+                        subset = self.__choose_subset(tnode, circuit)
+                        fault_locs = self.err_model.choose_w(self.partitions[circuit.id], subset)
+                        fault_circuit = self.err_model.run(circuit, fault_locs)
+                        msmt = state.run(circuit, fault_circuit)
+                        tnode = self.tree.add(name=subset, parent=tnode, node_type=SubsetCountNode, circuit_id=circuit.id,
+                                              invariant=True if circuit._ff_det and not any(subset) else False)
+                        tnode.count += 1
+                    msmt = msmt if msmt==None else int(msmt,2)
+                    msmt_hist[pnode] = msmt_hist.get(pnode, []) + [msmt]
+                else:
+                    if self.tree.path_weight(tnode) <= self.protocol.ft_level:
+                        # Set only leaf node invariant
+                        tnode.invariant = True
+                    if tnode.name != None:
+                        # "Interesting" event happened
+                        self.tree.marked_leaves.add(tnode)
+                    break
+                callbacks.on_circuit_end(None) # !!! MUST FIX CIRCUIT END CALLBACK DATA!
+            callbacks.on_protocol_end()
+            if self.stop_sampling:
+                break
+        del self.stop_sampling
+        callbacks.on_sampler_end()
 
-# %% ../../nbs/06d_sampler.subset.ipynb 5
+# %% ../../nbs/06d_sampler.subset.ipynb 6
 class SubsetSamplerERV(SubsetSampler):
     """Subset sampler with ERV optimize function"""
     
@@ -72,16 +207,19 @@ class SubsetSamplerERV(SubsetSampler):
         return subset_candidates
     
     def ERV(self, tree_node, circuit):
-
+    
+        # self._set_subsets() # problem, this sets full Aws, we want at pmax. (not saved)
+        # self.tree.constants = protocol_subset_occurence(self.protocol_groups, self.protocol_subsets, self.err_probs)
+        
         subset_candidates = self.wplus1(tree_node, circuit)
         
         # ERV
-        _min_path_weight = self.tree.min_path_weight
-        self.tree.min_path_weight = 0
+        _fault_tolerance_level = self.tree.fault_tolerance_level
+        self.tree.fault_tolerance_level = 0
         
         erv_deltas = np.ma.zeros(shape=len(subset_candidates))
-        delta = self.tree.delta
-        v_L = self.tree.variance
+        delta = 1 - self.tree.path_sum(self.tree.root, mode=2)
+        v_L = self.tree.uncertainty_propagated_variance(mode=1)
         
         for i, subset in enumerate(subset_candidates):
             
@@ -89,55 +227,48 @@ class SubsetSamplerERV(SubsetSampler):
                 erv_deltas[i] = np.ma.masked
                 continue
             
-            _tree_node = self.tree.add(subset, parent=tree_node, cid=circuit.id, nodetype=Constant)
+            _tree_node = self.tree.add(name=subset, parent=tree_node, circuit_id=circuit.id, node_type=SubsetCountNode)
             children = _tree_node.children
             
-            # delta_diff = 0
             if len(children) == 0:
-                # delta_diff = self.tree.twig(_tree_node)
-                __tree_node_minus = self.tree.add(None, parent=_tree_node, nodetype=Variable)
-                __tree_node_plus = self.tree.add('FAIL', parent=_tree_node, nodetype=Variable, marked=True)
+                __tree_node_minus = self.tree.add(name=None, parent=_tree_node, node_type=CircuitCountNode)
+                __tree_node_plus = self.tree.add(name='FAIL', parent=_tree_node, node_type=CircuitCountNode)
+                self.tree.marked_leaves.add(__tree_node_plus)
             elif len(children) == 1:
-                if children[0].marked:
-                    __tree_node_minus = self.tree.add(None, parent=_tree_node, nodetype=Variable)
+                if children[0] in self.tree.marked_leaves:
+                    __tree_node_minus = self.tree.add(name=None, parent=_tree_node, node_type=CircuitCountNode)
                     __tree_node_plus = children[0]
                 else:
                     __tree_node_minus = children[0]
-                    __tree_node_plus = self.tree.add('FAIL', parent=_tree_node, nodetype=Variable, marked=True)
+                    __tree_node_plus = self.tree.add(name='FAIL', parent=_tree_node, node_type=CircuitCountNode)
+                    self.tree.marked_leaves.add(__tree_node_plus)
             elif len(children) == 2:
                 __tree_node_minus, __tree_node_plus = children
             else:
                 raise Exception("Subset nodes not allowed to have more than 2 children.")
+                        
+            _tree_node.count += 1
+                        
+            __tree_node_minus.count += 1
+            _delta = 1 - self.tree.path_sum(self.tree.root, mode=2)
+            v_L_minus = self.tree.uncertainty_propagated_variance(mode=1)
+            __tree_node_minus.count -= 1
             
-            # v_L = self.tree.partial_variance(_tree_node)
+            __tree_node_plus.count += 1
+            v_L_plus = self.tree.uncertainty_propagated_variance(mode=1)
+            __tree_node_plus.count -= 1
             
-            _tree_node.counts += 1
-            
-            # _delta = self.tree.delta
-            
-            __tree_node_minus.counts += 1
-            _delta = self.tree.delta
-            v_L_minus = self.tree.variance
-            # v_L_minus = self.tree.partial_variance(_tree_node)
-            __tree_node_minus.counts -= 1
-            
-            __tree_node_plus.counts += 1
-            v_L_plus = self.tree.variance
-            # v_L_plus = self.tree.partial_variance(_tree_node)
-            __tree_node_plus.counts -= 1
-            
-            _tree_node.counts -= 1
+            _tree_node.count -= 1
             
             _v_L = __tree_node_plus.rate * v_L_plus + __tree_node_minus.rate * v_L_minus
-            # erv_delta = v_L - _v_L + delta_diff
             erv_delta = np.abs(v_L - _v_L + _delta - delta)
             erv_deltas[i] = erv_delta
             
-            if _tree_node.counts == 0: self.tree.detach(_tree_node)
-            if __tree_node_plus.counts == 0: self.tree.detach(__tree_node_plus)
-            if __tree_node_minus.counts == 0: self.tree.detach(__tree_node_minus)
+            if _tree_node.count == 0:self.tree.remove(_tree_node)
+            if __tree_node_plus.count == 0: self.tree.remove(__tree_node_plus)
+            if __tree_node_minus.count == 0: self.tree.remove(__tree_node_minus)
         
-        self.tree.min_path_weight = _min_path_weight
+        self.tree.min_path_weight = _fault_tolerance_level
         idx = np.argmax(erv_deltas)
         return subset_candidates[idx], erv_deltas[idx]
 

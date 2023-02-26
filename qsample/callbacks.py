@@ -76,7 +76,7 @@ class PlotStats(Callback):
     def on_sampler_end(self, sampler):
         
         stats = sampler.stats()
-        xs = sampler.err_probs.T     
+        xs = sampler.err_params.T     
         x_label = sampler.err_model.groups
         
         def pop(stats_len, ax):

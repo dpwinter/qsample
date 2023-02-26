@@ -5,7 +5,7 @@ __all__ = ['tolists', 'lens', 'maxlen', 'pad', 'equalize_lens', 'err_probs_tomat
            'all_subsets', 'protocol_all_subsets', 'protocol_subset_occurence', 'Sampler']
 
 # %% ../../nbs/06b_sampler.base.ipynb 3
-from .tree import CountTree, Variable, Constant
+from .tree import CountTree, CircuitCountNode, SubsetCountNode
 
 from ..callbacks import CallbackList
 from tqdm.auto import tqdm
@@ -108,7 +108,7 @@ class Sampler:
 
         self.trees = dict()
         for prob_vec in err_probs_tomatrix(err_probs, self.err_model.groups):
-            tree = CountTree(fault_tolerance_level=2 if self.protocol.fault_tolerant else 1,
+            tree = CountTree(#fault_tolerance_level=1 if self.protocol.fault_tolerant else 0,
                              constants=protocol_subset_occurence(self.protocol_groups, self.protocol_subsets, prob_vec))
             self.trees[tuple(prob_vec)] = tree
          
@@ -161,29 +161,32 @@ class Sampler:
                 for name, circuit in self.protocol:
                     callbacks.on_circuit_begin()
 
-                    tree_node = tree.add(name=name, parent=tree_node, node_type=Variable)
+                    tree_node = tree.add(name=name, parent=tree_node, node_type=CircuitCountNode)
+                    # set tree_node.invariant = True if path has max weight 0.
                     tree_node.count += 1
                     opt_out = dict()
 
                     if circuit:
                         if not circuit._noisy:
                             msmt = state.run(circuit)
-                            subset = (0,)
+                            tree_node.invariant = True
+                            # subset = (0,) # bad
                         else:
                             opt_out = self.optimize(tree_node, circuit, prob_vec)
                             fault_circuit = self.err_model.run(circuit, opt_out['flocs'])
                             msmt = state.run(circuit, fault_circuit)
                             subset = opt_out['subset']
-                            
-                        tree_node = tree.add(name=subset, parent=tree_node, node_type=Constant, circuit_id=circuit.id,
-                                             det=True if circuit._ff_det and not any(subset) else False)
-                        tree_node.count += 1
+                            tree_node = tree.add(name=subset, parent=tree_node, node_type=SubsetCountNode, circuit_id=circuit.id,
+                                                 det=True if circuit._ff_det and not any(subset) else False)
+                            tree_node.count += 1
                               
                         self.protocol.send(msmt)
 
                     elif name != None:
                         tree.marked_leaves.add(tree_node)
+                    # set tree_node.invariant = True if path is invariant
                     
+                    # at end of each circuit update tree.constants if necessary?
                     callbacks.on_circuit_end(locals() | opt_out)
 
                 callbacks.on_protocol_end()
