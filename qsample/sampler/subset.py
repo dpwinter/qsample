@@ -308,4 +308,5 @@ class SubsetSamplerERV(SubsetSampler):
             if __tree_node_minus.count == 0: self.tree.remove(__tree_node_minus)
         
         idx = np.argmax(erv_deltas)
-        return subset_candidates[idx]#, erv_deltas[idx]
+        self.erv = erv_deltas[idx]
+        return subset_candidates[idx]
