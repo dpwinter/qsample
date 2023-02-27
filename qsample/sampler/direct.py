@@ -67,7 +67,7 @@ class DirectSampler:
         with open(path, 'wb') as fp:
             pickle.dump(self, fp)
             
-    def stats(self):
+    def stats(self, idx=None):
         """Calculate sampling statistics
         
         Returns
@@ -75,8 +75,10 @@ class DirectSampler:
         tuple
             (Logical failure rate, Wilson variance on logical failure rate)
         """
-        p_L = self.counts / self.shots
+        p_L = np.array([0 if s==0 else c/s for (c,s) in zip(self.counts, self.shots)])
         v_L = math.Wilson_var(p_L, self.shots)
+        if idx != None: p_L, v_L = p_L[idx], v_L[idx]
+        
         return p_L, np.sqrt(v_L)
             
     def run(self, n_shots, callbacks=[]):
@@ -89,13 +91,18 @@ class DirectSampler:
         callbacks : list of Callback
             Callback instances executed during sampling
         """
+        self.n_shots = n_shots
+        
         if not isinstance(callbacks, CallbackList):
             callbacks = CallbackList(sampler=self, callbacks=callbacks)
                     
-        self.stop_sampling = False # Flag can be controlled in callbacks
         callbacks.on_sampler_begin()
         
         for i, p in enumerate(self.err_params):
+            
+            self.stop_sampling = False # Flag can be controlled in callbacks
+            self.i = i
+            
             for _ in tqdm(range(n_shots), desc=f"p={tuple(map('{:.2e}'.format, p))}", leave=True):
                 
                 self.shots[i] += 1

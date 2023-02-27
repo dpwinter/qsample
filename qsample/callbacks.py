@@ -11,6 +11,7 @@ import numpy as np
 
 # %% ../nbs/05_callbacks.ipynb 4
 class Callback:
+    """Callback super class: All callbacks must inherit this class."""
     
     def on_sampler_begin(self, *args, **kwargs):
         pass
@@ -35,7 +36,27 @@ class Callback:
             json.dump(data, f)
     
 class CallbackList:
+    """Manages execution of all specified callbacks
+    
+    Attributes
+    ----------
+    sampler : Sampler
+        Reference to sampler class for callbacks to access information
+        during sampling process
+    callbacks : list
+        List of user-specified callback instances
+    """
+    
     def __init__(self, sampler, callbacks=[]):
+        """
+        Parameters
+        ----------
+        sampler : Sampler
+            Reference to sampler class for callbacks to access information
+            during sampling process
+        callbacks : list
+            List of user-specified callback instances
+        """
         self.sampler = sampler
         self.callbacks = callbacks
         self._add_default_callbacks()
@@ -44,26 +65,38 @@ class CallbackList:
         pass
     
     def on_sampler_begin(self):
+        """Called by sampler at beginning of sampling process"""
         for callback in self.callbacks:
             callback.on_sampler_begin(sampler=self.sampler)
             
     def on_sampler_end(self):
+        """Called by sampler at end of sampling process"""
         for callback in self.callbacks:
             callback.on_sampler_end(sampler=self.sampler)
             
     def on_protocol_begin(self):
+        """Called by sampler at beginning of each protocol"""
         for callback in self.callbacks:
             callback.on_protocol_begin(sampler=self.sampler)
             
     def on_protocol_end(self):
+        """Called by sampler at end of each protocol"""
         for callback in self.callbacks:
             callback.on_protocol_end(sampler=self.sampler)
             
     def on_circuit_begin(self):
+        """Called by sampler at beginning of each circuit"""
         for callback in self.callbacks:
             callback.on_circuit_begin(sampler=self.sampler)
             
     def on_circuit_end(self, local_vars):
+        """Called by sampler at end of each circuit
+        
+        Parameters
+        ----------
+        local_vars : dict
+            Dictionary of all local variables at state after circuit execution
+        """
         for callback in self.callbacks:
             callback.on_circuit_end(sampler=self.sampler, local_vars=local_vars)
             
@@ -135,15 +168,14 @@ class RelStdTarget(Callback):
         
     def on_protocol_end(self, sampler):
         if sampler.__class__.__name__ == "DirectSampler":
-            p_L, err = sampler.stats(tree_idx=sampler.tree_idx)
+            p_L, err = sampler.stats(idx=sampler.i)
         else:
-            
-            p_L = sampler.tree.rate
-            std = np.sqrt(sampler.tree.variance)
-            delta = sampler.tree.delta
+            p_L = sampler.tree.path_sum(sampler.tree.root, mode=1)
+            std = np.sqrt(sampler.tree.uncertainty_propagated_variance(mode=1))
+            delta = 1 - sampler.tree.path_sum(sampler.tree.root, mode=2)
             
             err = std + delta if self.include_delta else std
-        
+            
         if p_L > 0 and err / p_L < self.target: 
             print(f'Rel. std target of {self.target} reached. Sampling stopped.') 
             sampler.stop_sampling = True
@@ -158,33 +190,35 @@ class StatsPerSample(Callback):
     def on_protocol_end(self, sampler):
         
         if sampler.__class__.__name__ == "DirectSampler":
-            stats = sampler.stats(tree_idx=sampler.tree_idx)
+            stats = sampler.stats(idx=sampler.i)
         else:
-            p_L = sampler.tree.rate
-            std = np.sqrt(sampler.tree.variance)
-            delta = sampler.tree.delta
-            std_up = np.sqrt(sampler.tree.variance_ub)
+            p_L = sampler.tree.path_sum(sampler.tree.root, mode=1)
+            std = np.sqrt(sampler.tree.uncertainty_propagated_variance(mode=1))
+            delta = 1 - sampler.tree.path_sum(sampler.tree.root, mode=2)
+            
+            std_up = np.sqrt(sampler.tree.uncertainty_propagated_variance(mode=0))
             stats = [p_L, std, delta, std_up]
             stats = [e if not isinstance(e,np.ndarray) else e[0] for e in stats]
             
         self.data.append(stats)
         self.n_calls += 1
+        self.n_shots = sampler.n_shots
     
     def on_sampler_end(self, **kwargs):
         
         data = np.array(self.data).T
-        x = range(self.n_calls)        
         n_cols = data.shape[0]
             
         fig, ax = plt.subplots(1, n_cols, figsize=(8*n_cols, 5))
         labels = ['$p_L$', 'std[$p_L$]', '$\delta$', 'std[$p_L^{up}$]']
         
         for i in range(n_cols):
-            ax[i].plot(x, data[i])
-            ax[i].set_xlabel('# of samples')
-            ax[i].set_ylabel(labels[i])
-            if i != 0:
-                ax[i].set_yscale('log')
+            for j in range(int(self.n_calls / self.n_shots)):
+                ax[i].plot(range(self.n_shots), data[i][j*self.n_shots:(j+1)*self.n_shots])
+                ax[i].set_xlabel('# of samples')
+                ax[i].set_ylabel(labels[i])
+                if i != 0:
+                    ax[i].set_yscale('log')
 
 # %% ../nbs/05_callbacks.ipynb 8
 class VerboseCircuitExec(Callback):
@@ -192,8 +226,9 @@ class VerboseCircuitExec(Callback):
     def on_circuit_end(self, sampler, local_vars):
         circuit = local_vars.get('circuit', None)
         fault_circuit = local_vars.get('fault_circuit', None)
-        name = local_vars.get('name', None)
+        name = local_vars.get('pnode', None)
         msmt = local_vars.get('msmt', None)
+
         if circuit == None:
             print(name)
         elif circuit._noisy:
@@ -206,6 +241,7 @@ class VerboseCircuitExec(Callback):
             print(f"{name} -> Msmt: {msmt}")
 
 # %% ../nbs/05_callbacks.ipynb 9
+## CHECK ERV
 class ErvPerSample(Callback):
     def __init__(self, log_dir=None):
         self.log_dir = log_dir
@@ -260,15 +296,15 @@ class PathProducts(Callback):
         self.log_dir = log_dir
         
     def on_sampler_end(self, sampler):
-        from qsample.sampler.tree import Constant, Variable
+        from qsample.sampler.tree import SubsetCountNode, CircuitCountNode
         data = []
         names, marked = [], []
         for leaf in sampler.tree.root.leaves:
             if not leaf.is_root:
                 names.append( ":".join([f'{n.name}' for n in leaf.path]) )
-                marked.append(1 if leaf.marked else 0)
-                pw_prod = np.prod([node.rate for node in leaf.path[1:] if isinstance(node, Variable)]) * 1 if leaf.marked else 0
-                Aw_prod = np.prod([sampler.tree.constants[node.cid][node.name] for node in leaf.path[1:] if isinstance(node, Constant)])
+                marked.append(1 if leaf in sampler.tree.marked_leaves else 0)
+                pw_prod = np.prod([node.rate for node in leaf.path[1:] if isinstance(node, CircuitCountNode)]) * 1 if leaf in sampler.tree.marked_leaves else 0
+                Aw_prod = np.prod([sampler.tree.constants[node.circuit_id][node.name] for node in leaf.path[1:] if isinstance(node, SubsetCountNode)])
                 data.append( (pw_prod, Aw_prod, Aw_prod * pw_prod) )
                 
         self.plot(names, marked, np.array(data))
@@ -301,10 +337,10 @@ class SubsetRates(Callback):
         
     def on_protocol_end(self, sampler):
         for leaf in sampler.tree.root.leaves:
-            if not leaf.is_root and leaf.marked:
+            if not leaf.is_root and leaf in sampler.tree.marked_leaves:
                 name = ":".join([f'{n.name}' for n in leaf.path]) 
                 prev_data = self.data.get(name, [])
-                prod = np.product([sampler.tree.multiplier(node) for node in leaf.path[1:]])
+                prod = np.product([sampler.tree._get_node_value(node) for node in leaf.path[1:]])
                 self.data[name] = prev_data + [(leaf.rate, prod)]
         self.n_calls += 1
 

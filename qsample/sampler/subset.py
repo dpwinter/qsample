@@ -142,6 +142,8 @@ class SubsetSampler:
         callbacks : list of Callback
             Callback instances executed during sampling
         """
+        self.n_shots = n_shots
+        
         if not isinstance(callbacks, CallbackList):
             callbacks = CallbackList(sampler=self, callbacks=callbacks)
             
@@ -187,6 +189,7 @@ class SubsetSampler:
                         self.tree.marked_leaves.add(tnode)
                     break
                 callbacks.on_circuit_end(locals())
+                
             callbacks.on_protocol_end()
             if self.stop_sampling:
                 break

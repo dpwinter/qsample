@@ -315,7 +315,7 @@ class CountTree:
         return path_weight
     
     
-    def __get_node_value(self, node):
+    def _get_node_value(self, node):
         """Lookup the value of a node.
         
         For `CircuitCountNode` return its `rate`, for `SubsetCountNode` return a corresponding
@@ -357,7 +357,7 @@ class CountTree:
                     # exclude start_node value
                     break
                 else:
-                    prod *= self.__get_node_value(node)
+                    prod *= self._get_node_value(node)
             return prod
     
     def path_sum(self, start_node, mode):
