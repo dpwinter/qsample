@@ -58,7 +58,7 @@ class Circuit(MutableSequence):
         Unique circuit identifier
     """
     
-    def __init__(self, ticks=[], noisy=True, ff_det=False):
+    def __init__(self, ticks=None, noisy=True, ff_det=False):
         """
         Parameters
         ----------
@@ -70,7 +70,7 @@ class Circuit(MutableSequence):
             If true, the measurement result of the circuit in the
             fault-free case is always deterministic
         """
-        self._ticks = ticks
+        self._ticks = ticks if ticks else [] # Must do this way, else keeps appending to same instance
         self._noisy = noisy
         self._ff_det = ff_det # fault-free deterministic
         

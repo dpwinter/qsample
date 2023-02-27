@@ -10,7 +10,6 @@ website:
       - 04c_sim.statevector.ipynb
       - 05_callbacks.ipynb
       - 06a_sampler.tree.ipynb
-      - 06b_sampler.base.ipynb
       - 06c_sampler.direct.ipynb
       - 06d_sampler.subset.ipynb
       - 07_noise.ipynb

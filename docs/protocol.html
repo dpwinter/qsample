@@ -209,11 +209,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./sampler.base.html" class="sidebar-item-text sidebar-link">Sampler base class</a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="./sampler.direct.html" class="sidebar-item-text sidebar-link">Direct Monte Carlo sampler</a>
   </div>
 </li>
@@ -415,60 +410,23 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <pre><code> Protocol (ft_level=0, check_functions={}, *args, **kwargs)</code></pre>
 </blockquote>
 <p>Representation of a Quantum (Error Correction) Protocol</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> qsample.examples <span class="im">import</span> ghz1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display">
-<p><img src="03_protocol_files/figure-html/cell-6-output-1.png" class="img-fluid"></p>
-</div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span>(ghz1.successor(<span class="st">'START'</span>, {})[<span class="dv">0</span>] <span class="op">==</span> <span class="st">'ghz'</span>)</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span>(ghz1.successor(<span class="st">'ghz'</span>, {<span class="st">'ghz'</span>: [<span class="dv">1</span>]})[<span class="dv">0</span>] <span class="op">==</span> <span class="st">'FAIL'</span>)</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>ghz1.successor(<span class="st">'ghz'</span>, {<span class="st">'ghz'</span>: [<span class="dv">1</span>]})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display">
+<div class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> qsample.examples <span class="im">import</span> ghz1</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span>(ghz1.successor(<span class="st">'START'</span>, {})[<span class="dv">0</span>] <span class="op">==</span> <span class="st">'ghz'</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span>(ghz1.successor(<span class="st">'ghz'</span>, {<span class="st">'ghz'</span>: [<span class="dv">1</span>]})[<span class="dv">0</span>] <span class="op">==</span> <span class="st">'FAIL'</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>ghz1.successor(<span class="st">'ghz'</span>, {<span class="st">'ghz'</span>: [<span class="dv">1</span>]})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
 <pre><code>('FAIL', None)</code></pre>
 </div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> qsample.circuit <span class="im">import</span> Circuit</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>ghz <span class="op">=</span> Circuit([ {<span class="st">"init"</span>: {<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>}},</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>                {<span class="st">"H"</span>: {<span class="dv">0</span>}},</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>                {<span class="st">"CNOT"</span>: {(<span class="dv">0</span>,<span class="dv">1</span>)}},</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>                {<span class="st">"CNOT"</span>: {(<span class="dv">1</span>,<span class="dv">2</span>)}},</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>                {<span class="st">"CNOT"</span>: {(<span class="dv">2</span>,<span class="dv">3</span>)}},</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>                {<span class="st">"CNOT"</span>: {(<span class="dv">3</span>,<span class="dv">4</span>)}},</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>                {<span class="st">"CNOT"</span>: {(<span class="dv">0</span>,<span class="dv">4</span>)}},</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>                {<span class="st">"measure"</span>: {<span class="dv">4</span>}}   ], ff_det<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> gen_ghz3():</span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> repeat(m):</span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="bu">len</span>(m) <span class="op">&lt;</span> <span class="dv">3</span> <span class="kw">and</span> m[<span class="op">-</span><span class="dv">1</span>] <span class="op">==</span> <span class="dv">1</span></span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> logErr(m):</span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="bu">len</span>(m) <span class="op">&gt;=</span> <span class="dv">3</span> <span class="kw">and</span> <span class="bu">sum</span>(m) <span class="op">==</span> <span class="bu">len</span>(m)</span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>    functions <span class="op">=</span> {<span class="st">'logErr'</span>: logErr, <span class="st">'repeat'</span>: repeat}</span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>    ghz3 <span class="op">=</span> Protocol(ft_level<span class="op">=</span><span class="dv">1</span>, check_functions<span class="op">=</span>functions)</span>
-<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>    ghz3.add_node(<span class="st">'ghz'</span>, circuit<span class="op">=</span>ghz)</span>
-<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>    ghz3.add_edge(<span class="st">'START'</span>, <span class="st">'ghz'</span>, check<span class="op">=</span><span class="st">'True'</span>)</span>
-<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>    ghz3.add_edge(<span class="st">'ghz'</span>, <span class="st">'ghz'</span>, check<span class="op">=</span><span class="st">'repeat(ghz)'</span>)</span>
-<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>    ghz3.add_edge(<span class="st">'ghz'</span>, <span class="st">'FAIL'</span>, check<span class="op">=</span><span class="st">'logErr(ghz)'</span>)</span>
-<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> ghz3</span>
-<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>ghz3 <span class="op">=</span> gen_ghz3()</span>
-<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>ghz3.draw()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-<p><img src="03_protocol_files/figure-html/cell-8-output-1.png" class="img-fluid"></p>
+<p><img src="03_protocol_files/figure-html/cell-6-output-2.png" class="img-fluid"></p>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span>(ghz3.successor(<span class="st">'START'</span>, {})[<span class="dv">0</span>] <span class="op">==</span> <span class="st">'ghz'</span>)</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span>(ghz3.successor(<span class="st">'ghz'</span>, {<span class="st">'ghz'</span>: [<span class="dv">1</span>]})[<span class="dv">0</span>] <span class="op">==</span> <span class="st">'ghz'</span>)</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span>(ghz3.successor(<span class="st">'ghz'</span>, {<span class="st">'ghz'</span>: [<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>]})[<span class="dv">0</span>] <span class="op">==</span> <span class="st">'FAIL'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> qsample.examples <span class="im">import</span> ghz3</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span>(ghz3.successor(<span class="st">'START'</span>, {})[<span class="dv">0</span>] <span class="op">==</span> <span class="st">'ghz'</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span>(ghz3.successor(<span class="st">'ghz'</span>, {<span class="st">'ghz'</span>: [<span class="dv">1</span>]})[<span class="dv">0</span>] <span class="op">==</span> <span class="st">'ghz'</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span>(ghz3.successor(<span class="st">'ghz'</span>, {<span class="st">'ghz'</span>: [<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>]})[<span class="dv">0</span>] <span class="op">==</span> <span class="st">'FAIL'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 
 

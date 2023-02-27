@@ -4,7 +4,6 @@
 __all__ = ['SubsetSampler', 'SubsetSamplerERV']
 
 # %% ../../nbs/06d_sampler.subset.ipynb 3
-# from qsample.sampler.base import Sampler, protocol_subset_occurence, err_probs_tomatrix, equalize_lens
 from .tree import CountTree, CircuitCountNode, SubsetCountNode
 import qsample.math as math
 
@@ -13,7 +12,7 @@ from tqdm.auto import tqdm
 
 import numpy as np
 
-# %% ../../nbs/06d_sampler.subset.ipynb 5
+# %% ../../nbs/06d_sampler.subset.ipynb 4
 class SubsetSampler:
     """Class to represent subset sampler
     
@@ -29,8 +28,12 @@ class SubsetSampler:
         Simulator used during sampling
     err_model : ErrorModel
         Error model used during sampling
+    err_params : dict
+        Physical error rates per faulty partition group at which plots generated.
     p_max : dict
         Error probabilities per faulty partition member (one float per member)
+    partitions : dict
+        Grouping of faulty circuit elements fore each circuit in protocol
     tree : CountTree
         Tree data structure to keep track of sampled events
     """
@@ -104,7 +107,7 @@ class SubsetSampler:
     def __explore_weight0_subset(self):
         pass
 
-    def __choose_subset(self, tnode, circuit):
+    def _choose_subset(self, tnode, circuit):
         """Choose a subset for `circuit`, based on current `tnode`
         
         Choice is based on subset occurence probability (Aws).
@@ -147,7 +150,7 @@ class SubsetSampler:
         self.stop_sampling = False # Flag can be controlled in callbacks
         callbacks.on_sampler_begin()
         
-        for _ in tqdm(range(n_shots), leave=True):
+        for _ in tqdm(range(n_shots), desc=f"p={tuple(map('{:.2e}'.format, self.p_max))}"):
             callbacks.on_protocol_begin()
             pnode = self.protocol.root # get protocol start node
             state = self.simulator(len(self.protocol.qubits)) # init state
@@ -166,35 +169,54 @@ class SubsetSampler:
                         msmt = state.run(circuit)
                         tnode.invariant = True
                     else:
-                        subset = self.__choose_subset(tnode, circuit)
+                        subset = self._choose_subset(tnode, circuit)
                         fault_locs = self.err_model.choose_w(self.partitions[circuit.id], subset)
                         fault_circuit = self.err_model.run(circuit, fault_locs)
                         msmt = state.run(circuit, fault_circuit)
                         tnode = self.tree.add(name=subset, parent=tnode, node_type=SubsetCountNode, circuit_id=circuit.id,
                                               invariant=True if circuit._ff_det and not any(subset) else False)
                         tnode.count += 1
-                    msmt = msmt if msmt==None else int(msmt,2)
+                    msmt = msmt if msmt==None else int(msmt,2) # convert to int for comparison in checks
                     msmt_hist[pnode] = msmt_hist.get(pnode, []) + [msmt]
                 else:
                     if self.tree.path_weight(tnode) <= self.protocol.ft_level:
-                        # Set only leaf node invariant
+                        # Set leaf node invariant
                         tnode.invariant = True
-                    if tnode.name != None:
+                    if pnode != None:
                         # "Interesting" event happened
                         self.tree.marked_leaves.add(tnode)
                     break
-                callbacks.on_circuit_end(None) # !!! MUST FIX CIRCUIT END CALLBACK DATA!
+                callbacks.on_circuit_end(locals())
             callbacks.on_protocol_end()
             if self.stop_sampling:
                 break
         del self.stop_sampling
         callbacks.on_sampler_end()
 
-# %% ../../nbs/06d_sampler.subset.ipynb 6
+# %% ../../nbs/06d_sampler.subset.ipynb 5
 class SubsetSamplerERV(SubsetSampler):
-    """Subset sampler with ERV optimize function"""
+    """Subset sampler implementing ERV sampling technique
+    
+    Attributes
+    ----------
+    k : int
+        Application of ERV every k-th shots
+    """
+    
+    def __init__(self, protocol, simulator, p_max, err_model, err_params=None, k=1):
+        super().__init__(protocol, simulator, p_max, err_model, err_params)
+        self.k = k
     
     def wplus1(self, tree_node, circuit):
+        """Return subsets of this `tree_node` plus next important subset
+        
+        Parameters
+        ----------
+        tree_node : CircuitCountNode
+            Circuit node for which subsets are returned
+        circuit : Circuit
+            Circuit corresponding to `tree_node`
+        """
         Aws = self.tree.constants[circuit.id]
         sampled_subsets = [n.name for n in tree_node.children]
         unsampled_Aws = {k:v for k,v in Aws.items() if k not in sampled_subsets}
@@ -206,16 +228,29 @@ class SubsetSamplerERV(SubsetSampler):
             
         return subset_candidates
     
-    def ERV(self, tree_node, circuit):
-    
-        # self._set_subsets() # problem, this sets full Aws, we want at pmax. (not saved)
-        # self.tree.constants = protocol_subset_occurence(self.protocol_groups, self.protocol_subsets, self.err_probs)
+    def _choose_subset(self, tree_node, circuit):
+        """ERV criterium to choose subsets
+        
+        For every k-th shot execute ERV, otherwise choose default routine
+        `SubsetSampler._choose_subset`. 
+        
+        Parameters
+        ----------
+        tree_node : CircuitCountNode
+            Current tree node we want to sample from
+        circuit : Circuit
+            Current circuit associated with tree node
+        
+        Returns
+        -------
+        tuple
+            Next subset to choose for `tree_node`
+        """
+        
+        if self.tree.root.count % self.k != 0:
+            return super()._choose_subset(tree_node, circuit)
         
         subset_candidates = self.wplus1(tree_node, circuit)
-        
-        # ERV
-        _fault_tolerance_level = self.tree.fault_tolerance_level
-        self.tree.fault_tolerance_level = 0
         
         erv_deltas = np.ma.zeros(shape=len(subset_candidates))
         delta = 1 - self.tree.path_sum(self.tree.root, mode=2)
@@ -224,6 +259,7 @@ class SubsetSamplerERV(SubsetSampler):
         for i, subset in enumerate(subset_candidates):
             
             if circuit._ff_det and not any(subset):
+                # deterministic circuit: exclude w=0 subset
                 erv_deltas[i] = np.ma.masked
                 continue
             
@@ -264,16 +300,9 @@ class SubsetSamplerERV(SubsetSampler):
             erv_delta = np.abs(v_L - _v_L + _delta - delta)
             erv_deltas[i] = erv_delta
             
-            if _tree_node.count == 0:self.tree.remove(_tree_node)
+            if _tree_node.count == 0: self.tree.remove(_tree_node)
             if __tree_node_plus.count == 0: self.tree.remove(__tree_node_plus)
             if __tree_node_minus.count == 0: self.tree.remove(__tree_node_minus)
         
-        self.tree.min_path_weight = _fault_tolerance_level
         idx = np.argmax(erv_deltas)
-        return subset_candidates[idx], erv_deltas[idx]
-
-    def optimize(self, tree_node, circuit, prob_vec):
-        subset, erv = self.ERV(tree_node, circuit)
-        locgrps = self.protocol_groups[circuit.id]
-        flocs = self.err_model.choose_w(locgrps, subset)
-        return {'subset': subset, 'flocs': flocs, 'erv': erv}
+        return subset_candidates[idx]#, erv_deltas[idx]

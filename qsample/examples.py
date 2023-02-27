@@ -204,7 +204,7 @@ def gen_ghz_stab():
     ghz_stab = Protocol(check_functions=functions)
     ghz_stab.add_nodes_from(['ghz', 'meas_1', 'meas_2'], circuits=[ghz, ghz_stabs, ghz_stabs])
 
-    ghz_stab.add_node('COR')
+    # ghz_stab.add_node('COR')
     ghz_stab.add_edge('START', 'ghz', check='True')
     ghz_stab.add_edge('ghz', 'ghz', check='ghz[-1]==1')
     ghz_stab.add_edge('ghz', 'meas_1', check='ghz[-1]==0')

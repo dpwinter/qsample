@@ -160,6 +160,9 @@ class Protocol(nx.DiGraph):
             if isinstance(check_return, Circuit):
                 # Correction node: Update circuits
                 # self.circuits[check_return.id] = check_return ### !!! MUST FIX: ADD COR CIRCUITS.
+                # succ_name = f"{succ_name}_{check_return.id}"
+                # circuit_id = check_return.id
+                # self.add_node(succ_name, check_return)
                 return succ_name, check_return
             return succ_name, self.circuits[ self.nodes(data='circuit_id')[succ_name] ]
     

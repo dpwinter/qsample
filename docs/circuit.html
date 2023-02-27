@@ -209,11 +209,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./sampler.base.html" class="sidebar-item-text sidebar-link">Sampler base class</a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="./sampler.direct.html" class="sidebar-item-text sidebar-link">Direct Monte Carlo sampler</a>
   </div>
 </li>
@@ -302,7 +297,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <section id="circuit" class="level3">
 <h3 class="anchored" data-anchor-id="circuit">Circuit</h3>
 <blockquote class="blockquote">
-<pre><code> Circuit (ticks=[], noisy=True, ff_det=False)</code></pre>
+<pre><code> Circuit (ticks=None, noisy=True, ff_det=False)</code></pre>
 </blockquote>
 <p>Representation of a quantum circuit</p>
 <div class="cell">
@@ -327,12 +322,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="cell">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># c = Circuit(ticks=[{'init': {0,1,2,3}}, {'X': {0,1}}, {'CNOT': {(0,3)}}, {'measure': {1,3}}])</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># c.partition</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>c <span class="op">=</span> Circuit()</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>c.insert(tick_index<span class="op">=</span><span class="dv">0</span>, tick<span class="op">=</span>{<span class="st">'Z'</span>: {<span class="dv">0</span>}})</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>c</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-<pre><code>{'init': [(0, 0), (0, 1), (0, 2), (0, 3)],
- 'q1': [(1, 0), (1, 1)],
- 'q2': [(2, (0, 3))],
- 'meas': [(3, 1), (3, 3)],
- 'idle': [(1, 2), (1, 3), (2, 1), (2, 2), (3, 0), (3, 2)]}</code></pre>
+<pre><code>0: {'Z': {0}}</code></pre>
 </div>
 </div>
 
