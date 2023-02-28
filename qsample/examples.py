@@ -16,7 +16,7 @@ ghz = Circuit([ {"init": {0,1,2,3,4}},
                 {"CNOT": {(2,3)}},
                 {"CNOT": {(3,4)}},
                 {"CNOT": {(0,4)}},
-                {"measure": {4}}   ], ff_det=True)
+                {"measure": {4}}   ], ff_deterministic=True)
 
 # %% ../nbs/09_examples.ipynb 7
 # stabilizers for 4-qubit ghz state are XXXX and three ZZ parity checks
@@ -58,7 +58,7 @@ eft = Circuit([ {"init": {0,1,2,4,3,5,6,7}},
                 {"CNOT": {(4,7)}},
                 {"CNOT": {(2,7)}},
                 {"CNOT": {(5,7)}},
-                {"measure": {7}} ], ff_det=True)
+                {"measure": {7}} ], ff_deterministic=True)
 
 # %% ../nbs/09_examples.ipynb 11
 sz_123 = Circuit([{"init": {8}},
@@ -153,9 +153,8 @@ def gen_ghz1():
     
     return ghz1
 ghz1 = gen_ghz1()
-ghz1.draw()
 
-# %% ../nbs/09_examples.ipynb 20
+# %% ../nbs/09_examples.ipynb 21
 def gen_ghz3():
     
     def repeat(m):
@@ -177,7 +176,7 @@ def gen_ghz3():
     return ghz3
 ghz3 = gen_ghz3()
 
-# %% ../nbs/09_examples.ipynb 23
+# %% ../nbs/09_examples.ipynb 24
 def gen_ghz_stab():
     def logErr(m):
         return m != 0b0000
@@ -217,7 +216,7 @@ def gen_ghz_stab():
     return ghz_stab
 ghz_stab = gen_ghz_stab()
 
-# %% ../nbs/09_examples.ipynb 26
+# %% ../nbs/09_examples.ipynb 27
 def gen_ftsteane():
     k1 = 0b0001111
     k2 = 0b1010101
@@ -262,7 +261,7 @@ def gen_ftsteane():
     return ftsteane
 ftsteane = gen_ftsteane()
 
-# %% ../nbs/09_examples.ipynb 29
+# %% ../nbs/09_examples.ipynb 30
 def gen_steane0():
     k1 = 0b0001111
     k2 = 0b1010101
@@ -327,7 +326,7 @@ def gen_steane0():
 
 steane0 = gen_steane0()
 
-# %% ../nbs/09_examples.ipynb 32
+# %% ../nbs/09_examples.ipynb 33
 def gen_flagstab():
     k1 = 0b0001111
     k2 = 0b1010101
@@ -395,7 +394,7 @@ def gen_flagstab():
     flagstab = Protocol(check_functions=functions)
 
     flagstab.add_nodes_from(['X1', 'X2', 'X3', 'nonFT', 'meas'], circuits=[fmx_1, fmx_2, fmx_3, nfs, meas7])
-    flagstab.add_node('COR', circuit=Circuit(noisy=False))
+    flagstab.add_node('COR')
 
     flagstab.add_edge('START', 'X1', check='True')
 

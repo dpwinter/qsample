@@ -59,7 +59,7 @@ def binom(k, n, p):
 # %% ../nbs/01_math.ipynb 7
 def joint_binom(k, n, p):
     """Product of independent binomial distributions with
-    parameters `k`, `n` and same `p`.
+    parameters `k`, `n` and `p` (can be list of lists)
     
     Example
     -------
@@ -72,7 +72,7 @@ def joint_binom(k, n, p):
         List of first parameters of combination
     k : list of int
         List of second parameters of combination
-    p : float list of float
+    p : list of list, list of float, or float
         Probability
         
     Returns
@@ -80,7 +80,7 @@ def joint_binom(k, n, p):
     np.array
         Joint probability
     """
-    return np.prod(binom(k,n,p), axis=-1)
+    return np.prod(binom(k,n,p), axis=-1) # In case p is list of list: vector, else scalar
 
 # %% ../nbs/01_math.ipynb 9
 def Wilson_var(p, N):
@@ -90,7 +90,7 @@ def Wilson_var(p, N):
     
     .. math:: CI = p+z^2/(2n) \pm z\sqrt{pq/n + z^2/(4n^2)}/(1 + z^2/n)
     
-    which we assume symmetric, s.t. we can extract the std (z=1), thus:
+    we can extract the std (z=1), thus:
     
     .. math: Var[p] = (CI/2)^2 = (npq + 0.25) / (1 + n)^2
     

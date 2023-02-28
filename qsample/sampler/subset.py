@@ -4,7 +4,7 @@
 __all__ = ['SubsetSampler', 'SubsetSamplerERV']
 
 # %% ../../nbs/06d_sampler.subset.ipynb 3
-from .tree import CountTree, CircuitCountNode, SubsetCountNode
+from .tree import CountTree, Variable, Constant
 import qsample.math as math
 import qsample.utils as utils
 
@@ -96,10 +96,7 @@ class SubsetSampler:
     
     def save(self, path):
         utils.save(path)
-            
-    def __explore_weight0_subset(self):
-        pass
-
+        
     def _choose_subset(self, tnode, circuit):
         """Choose a subset for `circuit`, based on current `tnode`
         
@@ -109,7 +106,7 @@ class SubsetSampler:
         
         Parameters
         ----------
-        tnode : CircuitCountNode
+        tnode : Variable
             Current tree node we want to sample from
         circuit : Circuit
             Current circuit associated with tree node
@@ -120,7 +117,7 @@ class SubsetSampler:
             Next subset to choose for `tnode`
         """
         subsets, Aws = zip(*self.tree.constants[circuit.id].items())
-        if circuit._ff_det and subsets[0] in {n.name for n in tnode.children}:
+        if circuit.ff_deterministic and subsets[0] in {n.name for n in tnode.children}:
             Aws = np.ma.masked_array(Aws)
             Aws[0] = np.ma.masked
         return subsets[ np.random.choice(len(subsets), p=Aws) ]
@@ -153,13 +150,15 @@ class SubsetSampler:
             while True:
                 callbacks.on_circuit_begin()
                 pnode, circuit = self.protocol.successor(pnode, msmt_hist)
-                tnode = self.tree.add(name=pnode, parent=tnode, node_type=CircuitCountNode)
-                if self.tree.path_weight(tnode) == 0:
+                tnode = self.tree.add(name=pnode, parent=tnode, node_type=Variable)
+                if self.tree._path_weight(tnode) == 0:
                     # Nodes along weight-0 path have no variance
                     tnode.invariant = True
                 tnode.count += 1
                 if circuit:
-                    if not circuit._noisy:
+                    tnode.deterministic = circuit.ff_deterministic
+                    tnode.circuit_id = circuit.id
+                    if not circuit.noisy:
                         msmt = state.run(circuit)
                         tnode.invariant = True
                     else:
@@ -167,13 +166,14 @@ class SubsetSampler:
                         fault_locs = self.err_model.choose_w(self.partitions[circuit.id], subset)
                         fault_circuit = self.err_model.run(circuit, fault_locs)
                         msmt = state.run(circuit, fault_circuit)
-                        tnode = self.tree.add(name=subset, parent=tnode, node_type=SubsetCountNode, circuit_id=circuit.id,
-                                              invariant=True if circuit._ff_det and not any(subset) else False)
+                        if tnode.deterministic and not any(subset):
+                            tnode.invariant = True
+                        tnode = self.tree.add(name=subset, parent=tnode, node_type=Constant)
                         tnode.count += 1
                     msmt = msmt if msmt==None else int(msmt,2) # convert to int for comparison in checks
                     msmt_hist[pnode] = msmt_hist.get(pnode, []) + [msmt]
                 else:
-                    if self.tree.path_weight(tnode) <= self.protocol.ft_level:
+                    if self.tree._path_weight(tnode) <= self.protocol.ft_level:
                         # Leaf nodes of path weight ft_level have not variance
                         tnode.invariant = True
                     if pnode != None:
@@ -207,7 +207,7 @@ class SubsetSamplerERV(SubsetSampler):
         
         Parameters
         ----------
-        tree_node : CircuitCountNode
+        tree_node : Variable
             Circuit node for which subsets are returned
         circuit : Circuit
             Circuit corresponding to `tree_node`
@@ -231,7 +231,7 @@ class SubsetSamplerERV(SubsetSampler):
         
         Parameters
         ----------
-        tree_node : CircuitCountNode
+        tree_node : Variable
             Current tree node we want to sample from
         circuit : Circuit
             Current circuit associated with tree node
@@ -253,25 +253,25 @@ class SubsetSamplerERV(SubsetSampler):
         
         for i, subset in enumerate(subset_candidates):
             
-            if circuit._ff_det and not any(subset):
+            if circuit.ff_deterministic and not any(subset):
                 # deterministic circuit: exclude w=0 subset
                 erv_deltas[i] = np.ma.masked
                 continue
             
-            _tree_node = self.tree.add(name=subset, parent=tree_node, circuit_id=circuit.id, node_type=SubsetCountNode)
+            _tree_node = self.tree.add(name=subset, parent=tree_node, node_type=Constant)
             children = _tree_node.children
             
             if len(children) == 0:
-                __tree_node_minus = self.tree.add(name=None, parent=_tree_node, node_type=CircuitCountNode)
-                __tree_node_plus = self.tree.add(name='FAIL', parent=_tree_node, node_type=CircuitCountNode)
+                __tree_node_minus = self.tree.add(name=None, parent=_tree_node, circuit_id=circuit.id, node_type=Variable)
+                __tree_node_plus = self.tree.add(name='FAIL', parent=_tree_node, circuit_id=circuit.id, node_type=Variable)
                 self.tree.marked_leaves.add(__tree_node_plus)
             elif len(children) == 1:
                 if children[0] in self.tree.marked_leaves:
-                    __tree_node_minus = self.tree.add(name=None, parent=_tree_node, node_type=CircuitCountNode)
+                    __tree_node_minus = self.tree.add(name=None, parent=_tree_node, circuit_id=circuit.id, node_type=Variable)
                     __tree_node_plus = children[0]
                 else:
                     __tree_node_minus = children[0]
-                    __tree_node_plus = self.tree.add(name='FAIL', parent=_tree_node, node_type=CircuitCountNode)
+                    __tree_node_plus = self.tree.add(name='FAIL', parent=_tree_node, circuit_id=circuit.id, node_type=Variable)
                     self.tree.marked_leaves.add(__tree_node_plus)
             elif len(children) == 2:
                 __tree_node_minus, __tree_node_plus = children

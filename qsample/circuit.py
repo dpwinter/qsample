@@ -93,9 +93,9 @@ class Circuit(MutableSequence):
     ----------
     _ticks : list of dict
         List of ticks in the circuit
-    _noisy : bool
+    noisy : bool
         If true, circuit is subject to noise during sampling
-    _ff_det : bool
+    ff_deterministic : bool
         If true, the measurement result of the circuit in the
         fault-free case is always deterministic
     qubits : set
@@ -108,7 +108,7 @@ class Circuit(MutableSequence):
         Unique circuit identifier
     """
     
-    def __init__(self, ticks=None, noisy=True, ff_det=False):
+    def __init__(self, ticks=None, noisy=True, ff_deterministic=False):
         """
         Parameters
         ----------
@@ -121,8 +121,8 @@ class Circuit(MutableSequence):
             fault-free case is always deterministic
         """
         self._ticks = ticks if ticks else [] # Must do this way, else keeps appending to same instance
-        self._noisy = noisy
-        self._ff_det = ff_det # fault-free deterministic
+        self.noisy = noisy
+        self.ff_deterministic = ff_deterministic # fault-free deterministic
         
     def __getitem__(self, tick_index):
         return self._ticks[tick_index]

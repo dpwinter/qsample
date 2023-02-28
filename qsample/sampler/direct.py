@@ -115,7 +115,7 @@ class DirectSampler:
                     callbacks.on_circuit_begin()
                     pnode, circuit = self.protocol.successor(pnode, msmt_hist)
                     if circuit:
-                        if not circuit._noisy:
+                        if not circuit.noisy:
                             msmt = state.run(circuit)
                         else:
                             fault_locs = self.err_model.choose_p(self.partitions[circuit.id], p)

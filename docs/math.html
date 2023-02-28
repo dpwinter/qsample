@@ -367,7 +367,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <blockquote class="blockquote">
 <pre><code> joint_binom (k, n, p)</code></pre>
 </blockquote>
-<p>Product of independent binomial distributions with parameters <code>k</code>, <code>n</code> and same <code>p</code>.</p>
+<p>Product of independent binomial distributions with parameters <code>k</code>, <code>n</code> and <code>p</code> (can be list of lists)</p>
 <table class="table">
 <thead>
 <tr class="header">
@@ -389,7 +389,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </tr>
 <tr class="odd">
 <td>p</td>
-<td>float list of float</td>
+<td>list of list, list of float, or float</td>
 <td>Probability</td>
 </tr>
 <tr class="even">
@@ -413,7 +413,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Wilson estimator of binomial variance</p>
 <p>The formula for the Wilson interval is:</p>
 <p>.. math:: CI = p+z^2/(2n) z/(1 + z^2/n)</p>
-<p>which we assume symmetric, s.t. we can extract the std (z=1), thus:</p>
+<p>we can extract the std (z=1), thus:</p>
 <p>.. math: Var[p] = (CI/2)^2 = (npq + 0.25) / (1 + n)^2</p>
 <table class="table">
 <thead>
