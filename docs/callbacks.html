@@ -111,6 +111,11 @@ ul.task-list li input[type="checkbox"] {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./utils.html" class="sidebar-item-text sidebar-link">Utilities</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./circuit.html" class="sidebar-item-text sidebar-link">Circuit</a>
   </div>
 </li>
@@ -136,27 +141,27 @@ ul.task-list li input[type="checkbox"] {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./callbacks.html" class="sidebar-item-text sidebar-link active">Sampler Callbacks</a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="./sampler.tree.html" class="sidebar-item-text sidebar-link">Count Tree</a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./sampler.direct.html" class="sidebar-item-text sidebar-link">Direct Monte Carlo sampler</a>
+  <a href="./sampler.direct.html" class="sidebar-item-text sidebar-link">Direct Sampler</a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./sampler.subset.html" class="sidebar-item-text sidebar-link">Subset Monte Carlo sampler</a>
+  <a href="./sampler.subset.html" class="sidebar-item-text sidebar-link">Subset Sampler</a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./noise.html" class="sidebar-item-text sidebar-link">Noise / Error models</a>
+  <a href="./noise.html" class="sidebar-item-text sidebar-link">Error models</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./callbacks.html" class="sidebar-item-text sidebar-link active">Sampler Callbacks</a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -177,7 +182,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#callback" id="toc-callback" class="nav-link" data-scroll-target="#callback">Callback</a></li>
   <li><a href="#plotstats" id="toc-plotstats" class="nav-link" data-scroll-target="#plotstats">PlotStats</a></li>
   <li><a href="#relstdtarget" id="toc-relstdtarget" class="nav-link" data-scroll-target="#relstdtarget">RelStdTarget</a></li>
-  <li><a href="#statspersample" id="toc-statspersample" class="nav-link" data-scroll-target="#statspersample">StatsPerSample</a></li>
+  <li><a href="#statspershot" id="toc-statspershot" class="nav-link" data-scroll-target="#statspershot">StatsPerShot</a></li>
   <li><a href="#verbosecircuitexec" id="toc-verbosecircuitexec" class="nav-link" data-scroll-target="#verbosecircuitexec">VerboseCircuitExec</a></li>
   <li><a href="#ervpersample" id="toc-ervpersample" class="nav-link" data-scroll-target="#ervpersample">ErvPerSample</a></li>
   <li><a href="#pathproducts" id="toc-pathproducts" class="nav-link" data-scroll-target="#pathproducts">PathProducts</a></li>
@@ -235,7 +240,7 @@ ul.task-list li input[type="checkbox"] {
 <blockquote class="blockquote">
 <pre><code> PlotStats ()</code></pre>
 </blockquote>
-<p>Callback super class: All callbacks must inherit this class.</p>
+<p>Plot sampler statistics at end of sampling process</p>
 <hr>
 </section>
 <section id="relstdtarget" class="level3">
@@ -243,15 +248,15 @@ ul.task-list li input[type="checkbox"] {
 <blockquote class="blockquote">
 <pre><code> RelStdTarget (target=0.1, include_delta=True)</code></pre>
 </blockquote>
-<p>Callback super class: All callbacks must inherit this class.</p>
+<p>Callback to stop sampling when the relative standard deviation target <code>target</code> is reached</p>
 <hr>
 </section>
-<section id="statspersample" class="level3">
-<h3 class="anchored" data-anchor-id="statspersample">StatsPerSample</h3>
+<section id="statspershot" class="level3">
+<h3 class="anchored" data-anchor-id="statspershot">StatsPerShot</h3>
 <blockquote class="blockquote">
-<pre><code> StatsPerSample (log_dir=None)</code></pre>
+<pre><code> StatsPerShot (log_dir=None)</code></pre>
 </blockquote>
-<p>Callback super class: All callbacks must inherit this class.</p>
+<p>Store information of <code>Sampler.stats()</code> with each shot and plot each statistic as as function of shots after sampler ends</p>
 <hr>
 </section>
 <section id="verbosecircuitexec" class="level3">
@@ -259,7 +264,7 @@ ul.task-list li input[type="checkbox"] {
 <blockquote class="blockquote">
 <pre><code> VerboseCircuitExec ()</code></pre>
 </blockquote>
-<p>Callback super class: All callbacks must inherit this class.</p>
+<p>Callback to output detailed information about circuit selection, specific fault that occured, measurement outcome and next circuit</p>
 <hr>
 </section>
 <section id="ervpersample" class="level3">
@@ -267,7 +272,7 @@ ul.task-list li input[type="checkbox"] {
 <blockquote class="blockquote">
 <pre><code> ErvPerSample (log_dir=None)</code></pre>
 </blockquote>
-<p>Callback super class: All callbacks must inherit this class.</p>
+<p>Callback to plot statistics about ERV values and selected subsets due to ERV</p>
 <hr>
 </section>
 <section id="pathproducts" class="level3">
@@ -275,7 +280,7 @@ ul.task-list li input[type="checkbox"] {
 <blockquote class="blockquote">
 <pre><code> PathProducts (log_dir=None)</code></pre>
 </blockquote>
-<p>Callback super class: All callbacks must inherit this class.</p>
+<p>Callback to plot distribution of sampled paths</p>
 <hr>
 </section>
 <section id="subsetrates" class="level3">
@@ -283,7 +288,7 @@ ul.task-list li input[type="checkbox"] {
 <blockquote class="blockquote">
 <pre><code> SubsetRates (log_dir=None)</code></pre>
 </blockquote>
-<p>Callback super class: All callbacks must inherit this class.</p>
+<p>Callback to plot progression of each fail path as a function of shots</p>
 
 
 </section>

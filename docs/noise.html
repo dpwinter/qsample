@@ -8,7 +8,7 @@
 
 <meta name="description" content="Classes for defining how errors are generated during sampling">
 
-<title>qsample - Noise / Error models</title>
+<title>qsample - Error models</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -62,10 +62,10 @@ ul.task-list li input[type="checkbox"] {
 
 
 <link rel="stylesheet" href="styles.css">
-<meta property="og:title" content="qsample - Noise / Error models">
+<meta property="og:title" content="qsample - Error models">
 <meta property="og:description" content="Classes for defining how errors are generated during sampling">
 <meta property="og:site-name" content="qsample">
-<meta name="twitter:title" content="qsample - Noise / Error models">
+<meta name="twitter:title" content="qsample - Error models">
 <meta name="twitter:description" content="Classes for defining how errors are generated during sampling">
 <meta name="twitter:card" content="summary">
 </head>
@@ -86,7 +86,7 @@ ul.task-list li input[type="checkbox"] {
     </nav>
   <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
     <div class="container-fluid d-flex justify-content-between">
-      <h1 class="quarto-secondary-nav-title">Noise / Error models</h1>
+      <h1 class="quarto-secondary-nav-title">Error models</h1>
       <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
         <i class="bi bi-chevron-right"></i>
       </button>
@@ -107,6 +107,11 @@ ul.task-list li input[type="checkbox"] {
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./math.html" class="sidebar-item-text sidebar-link">Math</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./utils.html" class="sidebar-item-text sidebar-link">Utilities</a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -136,27 +141,27 @@ ul.task-list li input[type="checkbox"] {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./callbacks.html" class="sidebar-item-text sidebar-link">Sampler Callbacks</a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="./sampler.tree.html" class="sidebar-item-text sidebar-link">Count Tree</a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./sampler.direct.html" class="sidebar-item-text sidebar-link">Direct Monte Carlo sampler</a>
+  <a href="./sampler.direct.html" class="sidebar-item-text sidebar-link">Direct Sampler</a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./sampler.subset.html" class="sidebar-item-text sidebar-link">Subset Monte Carlo sampler</a>
+  <a href="./sampler.subset.html" class="sidebar-item-text sidebar-link">Subset Sampler</a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./noise.html" class="sidebar-item-text sidebar-link active">Noise / Error models</a>
+  <a href="./noise.html" class="sidebar-item-text sidebar-link active">Error models</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./callbacks.html" class="sidebar-item-text sidebar-link">Sampler Callbacks</a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -188,7 +193,7 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title d-none d-lg-block">Noise / Error models</h1>
+<h1 class="title d-none d-lg-block">Error models</h1>
 </div>
 
 <div>

@@ -3,14 +3,15 @@ website:
     contents:
       - index.ipynb
       - 01_math.ipynb
-      - 02_circuit.ipynb
-      - 03_protocol.ipynb
-      - 04a_sim.mixin.ipynb
-      - 04b_sim.stabilizer.ipynb
-      - 04c_sim.statevector.ipynb
-      - 05_callbacks.ipynb
+      - 02_utils.ipynb
+      - 03_circuit.ipynb
+      - 04_protocol.ipynb
+      - 05a_sim.mixin.ipynb
+      - 05b_sim.stabilizer.ipynb
+      - 05c_sim.statevector.ipynb
       - 06a_sampler.tree.ipynb
       - 06c_sampler.direct.ipynb
       - 06d_sampler.subset.ipynb
       - 07_noise.ipynb
-      - 08_examples.ipynb
+      - 08_callbacks.ipynb
+      - 09_examples.ipynb

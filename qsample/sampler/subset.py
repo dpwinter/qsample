@@ -6,6 +6,7 @@ __all__ = ['SubsetSampler', 'SubsetSamplerERV']
 # %% ../../nbs/06d_sampler.subset.ipynb 3
 from .tree import CountTree, CircuitCountNode, SubsetCountNode
 import qsample.math as math
+import qsample.utils as utils
 
 from ..callbacks import CallbackList
 from tqdm.auto import tqdm
@@ -94,15 +95,7 @@ class SubsetSampler:
         
     
     def save(self, path):
-        """Save sampler to path
-        
-        Parameters
-        ----------
-        path : str
-            File path to save to
-        """
-        with open(path, 'wb') as fp:
-            pickle.dump(self, fp)
+        utils.save(path)
             
     def __explore_weight0_subset(self):
         pass
@@ -146,8 +139,6 @@ class SubsetSampler:
         
         if not isinstance(callbacks, CallbackList):
             callbacks = CallbackList(sampler=self, callbacks=callbacks)
-            
-        self.__explore_weight0_subset() # always explore weight-0 subset first
         
         self.stop_sampling = False # Flag can be controlled in callbacks
         callbacks.on_sampler_begin()
@@ -163,7 +154,8 @@ class SubsetSampler:
                 callbacks.on_circuit_begin()
                 pnode, circuit = self.protocol.successor(pnode, msmt_hist)
                 tnode = self.tree.add(name=pnode, parent=tnode, node_type=CircuitCountNode)
-                if self.tree.path_weight(tnode) == 0: # !!! THIS SHOULD BE REPLACED BY EXPLORE WEIGHT0 ROUTINE.. JUST FOR TESTING!
+                if self.tree.path_weight(tnode) == 0:
+                    # Nodes along weight-0 path have no variance
                     tnode.invariant = True
                 tnode.count += 1
                 if circuit:
@@ -182,7 +174,7 @@ class SubsetSampler:
                     msmt_hist[pnode] = msmt_hist.get(pnode, []) + [msmt]
                 else:
                     if self.tree.path_weight(tnode) <= self.protocol.ft_level:
-                        # Set leaf node invariant
+                        # Leaf nodes of path weight ft_level have not variance
                         tnode.invariant = True
                     if pnode != None:
                         # "Interesting" event happened

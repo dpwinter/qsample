@@ -6,6 +6,7 @@ __all__ = ['DirectSampler']
 # %% ../../nbs/06c_sampler.direct.ipynb 3
 import numpy as np
 import qsample.math as math
+import qsample.utils as utils
 from tqdm.auto import tqdm
 from ..callbacks import CallbackList
 
@@ -64,8 +65,7 @@ class DirectSampler:
         path : str
             File path to save to
         """
-        with open(path, 'wb') as fp:
-            pickle.dump(self, fp)
+        utils.save(path)
             
     def stats(self, idx=None):
         """Calculate sampling statistics

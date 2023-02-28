@@ -7,7 +7,6 @@ __all__ = ['draw_tree', 'CountNode', 'SubsetCountNode', 'CircuitCountNode', 'Cou
 from anytree import NodeMixin, RenderTree, PreOrderIter
 import qsample.math as math
 import pydot
-import dill as pickle
 
 from fastcore.test import *
 
