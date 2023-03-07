@@ -216,15 +216,8 @@ class SubsetSamplerERV(SubsetSampler):
         sampled_subsets = [n.name for n in tree_node.children]
         unsampled_Aws = {k:v for k,v in Aws.items() if k not in sampled_subsets}
         if unsampled_Aws:
-            # # print(unsampled_Aws)
-            # if tree_node.name == 'X2' or tree_node.name == 'X3':
-            sorted_subsets = dict(sorted(unsampled_Aws.items(), key=lambda k: k[1], reverse=True))
-            # print(sorted_subsets)
-            v = list(sorted_subsets.keys())
-            subset_candidates = sampled_subsets + v[:2] #[next_important_subset]
-            # else:
-            # next_important_subset = max(unsampled_Aws, key=lambda k: unsampled_Aws.get(k))
-            # subset_candidates = sampled_subsets + [next_important_subset]
+            next_important_subset = max(unsampled_Aws, key=lambda k: unsampled_Aws.get(k))
+            subset_candidates = sampled_subsets + [next_important_subset]
         else:
             subset_candidates = sampled_subsets
             
@@ -291,10 +284,12 @@ class SubsetSamplerERV(SubsetSampler):
 
             child_node_minus.count += 1
             delta_prime = 1 - self.tree.path_sum(self.tree.root, mode=2)
+            # delta_minus = 1 - self.tree.path_sum(self.tree.root, mode=2)
             v_L_minus = self.tree.uncertainty_propagated_variance(mode=1)
             child_node_minus.count -= 1
             
             child_node_plus.count += 1
+            # delta_plus = 1 - self.tree.path_sum(self.tree.root, mode=2)
             v_L_plus = self.tree.uncertainty_propagated_variance(mode=1)
             child_node_plus.count -= 1
             
@@ -302,7 +297,7 @@ class SubsetSamplerERV(SubsetSampler):
             
             v_L_exp = child_node_plus.rate * v_L_plus + child_node_minus.rate * v_L_minus
             erv = abs(v_L - v_L_exp + delta - delta_prime)
-            
+            # erv = child_node_plus.rate * (np.sqrt(v_L_plus) - delta_plus) + child_node_minus.rate * (np.sqrt(v_L_minus) - delta_minus) - (np.sqrt(v_L) - delta)
             erv_vals.append(erv)
                         
             if subset_node.count == 0: self.tree.remove(subset_node)
