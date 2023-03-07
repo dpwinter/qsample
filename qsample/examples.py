@@ -16,7 +16,7 @@ ghz = Circuit([ {"init": {0,1,2,3,4}},
                 {"CNOT": {(2,3)}},
                 {"CNOT": {(3,4)}},
                 {"CNOT": {(0,4)}},
-                {"measure": {4}}   ], ff_deterministic=True)
+                {"measure": {4}}   ])#, ff_deterministic=True)
 
 # %% ../nbs/09_examples.ipynb 7
 # stabilizers for 4-qubit ghz state are XXXX and three ZZ parity checks
@@ -58,7 +58,7 @@ eft = Circuit([ {"init": {0,1,2,4,3,5,6,7}},
                 {"CNOT": {(4,7)}},
                 {"CNOT": {(2,7)}},
                 {"CNOT": {(5,7)}},
-                {"measure": {7}} ], ff_deterministic=True)
+                {"measure": {7}} ])#, ff_deterministic=True)
 
 # %% ../nbs/09_examples.ipynb 11
 sz_123 = Circuit([{"init": {8}},
@@ -72,9 +72,9 @@ sz_123 = Circuit([{"init": {8}},
 meas7 = Circuit([ {"measure": {0,1,2,3,4,5,6}} ])
 
 # %% ../nbs/09_examples.ipynb 15
-fmx_1 = Circuit([{"init": {8}},
+fmx_1 = Circuit([{"init": {8,9}},
                  {"H": {8}},
-                {"init": {9}},
+                # {"init": {9}},
                 {"CNOT": {(8,3)}},
                 {"CNOT": {(8,9)}},
                 {"CNOT": {(8,4)}},
@@ -82,12 +82,12 @@ fmx_1 = Circuit([{"init": {8}},
                 {"CNOT": {(8,9)}},
                 {"CNOT": {(8,6)}},
                  {"H": {8}},
-                {"measure": {8}},
-                {"measure": {9}} ])
+                {"measure": {8,9}}])
+                # {"measure": {9}} ])
 
-fmx_2 = Circuit([{"init": {8}},
+fmx_2 = Circuit([{"init": {8,9}},
                   {"H": {8}},
-                {"init": {9}},
+                # {"init": {9}},
                 {"CNOT": {(8,0)}},
                 {"CNOT": {(8,9)}},
                 {"CNOT": {(8,2)}},
@@ -95,12 +95,12 @@ fmx_2 = Circuit([{"init": {8}},
                 {"CNOT": {(8,9)}},
                 {"CNOT": {(8,6)}},
                  {"H": {8}},
-                {"measure": {8}},
-                {"measure": {9}} ])
+                {"measure": {8,9}}])
+                # {"measure": {9}} ])
 
-fmx_3 = Circuit([{"init": {8}},
-              {"H": {8}},
-                {"init": {9}},
+fmx_3 = Circuit([{"init": {8,9}},
+                 {"H": {8}},
+                # {"init": {9}},
                 {"CNOT": {(8,1)}},
                 {"CNOT": {(8,9)}},
                 {"CNOT": {(8,2)}},
@@ -108,8 +108,8 @@ fmx_3 = Circuit([{"init": {8}},
                 {"CNOT": {(8,9)}},
                 {"CNOT": {(8,6)}},
                  {"H": {8}},
-                {"measure": {8}},
-                {"measure": {9}} ])
+                {"measure": {8,9}}])
+                # {"measure": {9}} ])
 
 nfs = Circuit([{"init": {7,8,9}},
                {"H": {7,8,9}},
@@ -142,7 +142,7 @@ nfs = Circuit([{"init": {7,8,9}},
                 {"CNOT": {(6,9)}},
                 {"measure": {7,8,9}} ])
 
-# %% ../nbs/09_examples.ipynb 18
+# %% ../nbs/09_examples.ipynb 21
 def gen_ghz1():
 
     ghz1 = Protocol()
@@ -154,7 +154,7 @@ def gen_ghz1():
     return ghz1
 ghz1 = gen_ghz1()
 
-# %% ../nbs/09_examples.ipynb 21
+# %% ../nbs/09_examples.ipynb 24
 def gen_ghz3():
     
     def repeat(m):
@@ -176,7 +176,7 @@ def gen_ghz3():
     return ghz3
 ghz3 = gen_ghz3()
 
-# %% ../nbs/09_examples.ipynb 24
+# %% ../nbs/09_examples.ipynb 27
 def gen_ghz_stab():
     def logErr(m):
         return m != 0b0000
@@ -216,7 +216,7 @@ def gen_ghz_stab():
     return ghz_stab
 ghz_stab = gen_ghz_stab()
 
-# %% ../nbs/09_examples.ipynb 27
+# %% ../nbs/09_examples.ipynb 30
 def gen_ftsteane():
     k1 = 0b0001111
     k2 = 0b1010101
@@ -261,7 +261,7 @@ def gen_ftsteane():
     return ftsteane
 ftsteane = gen_ftsteane()
 
-# %% ../nbs/09_examples.ipynb 30
+# %% ../nbs/09_examples.ipynb 33
 def gen_steane0():
     k1 = 0b0001111
     k2 = 0b1010101
@@ -326,7 +326,7 @@ def gen_steane0():
 
 steane0 = gen_steane0()
 
-# %% ../nbs/09_examples.ipynb 33
+# %% ../nbs/09_examples.ipynb 36
 def gen_flagstab():
     k1 = 0b0001111
     k2 = 0b1010101

@@ -102,6 +102,8 @@ class Constant(NodeMixin):
         Node visit counter variable
     invariant : bool
         If true, influences calculation of variance
+    ff_deterministic : bool
+        If true fault-free subset of circuit has deterministic outcom
     parent : Node, optional
         Reference to parent node object
     children : list of Node, optional
@@ -140,10 +142,10 @@ class Variable(Constant):
     of the logical failure rate.
     """
         
-    def __init__(self, name, count=0, parent=None, children=None, invariant=False, deterministic=False, circuit_id=None):
+    def __init__(self, name, count=0, parent=None, children=None, invariant=False, ff_deterministic=False, circuit_id=None):
         super().__init__(name, count, parent, children)
         self.invariant = invariant
-        self.deterministic = deterministic
+        self.ff_deterministic = ff_deterministic
         self.circuit_id = circuit_id
         
     @property
@@ -293,7 +295,7 @@ class CountTree:
         for node in end_node.path:
             if type(node) == Constant:
                 path_weight += sum(node.name)
-            elif node.deterministic:
+            elif node.ff_deterministic:
                 break
         return path_weight
     

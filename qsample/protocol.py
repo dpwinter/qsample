@@ -173,7 +173,7 @@ class Protocol(nx.DiGraph):
                 # Terminal node reached: End protocol
                 return succ_name, None
             if isinstance(check_return, Circuit):
-                # Correction node: Directly return circuit (not added to protocol)
+                # Correction node: We only allow noise-free correction.
                 return succ_name, check_return
             return succ_name, self.circuits[ self.nodes(data='circuit_id')[succ_name] ]
     

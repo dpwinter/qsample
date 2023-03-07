@@ -156,7 +156,7 @@ class SubsetSampler:
                     tnode.invariant = True
                 tnode.count += 1
                 if circuit:
-                    tnode.deterministic = circuit.ff_deterministic
+                    tnode.ff_deterministic = circuit.ff_deterministic
                     tnode.circuit_id = circuit.id
                     if not circuit.noisy:
                         msmt = state.run(circuit)
@@ -166,7 +166,7 @@ class SubsetSampler:
                         fault_locs = self.err_model.choose_w(self.partitions[circuit.id], subset)
                         fault_circuit = self.err_model.run(circuit, fault_locs)
                         msmt = state.run(circuit, fault_circuit)
-                        if tnode.deterministic and not any(subset):
+                        if tnode.ff_deterministic and not any(subset):
                             tnode.invariant = True
                         tnode = self.tree.add(name=subset, parent=tnode, node_type=Constant)
                         tnode.count += 1
@@ -216,14 +216,21 @@ class SubsetSamplerERV(SubsetSampler):
         sampled_subsets = [n.name for n in tree_node.children]
         unsampled_Aws = {k:v for k,v in Aws.items() if k not in sampled_subsets}
         if unsampled_Aws:
-            next_important_subset = max(unsampled_Aws, key=lambda k: unsampled_Aws.get(k))
-            subset_candidates = sampled_subsets + [next_important_subset]
+            # # print(unsampled_Aws)
+            # if tree_node.name == 'X2' or tree_node.name == 'X3':
+            sorted_subsets = dict(sorted(unsampled_Aws.items(), key=lambda k: k[1], reverse=True))
+            # print(sorted_subsets)
+            v = list(sorted_subsets.keys())
+            subset_candidates = sampled_subsets + v[:2] #[next_important_subset]
+            # else:
+            # next_important_subset = max(unsampled_Aws, key=lambda k: unsampled_Aws.get(k))
+            # subset_candidates = sampled_subsets + [next_important_subset]
         else:
             subset_candidates = sampled_subsets
             
         return subset_candidates
     
-    def _choose_subset(self, tree_node, circuit):
+    def _choose_subset(self, circuit_node, circuit):
         """ERV criterium to choose subsets
         
         For every k-th shot execute ERV, otherwise choose default routine
@@ -243,62 +250,67 @@ class SubsetSamplerERV(SubsetSampler):
         """
         
         if self.tree.root.count % self.k != 0:
-            return super()._choose_subset(tree_node, circuit)
+            return super()._choose_subset(circuit_node, circuit)
         
-        subset_candidates = self.wplus1(tree_node, circuit)
+        subset_candidates = self.wplus1(circuit_node, circuit)
         
-        erv_deltas = np.ma.zeros(shape=len(subset_candidates))
+        erv_vals = []
         delta = 1 - self.tree.path_sum(self.tree.root, mode=2)
         v_L = self.tree.uncertainty_propagated_variance(mode=1)
         
-        for i, subset in enumerate(subset_candidates):
+        for subset in subset_candidates:
             
-            if circuit.ff_deterministic and not any(subset):
-                # deterministic circuit: exclude w=0 subset
-                erv_deltas[i] = np.ma.masked
+            subset_node = self.tree.add(name=subset, parent=circuit_node, node_type=Constant)
+            # delta_prime = 1 - self.tree.path_sum(self.tree.root, mode=2)
+            
+            if circuit_node.ff_deterministic and not any(subset):
+                # erv_vals.append(delta - delta_prime)
+                erv_vals.append(0)
                 continue
             
-            _tree_node = self.tree.add(name=subset, parent=tree_node, node_type=Constant)
-            children = _tree_node.children
-            
-            if len(children) == 0:
-                __tree_node_minus = self.tree.add(name=None, parent=_tree_node, circuit_id=circuit.id, node_type=Variable)
-                __tree_node_plus = self.tree.add(name='FAIL', parent=_tree_node, circuit_id=circuit.id, node_type=Variable)
-                self.tree.marked_leaves.add(__tree_node_plus)
+            children = subset_node.children
+                        
+            if len(children) == 0: 
+                child_node_minus = self.tree.add(name=None, parent=subset_node, circuit_id=circuit.id, node_type=Variable)
+                child_node_plus = self.tree.add(name='FAIL', parent=subset_node, circuit_id=circuit.id, node_type=Variable)
+                self.tree.marked_leaves.add(child_node_plus)
             elif len(children) == 1:
                 if children[0] in self.tree.marked_leaves:
-                    __tree_node_minus = self.tree.add(name=None, parent=_tree_node, circuit_id=circuit.id, node_type=Variable)
-                    __tree_node_plus = children[0]
+                    child_node_minus = self.tree.add(name=None, parent=subset_node, circuit_id=circuit.id, node_type=Variable)
+                    child_node_plus = children[0]
                 else:
-                    __tree_node_minus = children[0]
-                    __tree_node_plus = self.tree.add(name='FAIL', parent=_tree_node, circuit_id=circuit.id, node_type=Variable)
-                    self.tree.marked_leaves.add(__tree_node_plus)
+                    child_node_minus = children[0]
+                    child_node_plus = self.tree.add(name='FAIL', parent=subset_node, circuit_id=circuit.id, node_type=Variable)
+                    self.tree.marked_leaves.add(child_node_plus)
             elif len(children) == 2:
-                __tree_node_minus, __tree_node_plus = children
+                child_node_minus, child_node_plus = children
             else:
                 raise Exception("Subset nodes not allowed to have more than 2 children.")
-                        
-            _tree_node.count += 1
-                        
-            __tree_node_minus.count += 1
-            _delta = 1 - self.tree.path_sum(self.tree.root, mode=2)
+                
+            subset_node.count += 1 
+
+            child_node_minus.count += 1
+            delta_prime = 1 - self.tree.path_sum(self.tree.root, mode=2)
             v_L_minus = self.tree.uncertainty_propagated_variance(mode=1)
-            __tree_node_minus.count -= 1
+            child_node_minus.count -= 1
             
-            __tree_node_plus.count += 1
+            child_node_plus.count += 1
             v_L_plus = self.tree.uncertainty_propagated_variance(mode=1)
-            __tree_node_plus.count -= 1
+            child_node_plus.count -= 1
             
-            _tree_node.count -= 1
+            subset_node.count -= 1
             
-            _v_L = __tree_node_plus.rate * v_L_plus + __tree_node_minus.rate * v_L_minus
-            erv_delta = np.abs(v_L - _v_L + _delta - delta)
-            erv_deltas[i] = erv_delta
+            v_L_exp = child_node_plus.rate * v_L_plus + child_node_minus.rate * v_L_minus
+            erv = abs(v_L - v_L_exp + delta - delta_prime)
             
-            if _tree_node.count == 0: self.tree.remove(_tree_node)
-            if __tree_node_plus.count == 0: self.tree.remove(__tree_node_plus)
-            if __tree_node_minus.count == 0: self.tree.remove(__tree_node_minus)
+            erv_vals.append(erv)
+                        
+            if subset_node.count == 0: self.tree.remove(subset_node)
+            if child_node_plus.count == 0: self.tree.remove(child_node_plus)
+            if child_node_minus.count == 0: self.tree.remove(child_node_minus)
         
-        idx = np.argmax(erv_deltas)
-        self.erv = erv_deltas[idx]
+        idx = np.argmax(erv_vals)        
+        self.erv_vals = erv_vals
+        self.erv_idx = idx
+        self.erv_subset_candidates = subset_candidates
         return subset_candidates[idx]
