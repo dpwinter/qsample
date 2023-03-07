@@ -180,6 +180,7 @@ ul.task-list li input[type="checkbox"] {
   <ul>
   <li><a href="#subsetsampler" id="toc-subsetsampler" class="nav-link active" data-scroll-target="#subsetsampler">SubsetSampler</a></li>
   <li><a href="#subsetsamplererv" id="toc-subsetsamplererv" class="nav-link" data-scroll-target="#subsetsamplererv">SubsetSamplerERV</a></li>
+  <li><a href="#probs" id="toc-probs" class="nav-link" data-scroll-target="#probs">Probs:</a></li>
   </ul>
 <div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/dpwinter/qsample/tree/master/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
@@ -229,6 +230,15 @@ ul.task-list li input[type="checkbox"] {
                    k=1)</code></pre>
 </blockquote>
 <p>Subset sampler implementing ERV sampling technique</p>
+</section>
+<section id="probs" class="level2">
+<h2 class="anchored" data-anchor-id="probs">Probs:</h2>
+<ol type="1">
+<li>If calc. delta at beginning (not after counting up child minus) get crappy results for ghz3, ghz_stab etc.</li>
+<li>Still not clear why we have to use abs when calc erv</li>
+<li>Removing “fail” possibility for “invariant” nodes could neglect going high contrib paths: 0-0-0-1-fail might exist, what we express with the “None”/“fail” branching</li>
+<li>Only not allowing “fail” for last protocol node along 0-path doesn’t give us anything as we are in this case already at end of chain when we calc. erv for it</li>
+</ol>
 
 
 </section>

@@ -184,7 +184,8 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#relstdtarget" id="toc-relstdtarget" class="nav-link" data-scroll-target="#relstdtarget">RelStdTarget</a></li>
   <li><a href="#statspershot" id="toc-statspershot" class="nav-link" data-scroll-target="#statspershot">StatsPerShot</a></li>
   <li><a href="#verbosecircuitexec" id="toc-verbosecircuitexec" class="nav-link" data-scroll-target="#verbosecircuitexec">VerboseCircuitExec</a></li>
-  <li><a href="#ervpersample" id="toc-ervpersample" class="nav-link" data-scroll-target="#ervpersample">ErvPerSample</a></li>
+  <li><a href="#plotervpershot" id="toc-plotervpershot" class="nav-link" data-scroll-target="#plotervpershot">PlotERVPerShot</a></li>
+  <li><a href="#printervpershot" id="toc-printervpershot" class="nav-link" data-scroll-target="#printervpershot">PrintERVPerShot</a></li>
   <li><a href="#pathproducts" id="toc-pathproducts" class="nav-link" data-scroll-target="#pathproducts">PathProducts</a></li>
   <li><a href="#subsetrates" id="toc-subsetrates" class="nav-link" data-scroll-target="#subsetrates">SubsetRates</a></li>
   </ul>
@@ -267,12 +268,20 @@ ul.task-list li input[type="checkbox"] {
 <p>Callback to output detailed information about circuit selection, specific fault that occured, measurement outcome and next circuit</p>
 <hr>
 </section>
-<section id="ervpersample" class="level3">
-<h3 class="anchored" data-anchor-id="ervpersample">ErvPerSample</h3>
+<section id="plotervpershot" class="level3">
+<h3 class="anchored" data-anchor-id="plotervpershot">PlotERVPerShot</h3>
 <blockquote class="blockquote">
-<pre><code> ErvPerSample (log_dir=None)</code></pre>
+<pre><code> PlotERVPerShot (log_dir=None)</code></pre>
 </blockquote>
 <p>Callback to plot statistics about ERV values and selected subsets due to ERV</p>
+<hr>
+</section>
+<section id="printervpershot" class="level3">
+<h3 class="anchored" data-anchor-id="printervpershot">PrintERVPerShot</h3>
+<blockquote class="blockquote">
+<pre><code> PrintERVPerShot ()</code></pre>
+</blockquote>
+<p>Callback to print ERV statistics per shot</p>
 <hr>
 </section>
 <section id="pathproducts" class="level3">
