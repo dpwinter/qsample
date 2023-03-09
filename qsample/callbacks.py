@@ -353,8 +353,9 @@ class PrintERVPerShot(Callback):
     def on_circuit_end(self, sampler, local_vars):
         name = local_vars.get('pnode', None)
         print(f"# ERV for circuit {name}")
-        for ss, erv in zip(sampler.erv_subset_candidates, sampler.erv_vals):
-            erv_str = f"{ss}: {erv:.3e}"
+        for ss, log in zip(sampler.erv_subset_candidates, sampler.logs):
+            # erv_str = f"{ss}: {erv:.3e}"
+            erv_str = ", ".join(list(map(str,log)))
             if ss == sampler.erv_subset_candidates[sampler.erv_idx]:
                 erv_str = "\033[1m" + erv_str + "\033[0m"
             print(erv_str)

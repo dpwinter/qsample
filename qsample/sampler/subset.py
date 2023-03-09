@@ -248,6 +248,7 @@ class SubsetSamplerERV(SubsetSampler):
         subset_candidates = self.wplus1(circuit_node, circuit)
         
         erv_vals = []
+        logs = []
         delta = 1 - self.tree.path_sum(self.tree.root, mode=2)
         v_L = self.tree.uncertainty_propagated_variance(mode=1)
         
@@ -284,12 +285,12 @@ class SubsetSamplerERV(SubsetSampler):
 
             child_node_minus.count += 1
             delta_prime = 1 - self.tree.path_sum(self.tree.root, mode=2)
-            # delta_minus = 1 - self.tree.path_sum(self.tree.root, mode=2)
+            delta_minus = 1 - self.tree.path_sum(self.tree.root, mode=2)
             v_L_minus = self.tree.uncertainty_propagated_variance(mode=1)
             child_node_minus.count -= 1
             
             child_node_plus.count += 1
-            # delta_plus = 1 - self.tree.path_sum(self.tree.root, mode=2)
+            delta_plus = 1 - self.tree.path_sum(self.tree.root, mode=2)
             v_L_plus = self.tree.uncertainty_propagated_variance(mode=1)
             child_node_plus.count -= 1
             
@@ -299,13 +300,15 @@ class SubsetSamplerERV(SubsetSampler):
             erv = abs(v_L - v_L_exp + delta - delta_prime)
             # erv = child_node_plus.rate * (np.sqrt(v_L_plus) - delta_plus) + child_node_minus.rate * (np.sqrt(v_L_minus) - delta_minus) - (np.sqrt(v_L) - delta)
             erv_vals.append(erv)
+            logs.append((erv, np.sqrt(v_L), "q", np.sqrt(v_L_plus), "1-q", np.sqrt(v_L_minus), delta, delta_prime, delta_plus, delta_minus))
                         
             if subset_node.count == 0: self.tree.remove(subset_node)
             if child_node_plus.count == 0: self.tree.remove(child_node_plus)
             if child_node_minus.count == 0: self.tree.remove(child_node_minus)
         
         idx = np.argmax(erv_vals)        
-        self.erv_vals = erv_vals
+        # self.erv_vals = erv_vals
         self.erv_idx = idx
+        self.logs = logs
         self.erv_subset_candidates = subset_candidates
         return subset_candidates[idx]
