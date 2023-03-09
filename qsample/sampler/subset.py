@@ -300,7 +300,7 @@ class SubsetSamplerERV(SubsetSampler):
             erv = abs(v_L - v_L_exp + delta - delta_prime)
             # erv = child_node_plus.rate * (np.sqrt(v_L_plus) - delta_plus) + child_node_minus.rate * (np.sqrt(v_L_minus) - delta_minus) - (np.sqrt(v_L) - delta)
             erv_vals.append(erv)
-            logs.append((erv, np.sqrt(v_L), "q", np.sqrt(v_L_plus), "1-q", np.sqrt(v_L_minus), delta, delta_prime, delta_plus, delta_minus))
+            logs.append((erv, np.sqrt(v_L), child_node_plus.rate, np.sqrt(v_L_plus), child_node_minus.rate, np.sqrt(v_L_minus), delta, delta_prime, delta_plus, delta_minus))
                         
             if subset_node.count == 0: self.tree.remove(subset_node)
             if child_node_plus.count == 0: self.tree.remove(child_node_plus)
