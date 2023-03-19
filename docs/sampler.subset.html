@@ -239,6 +239,9 @@ ul.task-list li input[type="checkbox"] {
 <li>Removing “fail” possibility for “invariant” nodes could neglect going high contrib paths: 0-0-0-1-fail might exist, what we express with the “None”/“fail” branching</li>
 <li>Only not allowing “fail” for last protocol node along 0-path doesn’t give us anything as we are in this case already at end of chain when we calc. erv for it</li>
 </ol>
+<p>from qsample.examples import ghz3, ftsteane, flagstab, ghz_stab from qsample.sim.stabilizer import StabilizerSimulator as CHP from qsample.noise import E1 import qsample.callbacks as cb</p>
+<p>sample_range = np.logspace(-7,0,7) err_params = {‘q’: sample_range} p_max = {‘q’: 0.1}</p>
+<p>ss_sam = SubsetSamplerERV(protocol=ghz3, simulator=CHP, p_max=p_max, err_model=E1, err_params=err_params) ss_sam.run(100, callbacks=[cb.PlotStats()])#, cb.PrintERVPerShot()]) ss_sam.tree.draw()</p>
 
 
 </section>

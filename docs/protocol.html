@@ -353,6 +353,21 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span>(ghz3.successor(<span class="st">'ghz'</span>, {<span class="st">'ghz'</span>: [<span class="dv">1</span>]})[<span class="dv">0</span>] <span class="op">==</span> <span class="st">'ghz'</span>)</span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span>(ghz3.successor(<span class="st">'ghz'</span>, {<span class="st">'ghz'</span>: [<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>]})[<span class="dv">0</span>] <span class="op">==</span> <span class="st">'FAIL'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<div class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ghz3.get_circuit('FAIL')</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co"># ghz3.draw()</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> qsample.examples <span class="im">import</span> flagstab</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>flagstab.draw(legend<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>[n <span class="cf">for</span> n <span class="kw">in</span> flagstab.neighbors(<span class="st">'X1a'</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<pre><code>['X1b', 'nonFT']</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="04_protocol_files/figure-html/cell-7-output-2.png" class="img-fluid"></p>
+</div>
+</div>
 
 
 </section>

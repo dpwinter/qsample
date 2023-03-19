@@ -166,7 +166,7 @@ class Variable(Constant):
         if self.is_root: 
             return 1.0
         elif self.parent.count == 0: 
-            return 0.0
+            return 1.0 # 0.0
         else: 
             return self.count / self.parent.count
         

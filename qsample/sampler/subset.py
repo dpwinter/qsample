@@ -121,6 +121,28 @@ class SubsetSampler:
             Aws = np.ma.masked_array(Aws)
             Aws[0] = np.ma.masked
         return subsets[ np.random.choice(len(subsets), p=Aws) ]
+    
+    def __add_virtual_subsets(self, tnode, path_weight):
+        """Append subset nodes with 0 count at tnode
+        
+        For F.T. protocols we know that all paths with a path weight
+        up to the F.T. level of the protocol result in a fault-free
+        execution. Thus we add virtual subsets to circuit nodes during
+        sampling to obtain a more realistic estimate of the cutoff error.
+        By "virtual" we denote nodes which have a count of 0 (but anyway
+        contribute to the calculation of estimates).
+        
+        Parameters
+        ----------
+        tnode : Variable
+            Circuit node at which to append subsets
+        path_weight : int
+            Weight of tree path from root to `tnode`
+        """
+        circuit = self.protocol.get_circuit(tnode.name)
+        delta_weight = self.protocol.ft_level - path_weight
+        for vsubset in [ss for ss in self.tree.constants[circuit.id].keys() if sum(ss) <= delta_weight]:
+            self.tree.add(name=vsubset, parent=tnode, node_type=Constant)
         
     def run(self, n_shots, callbacks=[]):
         """Execute n_shots of subset sampling
@@ -149,12 +171,25 @@ class SubsetSampler:
             
             while True:
                 callbacks.on_circuit_begin()
+                
+                _pnode = pnode
                 pnode, circuit = self.protocol.successor(pnode, msmt_hist)
                 tnode = self.tree.add(name=pnode, parent=tnode, node_type=Variable)
-                if self.tree._path_weight(tnode) == 0:
+                tnode.count += 1
+                
+                path_weight = self.tree._path_weight(tnode)
+                if path_weight == 0:
                     # Nodes along weight-0 path have no variance
                     tnode.invariant = True
-                tnode.count += 1
+                    
+                # Add virtual circuit node neighbor node and its virtual subsets
+                if path_weight <= self.protocol.ft_level and circuit:
+                    for vpnode in [n for n in self.protocol.successors(_pnode) if n != pnode]:
+                        vcircuit = self.protocol.get_circuit(vpnode)
+                        if vcircuit and vcircuit.noisy:
+                            vtnode = self.tree.add(name=vpnode, parent=tnode.parent, node_type=Variable, circuit_id=vcircuit.id)
+                            self.__add_virtual_subsets(vtnode, path_weight)
+                        
                 if circuit:
                     tnode.ff_deterministic = circuit.ff_deterministic
                     tnode.circuit_id = circuit.id
@@ -170,10 +205,15 @@ class SubsetSampler:
                             tnode.invariant = True
                         tnode = self.tree.add(name=subset, parent=tnode, node_type=Constant)
                         tnode.count += 1
+                        
+                        # Add virtual subsets for this circuit node
+                        if path_weight <= self.protocol.ft_level:
+                            self.__add_virtual_subsets(tnode.parent, path_weight)
+                        
                     msmt = msmt if msmt==None else int(msmt,2) # convert to int for comparison in checks
                     msmt_hist[pnode] = msmt_hist.get(pnode, []) + [msmt]
                 else:
-                    if self.tree._path_weight(tnode) <= self.protocol.ft_level:
+                    if path_weight <= self.protocol.ft_level:
                         # Leaf nodes of path weight ft_level have not variance
                         tnode.invariant = True
                     if pnode != None:
@@ -255,11 +295,11 @@ class SubsetSamplerERV(SubsetSampler):
         for subset in subset_candidates:
             
             subset_node = self.tree.add(name=subset, parent=circuit_node, node_type=Constant)
-            # delta_prime = 1 - self.tree.path_sum(self.tree.root, mode=2)
             
             if circuit_node.ff_deterministic and not any(subset):
                 # erv_vals.append(delta - delta_prime)
                 erv_vals.append(0)
+                logs.append((subset, 0, 'ff_deterministic!'))
                 continue
             
             children = subset_node.children
@@ -284,7 +324,7 @@ class SubsetSamplerERV(SubsetSampler):
             subset_node.count += 1 
 
             child_node_minus.count += 1
-            delta_prime = 1 - self.tree.path_sum(self.tree.root, mode=2)
+            # delta_prime = 1 - self.tree.path_sum(self.tree.root, mode=2)
             delta_minus = 1 - self.tree.path_sum(self.tree.root, mode=2)
             v_L_minus = self.tree.uncertainty_propagated_variance(mode=1)
             child_node_minus.count -= 1
@@ -297,10 +337,13 @@ class SubsetSamplerERV(SubsetSampler):
             subset_node.count -= 1
             
             v_L_exp = child_node_plus.rate * v_L_plus + child_node_minus.rate * v_L_minus
-            erv = abs(v_L - v_L_exp + delta - delta_prime)
+            delta_exp = child_node_plus.rate * delta_plus + child_node_minus.rate * delta_minus
+            
+            erv = np.sqrt(v_L) - np.sqrt(v_L_exp) + delta_exp - delta
+            # erv = abs(v_L - v_L_exp + delta - delta_prime)
             # erv = child_node_plus.rate * (np.sqrt(v_L_plus) - delta_plus) + child_node_minus.rate * (np.sqrt(v_L_minus) - delta_minus) - (np.sqrt(v_L) - delta)
             erv_vals.append(erv)
-            logs.append((erv, np.sqrt(v_L), child_node_plus.rate, np.sqrt(v_L_plus), child_node_minus.rate, np.sqrt(v_L_minus), delta, delta_prime, delta_plus, delta_minus))
+            logs.append((subset, erv, np.sqrt(v_L), child_node_plus.rate, np.sqrt(v_L_plus), child_node_minus.rate, np.sqrt(v_L_minus), delta, delta_plus, delta_minus))
                         
             if subset_node.count == 0: self.tree.remove(subset_node)
             if child_node_plus.count == 0: self.tree.remove(child_node_plus)

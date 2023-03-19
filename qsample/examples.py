@@ -356,13 +356,13 @@ def gen_flagstab():
         #print('flag', [format(i, '02b') for i in m], ':', v)
         return v
 
-    def flut(m, f1, f2, f3):
+    def flut(m, f1a, f1b, f2a, f2b, f3a, f3b):
         formatter = lambda i,m: str(format(m, '06b')[i])
 
         sx = ''.join([formatter(i,m) for i in range(3)])
         sz = ''.join([formatter(i,m) for i in range(3,6)])
 
-        if (sz == '011' and flagged(f1)) or (sz == '011' and flagged(f2)) or (sz == '011' and flagged(f3)):
+        if (sz == '011' and flagged([f1a,f1b])) or (sz == '011' and flagged([f2a,f2b])) or (sz == '011' and flagged([f3a,f3b])):
             corrs = {'011': {4, 5}, '101': {2, 4}, '110': {2, 5}} #{'010': {5, 6}, '001': {4, 6}}
             return Circuit([{'X': corrs[sz]}], noisy=False)
         else: 
@@ -370,51 +370,62 @@ def gen_flagstab():
 
     def rep_check(m):
         # no flag triggered, run second round regardless of syndrome
-        v = (m[-1] == 0b00 or m[-1] == 0b10) and len(m) == 1
+        # v = m[-1] == 0b00 or m[-1] == 0b10 #and len(m) == 1
         #print('rep', [format(i, '02b') for i in m], ':', v)
-        return v
+        # return v
+        return m[-1] == 0b00 or m[-1] == 0b10
 
-    def nft_check(m):
+    def nft_check1(m):
         # flag triggered in first or second round OR no flag triggered, syndromes disagree in second round
-        v = (len(m) == 1 and (m[-1] == 0b01 or m[-1] == 0b11)) or (len(m) == 2 and ((m[-1] == 0b00 and m[-2] == 0b10) or (m[-1] == 0b10 and m[-2] == 0b00) or (m[-1] == 0b01 or m[-1] == 0b11)))
+        # v = (len(m) == 1 and (m[-1] == 0b01 or m[-1] == 0b11)) or (len(m) == 2 and ((m[-1] == 0b00 and m[-2] == 0b10) or (m[-1] == 0b10 and m[-2] == 0b00) or (m[-1] == 0b01 or m[-1] == 0b11)))
         #print('nft', [format(i, '02b') for i in m], ':', v)
-        return v
+        return (m[-1] == 0b01 or m[-1] == 0b11 or (m[-1] == 0b01) or m[-1] == 0b11)
+    
+    def nft_check2(m1,m2):
+        return (m2[-1] == 0b00 and m1[-1] == 0b10) or (m2[-1] == 0b10 and m1[-1] == 0b00) or (m2[-1] == 0b01 or m2[-1] == 0b11)
 
-    def syn_check(m):
+    def syn_check(m1,m2):
         # no flag triggered, syndromes agree in second round
-        v = len(m) == 2 and ((m[-1] == 0b00 and m[-2] == 0b00) or (m[-1] == 0b10 and m[-2] == 0b10))
+        # v = len(m) == 2 and ((m[-1] == 0b00 and m[-2] == 0b00) or (m[-1] == 0b10 and m[-2] == 0b10))
         #print('syn', [format(i, '02b') for i in m], ':', v)
-        return v  
+        return (m2[-1] == 0b00 and m1[-1] == 0b00) or (m2[-1] == 0b10 and m1[-1] == 0b10)
 
 
-    functions = {"logErr": logErr, "flut": flut, "rep_check": rep_check, "nft_check": nft_check, "syn_check": syn_check}
+    functions = {"logErr": logErr, "flut": flut, "rep_check": rep_check, "nft_check1": nft_check1, 'nft_check2': nft_check2, "syn_check": syn_check}
 
     # Define protocol
 
     flagstab = Protocol(check_functions=functions)
 
-    flagstab.add_nodes_from(['X1', 'X2', 'X3', 'nonFT', 'meas'], circuits=[fmx_1, fmx_2, fmx_3, nfs, meas7])
+    # flagstab.add_nodes_from(['X1', 'X2', 'X3', 'nonFT', 'meas'], circuits=[fmx_1, fmx_2, fmx_3, nfs, meas7])
+    flagstab.add_nodes_from(['X1a', 'X1b', 'X2a', 'X2b', 'X3a', 'X3b', 'nonFT', 'meas'], circuits=[fmx_1, fmx_1, fmx_2,fmx_2, fmx_3,fmx_3, nfs, meas7])
+
     flagstab.add_node('COR')
 
-    flagstab.add_edge('START', 'X1', check='True')
+    flagstab.add_edge('START', 'X1a', check='True')
 
     # no flag triggered, run second round regardless of syndrome
-    flagstab.add_edge('X1', 'X1', check='rep_check(X1)')
-    flagstab.add_edge('X2', 'X2', check='rep_check(X2)')
-    flagstab.add_edge('X3', 'X3', check='rep_check(X3)')
+    flagstab.add_edge('X1a', 'X1b', check='rep_check(X1a)')
+    flagstab.add_edge('X2a', 'X2b', check='rep_check(X2a)')
+    flagstab.add_edge('X3a', 'X3b', check='rep_check(X3a)')
 
     # flag triggered in first or second round OR no flag triggered, syndromes disagree in second round
-    flagstab.add_edge('X1', 'nonFT', check='nft_check(X1)')
-    flagstab.add_edge('X2', 'nonFT', check='nft_check(X2)')
-    flagstab.add_edge('X3', 'nonFT', check='nft_check(X3)')
+    flagstab.add_edge('X1b', 'nonFT', check='nft_check2(X1a,X1b)')
+    flagstab.add_edge('X2b', 'nonFT', check='nft_check2(X2a,X2b)')
+    flagstab.add_edge('X3b', 'nonFT', check='nft_check2(X3a,X3b)')
+    
+    # flag triggered in first or second round OR no flag triggered, syndromes disagree in second round
+    flagstab.add_edge('X1a', 'nonFT', check='nft_check1(X1a)')
+    flagstab.add_edge('X2a', 'nonFT', check='nft_check1(X2a)')
+    flagstab.add_edge('X3a', 'nonFT', check='nft_check1(X3a)')
 
     # no flag triggered, syndromes agree in second round
-    flagstab.add_edge('X1', 'X2', check='syn_check(X1)')#False if rep_check(X1) or nft_check(X1) else True')
-    flagstab.add_edge('X2', 'X3', check='syn_check(X2)')#'False if rep_check(X2) or nft_check(X2) else True')
-    flagstab.add_edge('X3', 'meas', check='syn_check(X3)')#'False if rep_check(X3) or nft_check(X3) else True')
+    flagstab.add_edge('X1b', 'X2a', check='syn_check(X1a,X1b)')#False if rep_check(X1) or nft_check(X1) else True')
+    flagstab.add_edge('X2b', 'X3a', check='syn_check(X2a,X2b)')#'False if rep_check(X2) or nft_check(X2) else True')
+    flagstab.add_edge('X3b', 'meas', check='syn_check(X3a,X3b)')#'False if rep_check(X3) or nft_check(X3) else True')
 
     # apply flag correction after nonFT if a flag was triggered
-    flagstab.add_edge('nonFT', 'COR', check='flut(nonFT[-1], X1, X2, X3)')
+    flagstab.add_edge('nonFT', 'COR', check='flut(nonFT[-1], X1a,X1b, X2a,X2b, X3a,X3b)')
 
     flagstab.add_edge('COR', 'meas', check='True')
 

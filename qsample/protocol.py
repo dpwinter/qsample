@@ -107,6 +107,21 @@ class Protocol(nx.DiGraph):
         assert(len(deg_0_nodes)==1), "Protocol can only start with one node of degree 0."
         return deg_0_nodes[0]
     
+    def get_circuit(self, name):
+        """Return circuit corresponding to node `name`
+        
+        Parameters
+        ----------
+        name : str
+            Name of node
+        
+        Returns
+        -------
+        Circuit
+            Circuit corresponding to `name`
+        """
+        return self.circuits.get(self.nodes(data='circuit_id')[name], None)
+    
     def add_node(self, name, circuit=None):
         """Add node to protocol
         
@@ -175,8 +190,8 @@ class Protocol(nx.DiGraph):
             if isinstance(check_return, Circuit):
                 # Correction node: We only allow noise-free correction.
                 return succ_name, check_return
-            return succ_name, self.circuits[ self.nodes(data='circuit_id')[succ_name] ]
-    
+            return succ_name, self.get_circuit(succ_name)
+        
     def draw(self, *args, **kwargs):
         """Draw protocol"""
         return draw_protocol(self, *args, **kwargs)
