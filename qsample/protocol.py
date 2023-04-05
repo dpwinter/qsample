@@ -59,7 +59,7 @@ def draw_protocol(protocol, path=None, legend=False, figsize=(6,6), label_offset
     nx.draw_networkx_edge_labels(protocol, pos, lbls, font_size=12, bbox=edge_box, rotate=False if legend else True)
     nx.draw_networkx_edge_labels(protocol, loop_pos, loop_lbls, font_size=12, bbox=edge_box, rotate=True)
 
-    if path and legend: plt.savefig(save_path, bbox_extra_artists=(lgd,), bbox_inches='tight')
+    if path and legend: plt.savefig(path, bbox_extra_artists=(lgd,), bbox_inches='tight')
     elif path: plt.savefig(path, bbox_inches='tight')
 
 # %% ../nbs/04_protocol.ipynb 5
@@ -68,9 +68,8 @@ class Protocol(nx.DiGraph):
     
     Attributes
     ----------
-    ft_level : int
-        Degree of fault tolerance. `ft_level` corresponds to the total subset weight
-        of a circuit path which, when less than `ft_level` always lead to deterministic result
+    fault_tolerant : bool
+        True if protocol fault tolerant (robust against any 1-qubit error)
     check_functions : dict
         Functions used in transition checks between circuits
     circuits : dict
@@ -81,19 +80,19 @@ class Protocol(nx.DiGraph):
         Start node of the protocol
     """
     
-    def __init__(self, ft_level=0, check_functions={}, *args, **kwargs):
+    def __init__(self, fault_tolerant=False, check_functions={}, *args, **kwargs):
         """
         Parameters
         ----------
-        ft_level : int
-            Degree of protocol fault tolerance
+        fault_tolerant : bool
+            True if protocol fault tolerant (robust against any 1-qubit error)
         check_functions : dict
             Functions used in transition checks between circuits
         *args, **kwargs
             Any arguments passed to parent class `DiGraph`
         """
         super().__init__(*args, **kwargs)
-        self.ft_level = ft_level
+        self.fault_tolerant = fault_tolerant
         self.check_functions = check_functions
         self.circuits = dict()
 

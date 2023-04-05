@@ -134,10 +134,10 @@ class PlotStats(Callback):
                 p_L_low, std_low, p_L_up, std_up = stats
                 ax.plot(x, p_L_low, label="SS low")
                 ax.plot(x, p_L_up, label="SS up")
-                # ax.fill_between(x, p_L_low-std_low, p_L_low+std_low, alpha=0.2)
-                # ax.fill_between(x, p_L_up-std_up, p_L_up+std_up, alpha=0.2)
-                ax.fill_between(x, p_L_low, p_L_low-std_low, alpha=0.2)
-                ax.fill_between(x, p_L_up, p_L_up+std_up, alpha=0.2)
+                ax.fill_between(x, p_L_low-std_low, p_L_low+std_low, alpha=0.2)
+                ax.fill_between(x, p_L_up-std_up, p_L_up+std_up, alpha=0.2)
+                # ax.fill_between(x, p_L_low, p_L_low-std_low, alpha=0.2)
+                # ax.fill_between(x, p_L_up, p_L_up+std_up, alpha=0.2)
             else:
                 p_L, std = stats
                 ax.errorbar(x, p_L, fmt='--', c="black", yerr=std, label="Direct MC")
@@ -374,8 +374,8 @@ class PathProducts(Callback):
         for leaf in sampler.tree.root.leaves:
             if not leaf.is_root:
                 names.append( ":".join([f'{n.name}' for n in leaf.path]) )
-                marked.append(1 if leaf in sampler.tree.marked_leaves else 0)
-                pw_prod = np.prod([node.rate for node in leaf.path[1:] if isinstance(node, CircuitCountNode)]) * 1 if leaf in sampler.tree.marked_leaves else 0
+                marked.append(1 if leaf in sampler.tree.marked else 0)
+                pw_prod = np.prod([node.rate for node in leaf.path[1:] if isinstance(node, CircuitCountNode)]) * 1 if leaf in sampler.tree.marked else 0
                 Aw_prod = np.prod([sampler.tree.constants[node.circuit_id][node.name] for node in leaf.path[1:] if isinstance(node, SubsetCountNode)])
                 data.append( (pw_prod, Aw_prod, Aw_prod * pw_prod) )
                 

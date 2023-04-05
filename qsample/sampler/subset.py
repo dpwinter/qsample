@@ -4,7 +4,7 @@
 __all__ = ['SubsetSampler', 'SubsetSamplerERV']
 
 # %% ../../nbs/06d_sampler.subset.ipynb 3
-from .tree import CountTree, Variable, Constant
+from .tree import Tree, Variable, Constant, Delta
 import qsample.math as math
 import qsample.utils as utils
 
@@ -62,7 +62,7 @@ class SubsetSampler:
         self.err_params = self.__err_params_to_matrix(err_params)
         
         self.partitions = {cid: self.err_model.group(circuit) for cid, circuit in self.protocol.circuits.items()}
-        self.tree = CountTree(constants={cid: self.__get_subset_probs(partition.values(), self.p_max) for cid, partition in self.partitions.items()})
+        self.tree = Tree(constants={cid: self.__get_subset_probs(partition.values(), self.p_max) for cid, partition in self.partitions.items()})
         
     def __get_subset_probs(self, list_of_sets, prob):
         cards = list(map(len, list_of_sets))
@@ -85,10 +85,10 @@ class SubsetSampler:
         prob = self.err_params if err_params == None else self.__err_params_to_matrix(err_params)
         self.tree.constants = {cid: self.__get_subset_probs(partition.values(), prob) for cid, partition in self.partitions.items()}
         
-        p_L = self.tree.path_sum(self.tree.root, mode=1)
-        delta = 1 - self.tree.path_sum(self.tree.root, mode=2)
-        var = self.tree.uncertainty_propagated_variance(mode=1)
-        var_up = self.tree.uncertainty_propagated_variance(mode=0)
+        p_L = self.tree.subtree_sum(self.tree.root, self.tree.marked)
+        delta = self.tree.delta
+        var = self.tree.var(mode=1)
+        var_up = self.tree.var(mode=0)
         
         self.tree.constants = _constants
         return np.broadcast_arrays(p_L, np.sqrt(var), p_L+delta, np.sqrt(var_up))
@@ -140,9 +140,11 @@ class SubsetSampler:
             Weight of tree path from root to `tnode`
         """
         circuit = self.protocol.get_circuit(tnode.name)
-        delta_weight = self.protocol.ft_level - path_weight
+        delta_weight = (1 if self.protocol.fault_tolerant else 0) - path_weight
         for vsubset in [ss for ss in self.tree.constants[circuit.id].keys() if sum(ss) <= delta_weight]:
             self.tree.add(name=vsubset, parent=tnode, node_type=Constant)
+            delta_node = self.tree.add(name='δ', node_type=Delta, parent=tnode)
+            self.tree.deltas.add(delta_node)
         
     def run(self, n_shots, callbacks=[]):
         """Execute n_shots of subset sampling
@@ -177,13 +179,13 @@ class SubsetSampler:
                 tnode = self.tree.add(name=pnode, parent=tnode, node_type=Variable)
                 tnode.count += 1
                 
-                path_weight = self.tree._path_weight(tnode)
+                path_weight = self.tree.path_weight(tnode)
                 if path_weight == 0:
                     # Nodes along weight-0 path have no variance
                     tnode.invariant = True
                     
                 # Add virtual circuit node neighbor node and its virtual subsets
-                if path_weight <= self.protocol.ft_level and circuit:
+                if path_weight <= (1 if self.protocol.fault_tolerant else 0) and circuit:
                     for vpnode in [n for n in self.protocol.successors(_pnode) if n != pnode]:
                         vcircuit = self.protocol.get_circuit(vpnode)
                         if vcircuit and vcircuit.noisy:
@@ -191,34 +193,40 @@ class SubsetSampler:
                             self.__add_virtual_subsets(vtnode, path_weight)
                         
                 if circuit:
+                
                     tnode.ff_deterministic = circuit.ff_deterministic
                     tnode.circuit_id = circuit.id
+                    
                     if not circuit.noisy:
                         msmt = state.run(circuit)
                         tnode.invariant = True
                     else:
+                        delta_node = self.tree.add(name='δ', node_type=Delta, parent=tnode)
+                        self.tree.deltas.add(delta_node)
+                    
                         subset = self._choose_subset(tnode, circuit)
                         fault_locs = self.err_model.choose_w(self.partitions[circuit.id], subset)
                         fault_circuit = self.err_model.run(circuit, fault_locs)
                         msmt = state.run(circuit, fault_circuit)
-                        if tnode.ff_deterministic and not any(subset):
-                            tnode.invariant = True
+                        # if tnode.ff_deterministic and not any(subset): ### CHECK: Do we need this?
+                        #     tnode.invariant = True
                         tnode = self.tree.add(name=subset, parent=tnode, node_type=Constant)
                         tnode.count += 1
                         
+                        
                         # Add virtual subsets for this circuit node
-                        if path_weight <= self.protocol.ft_level:
+                        if path_weight <= (1 if self.protocol.fault_tolerant else 0):
                             self.__add_virtual_subsets(tnode.parent, path_weight)
                         
                     msmt = msmt if msmt==None else int(msmt,2) # convert to int for comparison in checks
                     msmt_hist[pnode] = msmt_hist.get(pnode, []) + [msmt]
                 else:
-                    if path_weight <= self.protocol.ft_level:
-                        # Leaf nodes of path weight ft_level have not variance
+                    if path_weight <= (1 if self.protocol.fault_tolerant else 0):
+                        # Leaf nodes of fault tolerant paths have not variance
                         tnode.invariant = True
                     if pnode != None:
                         # "Interesting" event happened
-                        self.tree.marked_leaves.add(tnode)
+                        self.tree.marked.add(tnode)
                     break
                 callbacks.on_circuit_end(locals())
                 
@@ -253,7 +261,7 @@ class SubsetSamplerERV(SubsetSampler):
             Circuit corresponding to `tree_node`
         """
         Aws = self.tree.constants[circuit.id]
-        sampled_subsets = [n.name for n in tree_node.children]
+        sampled_subsets = [n.name for n in tree_node.children if type(n) != Delta]
         unsampled_Aws = {k:v for k,v in Aws.items() if k not in sampled_subsets}
         if unsampled_Aws:
             next_important_subset = max(unsampled_Aws, key=lambda k: unsampled_Aws.get(k))
@@ -289,12 +297,16 @@ class SubsetSamplerERV(SubsetSampler):
         
         erv_vals = []
         logs = []
-        delta = 1 - self.tree.path_sum(self.tree.root, mode=2)
-        v_L = self.tree.uncertainty_propagated_variance(mode=1)
+        # delta = 1 - self.tree.path_sum(self.tree.root, mode=2)
+        delta = self.tree.delta
+        # v_L = self.tree.uncertainty_propagated_variance(mode=1)
+        v_L = self.tree.var()
         
         for subset in subset_candidates:
             
             subset_node = self.tree.add(name=subset, parent=circuit_node, node_type=Constant)
+            d = self.tree.add(parent=circuit_node, node_type=Delta)
+            self.tree.deltas.add(d)
             
             if circuit_node.ff_deterministic and not any(subset):
                 # erv_vals.append(delta - delta_prime)
@@ -307,15 +319,15 @@ class SubsetSamplerERV(SubsetSampler):
             if len(children) == 0: 
                 child_node_minus = self.tree.add(name=None, parent=subset_node, circuit_id=circuit.id, node_type=Variable)
                 child_node_plus = self.tree.add(name='FAIL', parent=subset_node, circuit_id=circuit.id, node_type=Variable)
-                self.tree.marked_leaves.add(child_node_plus)
+                self.tree.marked.add(child_node_plus)
             elif len(children) == 1:
-                if children[0] in self.tree.marked_leaves:
+                if children[0] in self.tree.marked:
                     child_node_minus = self.tree.add(name=None, parent=subset_node, circuit_id=circuit.id, node_type=Variable)
                     child_node_plus = children[0]
                 else:
                     child_node_minus = children[0]
                     child_node_plus = self.tree.add(name='FAIL', parent=subset_node, circuit_id=circuit.id, node_type=Variable)
-                    self.tree.marked_leaves.add(child_node_plus)
+                    self.tree.marked.add(child_node_plus)
             elif len(children) == 2:
                 child_node_minus, child_node_plus = children
             else:
@@ -325,13 +337,16 @@ class SubsetSamplerERV(SubsetSampler):
 
             child_node_minus.count += 1
             # delta_prime = 1 - self.tree.path_sum(self.tree.root, mode=2)
-            delta_minus = 1 - self.tree.path_sum(self.tree.root, mode=2)
-            v_L_minus = self.tree.uncertainty_propagated_variance(mode=1)
+            delta_minus = self.tree.delta #1 - self.tree.path_sum(self.tree.root, mode=2)
+            # v_L_minus = self.tree.uncertainty_propagated_variance(mode=1)
+            v_L_minus = self.tree.var()
             child_node_minus.count -= 1
             
             child_node_plus.count += 1
-            delta_plus = 1 - self.tree.path_sum(self.tree.root, mode=2)
-            v_L_plus = self.tree.uncertainty_propagated_variance(mode=1)
+            # delta_plus = 1 - self.tree.path_sum(self.tree.root, mode=2)
+            # v_L_plus = self.tree.uncertainty_propagated_variance(mode=1)
+            delta_plus = self.tree.delta
+            v_L_plus = self.tree.var()
             child_node_plus.count -= 1
             
             subset_node.count -= 1

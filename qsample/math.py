@@ -143,7 +143,7 @@ def subset_cards(superset):
     Returns
     -------
     list of int
-        All possible cardinalities of subsets
+        All possible cardinalities of subsets in superset
     """
     return set(range(len(superset) + 1))
 
