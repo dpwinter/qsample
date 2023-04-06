@@ -3,7 +3,7 @@
 # %% auto 0
 __all__ = ['draw_tree', 'Constant', 'Delta', 'Variable', 'Tree']
 
-# %% ../../nbs/06a_sampler.tree.ipynb 4
+# %% ../../nbs/06a_sampler.tree.ipynb 3
 from anytree import RenderTree, PreOrderIter, Node, NodeMixin
 import qsample.math as math
 import numpy as np
@@ -12,7 +12,7 @@ import pydot
 
 from fastcore.test import *
 
-# %% ../../nbs/06a_sampler.tree.ipynb 5
+# %% ../../nbs/06a_sampler.tree.ipynb 4
 def draw_tree(tree, verbose=False, path=None):
     """Generate and return PNG image of `tree`
 
@@ -90,15 +90,15 @@ def draw_tree(tree, verbose=False, path=None):
     from io import BytesIO
     return Image.open(BytesIO(G.create_png()))
 
-# %% ../../nbs/06a_sampler.tree.ipynb 6
+# %% ../../nbs/06a_sampler.tree.ipynb 5
 class Constant(Node):
-    """Class to represent a tree node of a `Tree`.
+    """Representation of a constant value inside `Tree`.
     
     A node in a tree is a uniquely identifiable object containing references
     to at most one parent and possibly many children. The root node has no 
     parent and leaf nodes have not children.
     
-    The `CountNode` class complements the common tree node by a `count` attribute
+    The `Constant` class complements the common tree node by a `count` attribute
     which represents the number of times a node has been visited during sampling.
     
     Attributes
@@ -437,7 +437,8 @@ class Tree:
                 if type(ix_node) == Constant:
                     q = nodeA.rate * nodeB.rate
                     if q != 0: 
-                        cov /= nodeA.rate * nodeB.rate # must exclude rate at Constant intersection node
+                        # must exclude rate at Constant intersection node
+                        cov /= nodeA.rate * nodeB.rate 
             
             if type(ix_node) == Constant:
                 q = ix_node.children[0]

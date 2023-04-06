@@ -203,9 +203,9 @@ class RelStdTarget(Callback):
             # For direct sampler need to know which is current p_phy
             p_L, err = sampler.stats(idx=sampler.i)
         else:
-            p_L = sampler.tree.path_sum(sampler.tree.root, mode=1)
-            std = np.sqrt(sampler.tree.uncertainty_propagated_variance(mode=1))
-            delta = 1 - sampler.tree.path_sum(sampler.tree.root, mode=2)
+            p_L = sampler.tree.subtree_sum(sampler.tree.root, sampler.tree.marked)
+            std = np.sqrt(sampler.tree.var(mode=1))
+            delta = sampler.tree.delta
             
             err = std + delta if self.include_delta else std
             
@@ -239,11 +239,11 @@ class StatsPerShot(Callback):
             # For direct sampler need to know which is current p_phy
             stats = sampler.stats(idx=sampler.i)
         else:
-            p_L = sampler.tree.path_sum(sampler.tree.root, mode=1)
-            std = np.sqrt(sampler.tree.uncertainty_propagated_variance(mode=1))
-            delta = 1 - sampler.tree.path_sum(sampler.tree.root, mode=2)
+            p_L = sampler.tree.subtree_sum(sampler.tree.root, sampler.tree.marked)
+            std = np.sqrt(sampler.tree.var(mode=1))
+            delta = sampler.tree.delta
             
-            std_up = np.sqrt(sampler.tree.uncertainty_propagated_variance(mode=0))
+            std_up = np.sqrt(sampler.tree.var(mode=0))
             stats = [p_L, std, delta, std_up]
             stats = [e if not isinstance(e,np.ndarray) else e[0] for e in stats]
             
@@ -280,7 +280,7 @@ class VerboseCircuitExec(Callback):
 
         if circuit == None:
             print(name)
-        elif circuit._noisy:
+        elif circuit.noisy:
             faults = [(i,tick) for i, tick in enumerate(fault_circuit._ticks) if tick]
             print(f"{name} -> Faults: {faults} -> Msmt: {msmt}")
         elif "COR" in name:
@@ -368,15 +368,15 @@ class PathProducts(Callback):
         self.log_dir = log_dir
         
     def on_sampler_end(self, sampler):
-        from qsample.sampler.tree import SubsetCountNode, CircuitCountNode
+        from qsample.sampler.tree import Constant, Variable
         data = []
         names, marked = [], []
         for leaf in sampler.tree.root.leaves:
             if not leaf.is_root:
                 names.append( ":".join([f'{n.name}' for n in leaf.path]) )
                 marked.append(1 if leaf in sampler.tree.marked else 0)
-                pw_prod = np.prod([node.rate for node in leaf.path[1:] if isinstance(node, CircuitCountNode)]) * 1 if leaf in sampler.tree.marked else 0
-                Aw_prod = np.prod([sampler.tree.constants[node.circuit_id][node.name] for node in leaf.path[1:] if isinstance(node, SubsetCountNode)])
+                pw_prod = np.prod([node.rate for node in leaf.path if isinstance(node, Variable)]) * 1 if leaf in sampler.tree.marked else 0
+                Aw_prod = np.prod([sampler.tree.constants[node.parent.circuit_id][node.name] for node in leaf.path[1:] if isinstance(node, Constant)])
                 data.append( (pw_prod, Aw_prod, Aw_prod * pw_prod) )
                 
         self.plot(names, marked, np.array(data))
@@ -411,10 +411,10 @@ class SubsetRates(Callback):
         
     def on_protocol_end(self, sampler):
         for leaf in sampler.tree.root.leaves:
-            if not leaf.is_root and leaf in sampler.tree.marked_leaves:
+            if not leaf.is_root and leaf in sampler.tree.marked:
                 name = ":".join([f'{n.name}' for n in leaf.path]) 
                 prev_data = self.data.get(name, [])
-                prod = np.product([sampler.tree._get_node_value(node) for node in leaf.path[1:]])
+                prod = np.product([sampler.tree.value(node) for node in leaf.path[1:]])
                 self.data[name] = prev_data + [(leaf.rate, prod)]
         self.n_calls += 1
 

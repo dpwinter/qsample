@@ -208,11 +208,9 @@ class SubsetSampler:
                         fault_locs = self.err_model.choose_w(self.partitions[circuit.id], subset)
                         fault_circuit = self.err_model.run(circuit, fault_locs)
                         msmt = state.run(circuit, fault_circuit)
-                        # if tnode.ff_deterministic and not any(subset): ### CHECK: Do we need this?
-                        #     tnode.invariant = True
+
                         tnode = self.tree.add(name=subset, parent=tnode, node_type=Constant)
                         tnode.count += 1
-                        
                         
                         # Add virtual subsets for this circuit node
                         if path_weight <= (1 if self.protocol.fault_tolerant else 0):
@@ -297,16 +295,19 @@ class SubsetSamplerERV(SubsetSampler):
         
         erv_vals = []
         logs = []
-        # delta = 1 - self.tree.path_sum(self.tree.root, mode=2)
+        
+        # exclude virtual nodes in calculation of delta
+        # vss_contrib = np.prod([self.tree.value(n) for n in circuit_node.children if type(n) == Delta or n.count==0])
+        # delta = self.tree.delta / (1 if vss_contrib==0 else vss_contrib)
+        d = self.tree.add(name='δ', parent=circuit_node, node_type=Delta)
+        self.tree.deltas.add(d)
+        
         delta = self.tree.delta
-        # v_L = self.tree.uncertainty_propagated_variance(mode=1)
-        v_L = self.tree.var()
+        v_L = self.tree.var(mode=1)
         
         for subset in subset_candidates:
             
             subset_node = self.tree.add(name=subset, parent=circuit_node, node_type=Constant)
-            d = self.tree.add(parent=circuit_node, node_type=Delta)
-            self.tree.deltas.add(d)
             
             if circuit_node.ff_deterministic and not any(subset):
                 # erv_vals.append(delta - delta_prime)
@@ -334,38 +335,41 @@ class SubsetSamplerERV(SubsetSampler):
                 raise Exception("Subset nodes not allowed to have more than 2 children.")
                 
             subset_node.count += 1 
+            
+            delta_prime = self.tree.delta
 
             child_node_minus.count += 1
-            # delta_prime = 1 - self.tree.path_sum(self.tree.root, mode=2)
-            delta_minus = self.tree.delta #1 - self.tree.path_sum(self.tree.root, mode=2)
-            # v_L_minus = self.tree.uncertainty_propagated_variance(mode=1)
-            v_L_minus = self.tree.var()
+            # delta_minus = self.tree.delta
+            v_L_minus = self.tree.var(mode=1)
             child_node_minus.count -= 1
             
             child_node_plus.count += 1
-            # delta_plus = 1 - self.tree.path_sum(self.tree.root, mode=2)
-            # v_L_plus = self.tree.uncertainty_propagated_variance(mode=1)
-            delta_plus = self.tree.delta
-            v_L_plus = self.tree.var()
+            # delta_plus = self.tree.delta
+            v_L_plus = self.tree.var(mode=1)
             child_node_plus.count -= 1
             
             subset_node.count -= 1
             
             v_L_exp = child_node_plus.rate * v_L_plus + child_node_minus.rate * v_L_minus
-            delta_exp = child_node_plus.rate * delta_plus + child_node_minus.rate * delta_minus
+            # delta_exp = child_node_plus.rate * delta_plus + child_node_minus.rate * delta_minus
             
-            erv = np.sqrt(v_L) - np.sqrt(v_L_exp) + delta_exp - delta
-            # erv = abs(v_L - v_L_exp + delta - delta_prime)
+            # erv = np.sqrt(v_L) - np.sqrt(v_L_exp) + delta_exp - delta # orig
+            # erv = np.sqrt(v_L) - np.sqrt(v_L_exp) + delta - delta_exp
+            # erv = np.sqrt(v_L) - np.sqrt(v_L_exp) + delta_prime - delta
+            # erv = delta_prime - delta
+            
+            erv = abs(v_L - v_L_exp + delta - delta_prime)
             # erv = child_node_plus.rate * (np.sqrt(v_L_plus) - delta_plus) + child_node_minus.rate * (np.sqrt(v_L_minus) - delta_minus) - (np.sqrt(v_L) - delta)
             erv_vals.append(erv)
-            logs.append((subset, erv, np.sqrt(v_L), child_node_plus.rate, np.sqrt(v_L_plus), child_node_minus.rate, np.sqrt(v_L_minus), delta, delta_plus, delta_minus))
-                        
+            # logs.append((subset, erv, np.sqrt(v_L), child_node_plus.rate, np.sqrt(v_L_plus), child_node_minus.rate, np.sqrt(v_L_minus), delta, delta_plus, delta_minus))
+            logs.append((subset, erv, np.sqrt(v_L), child_node_plus.rate, np.sqrt(v_L_plus), child_node_minus.rate, np.sqrt(v_L_minus), delta, delta_prime))
+                         
             if subset_node.count == 0: self.tree.remove(subset_node)
             if child_node_plus.count == 0: self.tree.remove(child_node_plus)
             if child_node_minus.count == 0: self.tree.remove(child_node_minus)
         
         idx = np.argmax(erv_vals)        
-        # self.erv_vals = erv_vals
+        self.erv_vals = erv_vals
         self.erv_idx = idx
         self.logs = logs
         self.erv_subset_candidates = subset_candidates
