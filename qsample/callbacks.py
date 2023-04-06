@@ -136,8 +136,6 @@ class PlotStats(Callback):
                 ax.plot(x, p_L_up, label="SS up")
                 ax.fill_between(x, p_L_low-std_low, p_L_low+std_low, alpha=0.2)
                 ax.fill_between(x, p_L_up-std_up, p_L_up+std_up, alpha=0.2)
-                # ax.fill_between(x, p_L_low, p_L_low-std_low, alpha=0.2)
-                # ax.fill_between(x, p_L_up, p_L_up+std_up, alpha=0.2)
             else:
                 p_L, std = stats
                 ax.errorbar(x, p_L, fmt='--', c="black", yerr=std, label="Direct MC")

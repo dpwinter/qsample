@@ -336,15 +336,15 @@ class SubsetSamplerERV(SubsetSampler):
                 
             subset_node.count += 1 
             
-            delta_prime = self.tree.delta
+            # delta_prime = self.tree.delta
 
             child_node_minus.count += 1
-            # delta_minus = self.tree.delta
+            delta_minus = self.tree.delta
             v_L_minus = self.tree.var(mode=1)
             child_node_minus.count -= 1
             
             child_node_plus.count += 1
-            # delta_plus = self.tree.delta
+            delta_plus = self.tree.delta
             v_L_plus = self.tree.var(mode=1)
             child_node_plus.count -= 1
             
@@ -358,11 +358,11 @@ class SubsetSamplerERV(SubsetSampler):
             # erv = np.sqrt(v_L) - np.sqrt(v_L_exp) + delta_prime - delta
             # erv = delta_prime - delta
             
-            erv = abs(v_L - v_L_exp + delta - delta_prime)
-            # erv = child_node_plus.rate * (np.sqrt(v_L_plus) - delta_plus) + child_node_minus.rate * (np.sqrt(v_L_minus) - delta_minus) - (np.sqrt(v_L) - delta)
+            # erv = abs(v_L - v_L_exp + delta - delta_prime)
+            erv = child_node_plus.rate * (np.sqrt(v_L_plus) - delta_plus) + child_node_minus.rate * (np.sqrt(v_L_minus) - delta_minus) - (np.sqrt(v_L) - delta)
             erv_vals.append(erv)
-            # logs.append((subset, erv, np.sqrt(v_L), child_node_plus.rate, np.sqrt(v_L_plus), child_node_minus.rate, np.sqrt(v_L_minus), delta, delta_plus, delta_minus))
-            logs.append((subset, erv, np.sqrt(v_L), child_node_plus.rate, np.sqrt(v_L_plus), child_node_minus.rate, np.sqrt(v_L_minus), delta, delta_prime))
+            logs.append((subset, erv, np.sqrt(v_L), child_node_plus.rate, np.sqrt(v_L_plus), child_node_minus.rate, np.sqrt(v_L_minus), delta, delta_plus, delta_minus))
+            # logs.append((subset, erv, np.sqrt(v_L), child_node_plus.rate, np.sqrt(v_L_plus), child_node_minus.rate, np.sqrt(v_L_minus), delta, delta_prime))
                          
             if subset_node.count == 0: self.tree.remove(subset_node)
             if child_node_plus.count == 0: self.tree.remove(child_node_plus)
