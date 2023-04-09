@@ -12,6 +12,7 @@ website:
       - 06a_sampler.tree.ipynb
       - 06c_sampler.direct.ipynb
       - 06d_sampler.subset.ipynb
+      - 06e_sampler.experimental.ipynb
       - 07_noise.ipynb
       - 08_callbacks.ipynb
       - 09_examples.ipynb

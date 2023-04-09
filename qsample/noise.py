@@ -188,7 +188,10 @@ class E3_1(ErrorModel):
 
 # %% ../nbs/07_noise.ipynb 12
 class InnsbruckTrap(ErrorModel):
-    """Extension of E3_1 adding crosstalk and idlem."""
+    """Extension of E3_1 adding crosstalk and idlem.
+    
+    !!! Under construction !!!
+    """
     
     groups = ["q1", "q2", "init", "meas", "idle1", "idle2", "idlem", "c1", "c2_com", "c2_!com"]
     

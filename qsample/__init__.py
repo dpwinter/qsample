@@ -6,4 +6,4 @@ from .sim.statevector import StatevectorSimulator
 from .circuit import Circuit
 from .protocol import Protocol
 from .sampler.direct import DirectSampler
-from .sampler.subset import SubsetSampler, SubsetSamplerERV
+from .sampler.subset import SubsetSampler

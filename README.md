@@ -5,368 +5,230 @@ qsample
 
 ## Install
 
+------------------------------------------------------------------------
+
     pip install qsample
 
-## Prerequisites
+## \## Prerequisites
 
 - This package requires Python 3.9 or higher.  
 - pdflatex (for circuit rendering)
 
 ## When to use
 
-This package is for you if you want to  
-\* model circuit-level incoherent Pauli noise (we don’t do coherent
-noise here, neither are our auxiliary qubits modelled as ideal)  
-\* with high fidelity physical operations aka low physical error rates  
-\* for a QEC protocol that consists of execution of one or more quantum
-circuits with in-sequence measurements and feed-forward of measurement
-information  
-\* over a specific range of varying physical error rates
-
-## Getting started
-
 ------------------------------------------------------------------------
 
-### Library overview
+- Define QEC protocols that consist of one or more quantum circuits with
+  in-sequence measurements and feed-forward of measurement information  
+- Apply circuit-level incoherent Pauli noise at low physical error rates
+  (i.e. high fidelity physical operations)
+- Simulate and sample protocol execution over ranges of varying physical
+  error rates, using customizable callbacks
 
-1.  Circuit
-2.  Protocol
-3.  Error Model
-4.  Simulator
-5.  Sampler  
-    5.1. Direct Sampler  
-    5.2. Interlude: Callbacks  
-    5.3. Subset Sampler
+## \## Getting started
 
-### 1. Circuit
+Define a quantum protocol to sample from. In `qsample` a protocol is
+represented as a graph with quantum
+[`Circuit`](https://dpwinter.github.io/qsample/circuit.html#circuit)s as
+nodes and transition `checks` as edges.
 
-- List of ticks
-- Each tick is a dictionary, key: gate type, value: set of qubit(s)
-- Recommended: 1 gate type per tick
-
-**Example:** Flagged-GHZ preparation: \* Produce GHZ state on qubits
-0-3  
-\* Flag-qubit 4, measure:  
-\* 0: error-free\*  
-\* 1: flip on one data qubit\*
-
-\* Only for max. 1 allowed fault.
+To sample logical error rates of an error-corrected quantum state
+teleportation protocol, we define the teleportation circuit which sends
+the state of the first to the third qubit.
 
 ``` python
-from qsample import Circuit
+from qsample.circuit import Circuit
+
+teleport = Circuit([{"init": {0, 1, 2}},
+                    {"H": {1}},
+                    {"CNOT": {(1, 2)}},
+                    {"CNOT": {(0, 1)}},
+                    {"H": {0}},
+                    {"measure": {0, 1}}])
+
+teleport.draw()
 ```
+
+![](index_files/figure-commonmark/cell-2-output-1.svg)
+
+Additionally, we need a circuit to (perfectly) measure the third qubit
+after running `teleport`. If the outcome of this measurement is 0
+(corresponding to the initially prepared $|0\rangle$ state of qubit 1)
+the teleportation succeded. If the outcome is 1 however, we want to
+count a logical failure of this protocol.
 
 ``` python
-ghz = Circuit([ {"init": {0,1,2,3,4}},
-                {"H": {0}},
-                {"CNOT": {(0,1)}},
-                {"CNOT": {(1,2)}},
-                {"CNOT": {(2,3)}},
-                {"CNOT": {(3,4)}},
-                {"CNOT": {(0,4)}},
-                {"measure": {4}}], ff_det=True)
+meas = Circuit([{"measure": {2}}], noisy=False)
+
+meas.draw()
 ```
 
-**ff_det**: fault-free deterministic. Set to `True` if circuit gives
-unique measurement result when executed without faults.
+![](index_files/figure-commonmark/cell-3-output-1.svg)
+
+Between `teleport` and `meas` apply a correction to qubit 3 conditioned
+on the measurement outcome (syndrome) of the teleportation circuit. We
+define the lookup function `lut`
 
 ``` python
-ghz.draw()
+def lut(syn):
+    op = {0: 'I', 1: 'X', 2: 'Z', 3: 'Y'}[syn]
+    return Circuit([{op: {2}}], noisy=False)
 ```
 
-![](index_files/figure-commonmark/cell-5-output-1.svg)
-
-### 2. Protocol
-
-- Graph (can be cyclic)
-  - Vertices: Circuits
-  - Edges: transition rules = boolean\* functions (*checks*)
-  - Must include **start** and **end** nodes.
-
-\* Exception: Correction functions can return circuits for on-the-fly
-execution. (special case, will not show here)
-
-**Example:** Flagged-GHZ repeat(3)-until-success  
-\* Execute flagged-GHZ circuit max. 3 times.  
-\* Only repeat if measured `1`.  
-\* If measured flag to be `0` within 3 iteration -\> No fail  
-\* If after 2 iterations 3rd measurement is also `1` -\> Fail
+Finally, define the circuit sequence and transition logic in a
+[`Protocol`](https://dpwinter.github.io/qsample/protocol.html#protocol),
+commenced by a *START* and terminated by a *FAIL* node.
 
 ``` python
-from qsample import Protocol
+from qsample.protocol import Protocol
+
+tele_proto = Protocol(check_functions={'lut': lut})
+tele_proto.add_nodes_from(['tele', 'meas'], circuits=[teleport, meas])
+tele_proto.add_edge('START', 'tele', check='True')
+tele_proto.add_edge('tele', 'COR', check='lut(tele[-1])')
+tele_proto.add_edge('COR', 'meas', check='True')
+tele_proto.add_edge('meas', 'FAIL', check='meas[-1] == 1')
+
+tele_proto.draw(figsize=(8,5))
 ```
 
-``` python
-ghz3 = Protocol(fault_tolerant=True)
+![](index_files/figure-commonmark/cell-5-output-1.png)
 
-ghz3.add_node('ghz', circuit=ghz) # Add node with corresponding circuit
-ghz3.add_edge('START', 'ghz', check='True') # Transition START -> first circuit node always True
-ghz3.add_edge('ghz', 'ghz', check='repeat(ghz)') # Transition to ghz if repeat(ghz) True.
-ghz3.add_edge('ghz', 'FAIL', check='logErr(ghz)') # Transition to final node FAIL if logErr(ghz) True.
-```
+Notice that we do not define any initial circuit for the correction
+*COR* but pass our lookup function to the `check_functions` dictionary,
+which makes it accessible inside the `check` transition statements
+(edges) between circuits. This way we can dynamically insert circuits
+into our protocol at execution time.
 
-**fault_tolerant:** Define all weight-1 paths (circuit sequence with
-max. 1 fault) to never result in a logical fail.
-
-``` python
-ghz3.draw()
-```
-
-![](index_files/figure-commonmark/cell-8-output-1.png)
-
-- `repeat()` and `logErr()` are user-defined (boolean) check functions  
-- Measurement history of circuits stored during for protocol run
-  - Can access measurement history of any circuit by passing its name as
-    argument
-
-Next, we define what the two check functions should do:
-
-``` python
-def repeat(msmt_list): # arg: list of ghz's measurment history
-    return len(msmt_list) < 3 and msmt_list[-1] == 1 # If True repeat ghz
-
-def logErr(msmt_list):
-    return len(msmt_list) == 3 and msmt_list[-1] == 1 # If True transition to `FAIL`
-
-functions = {'logErr': logErr, 'repeat': repeat}
-ghz3._check_fns.update(functions) # Let protocol know about user-defined checks
-```
-
-**Note**: It is also possible that **all checks are false**. In this
-case the protocol exits “insignficantly”.  
-Here: “insignificant” when Flag=0 within 3 protocol runs -\> Go to next
-protocol run, i.e. sample.
-
-### 3. Error model
-
-- Strategy:
-  - Generate *fault* circuit $C_f$ of same length as reference circuit
-    $C$  
-  - During simulation iterate $C$ and $C_f$ simulateously and apply to
-    state  
-- Must include:
-  - `group()`: group circuit locations by key, e.g. all 1-qubit-gates  
-  - `select()`: picks certain amount of locations from each group (not
-    required by user)  
-  - `generate()`: generator function, returns a Pauli fault operator for
-    given location
+After the protocol has been defined we can repeatedly execute
+(i.e. sample) it in the presence of incoherent noise. Let’s say we are
+interested in the logical error rates for physical error rates on all 1-
+and 2-qubit gates of $p_{phy}=10^{-4}, 10^{-3}$, and $10^{-2}$. The
+corresponding noise model is called
+[`E1`](https://dpwinter.github.io/qsample/noise.html#e1) in qsample. The
+groups of all 1- and 2-qubit gates are indexed by the key *q* in
+[`E1`](https://dpwinter.github.io/qsample/noise.html#e1).
 
 ``` python
 from qsample.noise import E1
 
-E1.groups, E1().group(ghz) # All gates in group `q`
+err_params = {'q': [1e-5, 1e-4, 1e-3, 1e-2, 1e-1]}
 ```
 
-    (['q'],
-     {'q': [(1, 0),
-       (2, (0, 1)),
-       (3, (1, 2)),
-       (4, (2, 3)),
-       (5, (3, 4)),
-       (6, (0, 4))]})
-
-### 4. Simulator
-
-- Two types available: Stabilizer (CHP) and Statevectors (ProjectQ
-  port), both well-tested
-  - https://github.com/Strilanc/python-chp-stabilizer-simulator
-  - https://github.com/ProjectQ-Framework/ProjectQ
-- Statevector simulator has more available gates and functions
+We are ready to sample. As our protocol only contains Clifford gates
+let’s choose the
+[`StabilizerSimulator`](https://dpwinter.github.io/qsample/sim.stabilizer.html#stabilizersimulator),
+as well as the
+[`PlotStats`](https://dpwinter.github.io/qsample/callbacks.html#plotstats)
+callback for plotting the resulting logical error rate as function of
+$p_{phy}$.
 
 ``` python
-from qsample import StabilizerSimulator as CHP
+from qsample.sampler.direct import DirectSampler
+from qsample.sim.stabilizer import StabilizerSimulator as CHP
+from qsample.callbacks import PlotStats
+
+sam = DirectSampler(protocol=tele_proto, simulator=CHP, err_model=E1, err_params=err_params)
+sam.run(n_shots=10000, callbacks=[PlotStats()])
 ```
 
-### 5. Sampler
+    p=('1.00e-05',):   0%|          | 0/10000 [00:00<?, ?it/s]
 
-- Two types: Direct (Monte Carlo) and Subset sampler
-- All relevant information stored in `CountTree` data structure
+    p=('1.00e-04',):   0%|          | 0/10000 [00:00<?, ?it/s]
 
-### 5.1. Direct sampler
+    p=('1.00e-03',):   0%|          | 0/10000 [00:00<?, ?it/s]
 
-``` python
-from qsample import DirectSampler
-import numpy as np
-import matplotlib.pyplot as plt
-```
+    p=('1.00e-02',):   0%|          | 0/10000 [00:00<?, ?it/s]
 
-Let’s define some physical error rates at which to sample:
+    p=('1.00e-01',):   0%|          | 0/10000 [00:00<?, ?it/s]
 
-``` python
-sample_range = np.logspace(-3,0,5)
-err_probs = {'q': sample_range} # Note: Must provide rate(s) for each group specified in `ErrorModel`
-err_probs
-```
+![](index_files/figure-commonmark/cell-7-output-6.png)
 
-    {'q': array([0.001     , 0.00562341, 0.03162278, 0.17782794, 1.        ])}
-
-``` python
-dsam = DirectSampler(protocol=ghz3, simulator=CHP, err_probs=err_probs, err_model=E1)
-dsam.run(10000)
-```
-
-    p_phy=1.00E-03:   0%|          | 0/10000 [00:00<?, ?it/s]
-
-    p_phy=5.62E-03:   0%|          | 0/10000 [00:00<?, ?it/s]
-
-    p_phy=3.16E-02:   0%|          | 0/10000 [00:00<?, ?it/s]
-
-    p_phy=1.78E-01:   0%|          | 0/10000 [00:00<?, ?it/s]
-
-    p_phy=1.00E+00:   0%|          | 0/10000 [00:00<?, ?it/s]
+At large physical error rates
+[`DirectSampler`](https://dpwinter.github.io/qsample/sampler.direct.html#directsampler)
+gives good results. However, the lower the error rate, the larger the
+errorbars on the logical error rate become, as most of the time the
+protocol is executed error free and, consequently, logical errors are
+measured infrequently. At low physical error rates it is much more
+efficient use an importance sampling strategy, which if possible avoids
+fault-free protocol execution and instead puts more emphasis on
+execution with at least one fault (so called subset) occurring. This
+approach is implemented in the
+[`SubsetSampler`](https://dpwinter.github.io/qsample/sampler.subset.html#subsetsampler)
+class. We only need to specify one additional parameter `p_max` which
+specifies the $p_{phy}$ at which sampling takes place. This parameter
+must be chosen experimentally by repeated sampling and observing which
+subsets have the largest impact on the failure rate. However, we must
+always choose a value such that the subset occurence probability has an
+exponentially falling shape. Only in this case is the scaling of the
+sampling results valid. Below we see that for the teleportation circuit
+a `p_max` of 0.01 and 0.1 is still okay, while 0.3 would be a
+problematic value. For more information on this approach to sampling
+refer to the linked publication.
 
 ``` python
-p_L, std = dsam.stats()
-
-plt.errorbar(sample_range, p_L, fmt='--', c="black", yerr=std, label="Direct MC")
-plt.plot(sample_range, sample_range,'k:', alpha=0.5)
-plt.xscale('log')
-plt.yscale('log')
-plt.xlabel('$p_{phy}$(q)')
-plt.ylabel('$p_L$');
-```
-
-![](index_files/figure-commonmark/cell-15-output-1.png)
-
-Check what has been sampled for the last (1e0) physical error rate:
-
-``` python
-dsam.trees[(1.0,)].draw()
-```
-
-![](index_files/figure-commonmark/cell-16-output-1.png)
-
-### 5.2. Interlude: Callbacks
-
-- Used to receive intermediate results inside sampling process
-- E.g. we might want to avoid unnecessary samples (at large $p_{phy}$)
-  - We can use the callback `RelStdTarget`
-
-``` python
-from qsample import callbacks as cb
-
-dsam2 = DirectSampler(protocol=ghz3, simulator=CHP, err_probs=err_probs, err_model=E1)
-dsam2.run(10000, callbacks=[cb.RelStdTarget(target=0.2)])
-```
-
-    p_phy=1.00E-03:   0%|          | 0/10000 [00:00<?, ?it/s]
-
-    p_phy=5.62E-03:   0%|          | 0/10000 [00:00<?, ?it/s]
-
-    p_phy=3.16E-02:   0%|          | 0/10000 [00:00<?, ?it/s]
-
-    p_phy=1.78E-01:   0%|          | 0/10000 [00:00<?, ?it/s]
-
-    Rel. std target of 0.2 reached. Sampling stopped.
-
-    p_phy=1.00E+00:   0%|          | 0/10000 [00:00<?, ?it/s]
-
-    Rel. std target of 0.2 reached. Sampling stopped.
-
-Another callback is `VerboseCircuitExec`, which gives a detailed log of
-which circuits, faults and measurements took place:
-
-``` python
-dsam3 = DirectSampler(protocol=ghz3, simulator=CHP, err_probs={'q': 0.1}, err_model=E1)
-dsam3.run(10, callbacks=[cb.VerboseCircuitExec()])
-```
-
-    p_phy=1.00E-01:   0%|          | 0/10 [00:00<?, ?it/s]
-
-    ghz -> Faults: [] -> Msmt: 0
-    None
-    ghz -> Faults: [(3, {'X': {1, 2}})] -> Msmt: 1
-    ghz -> Faults: [(2, {'Z': {0}, 'Y': {1}})] -> Msmt: 1
-    ghz -> Faults: [] -> Msmt: 0
-    None
-    ghz -> Faults: [] -> Msmt: 0
-    None
-    ghz -> Faults: [(2, {'Z': {1}}), (6, {'Y': {0}})] -> Msmt: 0
-    None
-    ghz -> Faults: [] -> Msmt: 0
-    None
-    ghz -> Faults: [(3, {'Z': {1}, 'Y': {2}}), (5, {'Z': {4}})] -> Msmt: 1
-    ghz -> Faults: [(2, {'Z': {0}, 'X': {1}})] -> Msmt: 1
-    ghz -> Faults: [(5, {'Y': {3, 4}})] -> Msmt: 1
-    FAIL
-    ghz -> Faults: [(4, {'X': {3}}), (6, {'X': {0}})] -> Msmt: 1
-    ghz -> Faults: [] -> Msmt: 0
-    None
-    ghz -> Faults: [] -> Msmt: 0
-    None
-    ghz -> Faults: [] -> Msmt: 0
-    None
-    ghz -> Faults: [(3, {'X': {1}, 'Z': {2}}), (4, {'X': {2, 3}})] -> Msmt: 1
-    ghz -> Faults: [(3, {'Y': {1, 2}})] -> Msmt: 1
-    ghz -> Faults: [(6, {'X': {4}})] -> Msmt: 1
-    FAIL
-
-We can also write our own callback. Every sampler has 6 callback
-hooks:  
-\* Begin/End sampler  
-\* Begin/End protocol  
-\* Begin/End circuit
-
-### 5.3. Subset Sampler
-
-- Samples only at one physical error rate `pmax`
-- Scaling obtained analytically
-- `pmax` must be chosen in “representative” region
-
-*Note*: 1. For multi-parameter error model `pmax` is a tuple of one
-physical error rate per group.  
-2. The choice of `pmax` has a direct impact of which subsets are
-sampled.
-
-How to choose `pmax`? What is the heuristic?  
-\* We want to sample, s.t. the subset occurence probability is max. for
-0-weight subset and subsequently falling for higher order subsets.  
-\* We want to have also relatively high probability for other
-(important) subsets, i.e. weight-1, weight-2,..
-
-**Example:** For the Flagged-GHZ circuit we would choose a `pmax` close
-to 0.1:
-
-``` python
-from qsample.sampler.base import subset_occurence, all_subsets, err_probs_tomatrix
-
-grp = E1().group(ghz).values()
-wgts_combis = all_subsets(grp)
+import qsample.math as math
 
 for p_phy in [0.01, 0.1, 0.3]:
-    Aws = subset_occurence(grp, wgts_combis, p_phy)
+    Aws = math.subset_probs(teleport, E1(), p_phy)
     plt.figure()
     plt.title("Subset occurence prob. $A_w$ at $p_{phy}$=%.2f" % p_phy)
-    plt.bar(range(len(Aws)), Aws)
+    plt.bar(list(map(str,Aws.keys())), Aws.values())
     plt.ylabel("$A_w$")
     plt.xlabel("Subsets")
 ```
 
-![](index_files/figure-commonmark/cell-19-output-1.png)
+![](index_files/figure-commonmark/cell-8-output-1.png)
 
-![](index_files/figure-commonmark/cell-19-output-2.png)
+![](index_files/figure-commonmark/cell-8-output-2.png)
 
-![](index_files/figure-commonmark/cell-19-output-3.png)
+![](index_files/figure-commonmark/cell-8-output-3.png)
+
+Let’s choose a $p_{max}=0.1$ for the same error model as before and
+start sampling. (Note the significant difference in the number of
+samples)
 
 ``` python
-from qsample import SubsetSampler
+from qsample.sampler.subset import SubsetSampler
+
+ss_sam = SubsetSampler(protocol=tele_proto, simulator=CHP,  p_max={'q': 0.1}, err_model=E1, err_params=err_params)
+ss_sam.run(500, callbacks=[PlotStats()])
 ```
+
+    p=('1.00e-01',):   0%|          | 0/500 [00:00<?, ?it/s]
+
+![](index_files/figure-commonmark/cell-9-output-2.png)
+
+The sampling results are internally stored by the
+[`SubsetSampler`](https://dpwinter.github.io/qsample/sampler.subset.html#subsetsampler)
+in a [`Tree`](https://dpwinter.github.io/qsample/sampler.tree.html#tree)
+data structure
 
 ``` python
-pmax = {'q': 0.1}
-
-ss_sam = SubsetSampler(ghz3, CHP,  pmax=pmax, err_probs=err_probs, err_model=E1)
-ss_sam.run(300)
+ss_sam.tree.draw(verbose=True)
 ```
 
-    p_phy=1.00E-01:   0%|          | 0/300 [00:00<?, ?it/s]
+![](index_files/figure-commonmark/cell-10-output-1.png)
 
-*Note*: Although we passed `err_probs` those are not used for sampling.
-Only when we call `stats()` those probs are used:
+We see that only the teleportation protocol has fault weight subsets,
+while the *meas* and *COR* circuits are noise-free (ie.e no subsets).
+The leaf nodes *FAIL* and *None* represent logical failure and
+successful teleportation events, respectively. $\delta$ represents the
+missing subsets which have not been sampled and which result in the
+upper bound on the failure rate (*SS up*).
+
+Finally, let’s compare the results of
+[`DirectSampler`](https://dpwinter.github.io/qsample/sampler.direct.html#directsampler)
+and
+[`SubsetSampler`](https://dpwinter.github.io/qsample/sampler.subset.html#subsetsampler).
 
 ``` python
 p_L_low, std_low, p_L_up, std_up = ss_sam.stats()
+p_L, std = sam.stats()
 
+import matplotlib.pyplot as plt
+
+sample_range = err_params['q']
 plt.errorbar(sample_range, p_L, fmt='--', c="black", yerr=std, label="Direct MC")
 plt.loglog(sample_range, p_L_low, label='SS low')
 plt.fill_between(sample_range, p_L_low - std_low, p_L_low + std_low, alpha=0.2)
@@ -378,43 +240,24 @@ plt.ylabel('$p_L$')
 plt.legend();
 ```
 
-![](index_files/figure-commonmark/cell-22-output-1.png)
+![](index_files/figure-commonmark/cell-11-output-1.png)
 
-We sampled at a single error rate with much less samples and get a much
-better bound on the logical error rate. Let’s inspect what has been
-sampled:
-
-``` python
-ss_sam.tree.draw() # only one tree
-```
-
-![](index_files/figure-commonmark/cell-23-output-1.png)
-
-We can store and later reload our sample results:
-
-``` python
-ss_sam.save('ghz3ss.samp')
-
-from qsample import Sampler
-stored_sam = Sampler.load('ghz3ss.samp')
-counts_before = stored_sam.tree.root.counts
-
-stored_sam.run(200) # After loading we can for example run a few more samples.
-counts_after = stored_sam.tree.root.counts
-
-print(counts_before, counts_after)
-```
-
-    ImportError: cannot import name 'Sampler' from 'qsample' (/home/dw/Desktop/HiWi/qsample/qsample/__init__.py)
-
-More complex examples can be found here:
-https://github.com/dpwinter/qsample/blob/master/08_examples.ipynb
+More things to explore: \* `qsample.examples` shows more examples of
+protocol and protocol samplings. \* `qsample.noise` defines more complex
+error models, as well as a superclass
+[`ErrorModel`](https://dpwinter.github.io/qsample/noise.html#errormodel)
+which can be used to define custom error models. \* `qsample.callbacks`
+defines more callbacks, as well as the superclass
+[`Callback`](https://dpwinter.github.io/qsample/callbacks.html#callback)
+which allows for the implementation of custom callbacks.
 
 ## Contribute
 
+------------------------------------------------------------------------
+
 - submit your feature request via github issue
 
-## Team
+## \## Team
 
 `qsample` was developed by Don Winter based on and in collaboration with
 Sascha Heußen under supervision of Prof. Dr. Markus Müller.

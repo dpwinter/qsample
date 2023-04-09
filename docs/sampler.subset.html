@@ -156,6 +156,11 @@ ul.task-list li input[type="checkbox"] {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./sampler.experimental.html" class="sidebar-item-text sidebar-link">ERV Subset Sampler</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./noise.html" class="sidebar-item-text sidebar-link">Error models</a>
   </div>
 </li>
@@ -179,7 +184,6 @@ ul.task-list li input[type="checkbox"] {
    
   <ul>
   <li><a href="#subsetsampler" id="toc-subsetsampler" class="nav-link active" data-scroll-target="#subsetsampler">SubsetSampler</a></li>
-  <li><a href="#subsetsamplererv" id="toc-subsetsamplererv" class="nav-link" data-scroll-target="#subsetsamplererv">SubsetSamplerERV</a></li>
   </ul>
 <div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/dpwinter/qsample/tree/master/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
@@ -221,19 +225,10 @@ ul.task-list li input[type="checkbox"] {
 <pre><code> SubsetSampler (protocol, simulator, p_max, err_model, err_params=None)</code></pre>
 </blockquote>
 <p>Class to represent subset sampler</p>
-<hr>
-<p><a href="https://github.com/dpwinter/qsample/tree/master/blob/master/qsample/sampler/subset.py#L238" target="_blank" style="float:right; font-size:smaller">source</a></p>
-</section>
-<section id="subsetsamplererv" class="level3">
-<h3 class="anchored" data-anchor-id="subsetsamplererv">SubsetSamplerERV</h3>
-<blockquote class="blockquote">
-<pre><code> SubsetSamplerERV (protocol, simulator, p_max, err_model, err_params=None,
-                   k=1)</code></pre>
-</blockquote>
-<p>Subset sampler implementing ERV sampling technique</p>
 <p>from qsample.examples import ghz1, ghz3, ghz_stab, ftsteane, flagstab, steane0, tele from qsample.sim.stabilizer import StabilizerSimulator as CHP from qsample.noise import E1 import qsample.callbacks as cb</p>
-<p>sample_range = np.logspace(-7,0,20) err_params = {‘q’: sample_range} p_max = {‘q’: 0.1}</p>
-<p>ss_sam = SubsetSampler(protocol=ghz3, simulator=CHP, p_max=p_max, err_model=E1, err_params=err_params) ss_sam.run(100, callbacks=[cb.PlotStats(), cb.StatsPerShot()])#, cb.PrintERVPerShot()]) ss_sam.tree.draw()</p>
+<p>sample_range = np.logspace(-5,0,11) err_params = {‘q’: sample_range} p_max = {‘q’: 1e-2}</p>
+<p>ss_sam = SubsetSampler(protocol=ghz3, simulator=CHP, p_max=p_max, err_model=E1, err_params=err_params) # ss_sam.run(1, callbacks=[cb.PrintERVPerShot()]) ss_sam.run(100, callbacks=[cb.PlotStats()])</p>
+<p>ss_sam.tree.draw(verbose=True)</p>
 
 
 </section>
