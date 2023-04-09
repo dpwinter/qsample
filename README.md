@@ -5,18 +5,14 @@ qsample
 
 ## Install
 
-------------------------------------------------------------------------
-
     pip install qsample
 
-## \## Prerequisites
+## Prerequisites
 
 - This package requires Python 3.9 or higher.  
 - pdflatex (for circuit rendering)
 
 ## When to use
-
-------------------------------------------------------------------------
 
 - Define QEC protocols that consist of one or more quantum circuits with
   in-sequence measurements and feed-forward of measurement information  
@@ -25,7 +21,7 @@ qsample
 - Simulate and sample protocol execution over ranges of varying physical
   error rates, using customizable callbacks
 
-## \## Getting started
+## Getting started
 
 Define a quantum protocol to sample from. In `qsample` a protocol is
 represented as a graph with quantum
@@ -144,27 +140,24 @@ sam.run(n_shots=10000, callbacks=[PlotStats()])
 
 ![](index_files/figure-commonmark/cell-7-output-6.png)
 
-At large physical error rates
+Notice, that at low error rates
 [`DirectSampler`](https://dpwinter.github.io/qsample/sampler.direct.html#directsampler)
-gives good results. However, the lower the error rate, the larger the
-errorbars on the logical error rate become, as most of the time the
-protocol is executed error free and, consequently, logical errors are
-measured infrequently. At low physical error rates it is much more
-efficient use an importance sampling strategy, which if possible avoids
-fault-free protocol execution and instead puts more emphasis on
-execution with at least one fault (so called subset) occurring. This
-approach is implemented in the
+performs badly, as most of the time the protocol is executed error free
+and, consequently, logical errors are measured infrequently. In this
+regime it is much more efficient to use an importance sampling strategy
+to avoid fault-free protocol execution and instead put more emphasis on
+execution with at least one fault happening. This approach is
+implemented in the
 [`SubsetSampler`](https://dpwinter.github.io/qsample/sampler.subset.html#subsetsampler)
 class. We only need to specify one additional parameter `p_max` which
 specifies the $p_{phy}$ at which sampling takes place. This parameter
 must be chosen experimentally by repeated sampling and observing which
-subsets have the largest impact on the failure rate. However, we must
-always choose a value such that the subset occurence probability has an
+subsets have the largest impact on the failure rate. We must always
+choose a value such that the subset occurence probability has an
 exponentially falling shape. Only in this case is the scaling of the
 sampling results valid. Below we see that for the teleportation circuit
-a `p_max` of 0.01 and 0.1 is still okay, while 0.3 would be a
-problematic value. For more information on this approach to sampling
-refer to the linked publication.
+a `p_max`-value of 0.01 and 0.1 is still okay, while 0.3 would be
+problematic. For more information refer to the linked publication.
 
 ``` python
 import qsample.math as math
@@ -253,11 +246,9 @@ which allows for the implementation of custom callbacks.
 
 ## Contribute
 
-------------------------------------------------------------------------
-
 - Feel free to submit your feature request via github issues
 
-## \## Team
+## Team
 
 `qsample` was developed by Don Winter based on and in collaboration with
 Sascha Heußen under supervision of Prof. Dr. Markus Müller.
