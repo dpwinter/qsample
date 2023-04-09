@@ -255,7 +255,7 @@ which allows for the implementation of custom callbacks.
 
 ------------------------------------------------------------------------
 
-- submit your feature request via github issue
+- Feel free to submit your feature request via github issues
 
 ## \## Team
 
