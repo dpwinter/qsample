@@ -724,45 +724,40 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>mc_sam.run(<span class="dv">20000</span>, callbacks<span class="op">=</span>[])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"d0529f078bdb4f2187d12eac66abb1f7","version_major":2,"version_minor":0}
+{"model_id":"8e247128a84f487186b976dbf62cb921","version_major":2,"version_minor":0}
+</script>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>IOStream.flush timed out</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"499c7c1a204a4b5d8cc93420719b6fc4","version_major":2,"version_minor":0}
 </script>
 </div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"da67f0bd5047480e80db423416970b9c","version_major":2,"version_minor":0}
+{"model_id":"ffd871c153f8420ab5049c56396986ea","version_major":2,"version_minor":0}
 </script>
 </div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"e4a93828b06540029404cc0222b92799","version_major":2,"version_minor":0}
+{"model_id":"e05a3f429ca34e0dbd000cb966a79b9c","version_major":2,"version_minor":0}
 </script>
 </div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"0a349190bc534e7cae3007abbebe31bd","version_major":2,"version_minor":0}
-</script>
-</div>
-<div class="cell-output cell-output-display">
-<script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"d13b0461b77e491db03d79b03797a00c","version_major":2,"version_minor":0}
+{"model_id":"c3866217c877454dbcd13c57554807e5","version_major":2,"version_minor":0}
 </script>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> qsample.sim.stabilizer <span class="im">import</span> StabilizerSimulator <span class="im">as</span> CHP</span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> qsample.noise <span class="im">import</span> E1</span>
-<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> qsample.callbacks <span class="im">as</span> cb</span>
-<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>sample_range <span class="op">=</span> np.logspace(<span class="op">-</span><span class="dv">5</span>,<span class="dv">0</span>,<span class="dv">11</span>)</span>
-<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>err_params <span class="op">=</span> {<span class="st">'q'</span>: sample_range}</span>
-<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>p_max <span class="op">=</span> {<span class="st">'q'</span>: <span class="fl">0.05</span>}</span>
-<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>ss_sam <span class="op">=</span> SubsetSampler(flagstab, CHP, p_max<span class="op">=</span>p_max, err_params<span class="op">=</span>err_params, err_model<span class="op">=</span>E1)</span>
-<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>ss_sam.run(<span class="dv">500</span>, callbacks<span class="op">=</span>[])</span>
-<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>ss_sam.tree.draw(verbose<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>ss_sam <span class="op">=</span> SubsetSampler(flagstab, CHP, p_max<span class="op">=</span>{<span class="st">'q'</span>: <span class="fl">0.05</span>}, err_params<span class="op">=</span>err_params, err_model<span class="op">=</span>E1)</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>ss_sam.run(<span class="dv">5000</span>, callbacks<span class="op">=</span>[])</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>ss_sam.tree.draw(verbose<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"b8171127c88d42188a9d627a44a935bb","version_major":2,"version_minor":0}
+{"model_id":"9a3d1183501249c1bdd30007e94e1f87","version_major":2,"version_minor":0}
 </script>
 </div>
 <div class="cell-output cell-output-display">
@@ -770,145 +765,103 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># p_L, std = mc_sam.stats()</span></span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>p_L_low, ss_std_low, p_L_up, ss_std_up <span class="op">=</span> ss_sam.stats()</span>
-<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a><span class="co"># plt.errorbar(sample_range, p_L, fmt='--', c="black", yerr=std, label="Direct MC")</span></span>
-<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>plt.loglog(sample_range, p_L_low, label<span class="op">=</span><span class="st">'SS low'</span>)</span>
-<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>plt.fill_between(sample_range, p_L_low<span class="op">-</span>ss_std_low, p_L_low<span class="op">+</span>ss_std_low, alpha<span class="op">=</span><span class="fl">0.2</span>)</span>
-<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>plt.loglog(sample_range, p_L_up, label<span class="op">=</span><span class="st">'SS low'</span>)</span>
-<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>plt.fill_between(sample_range, p_L_up<span class="op">-</span>ss_std_up, p_L_up<span class="op">+</span>ss_std_up, alpha<span class="op">=</span><span class="fl">0.2</span>)</span>
-<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'$p_L$'</span>)</span>
-<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'$p$'</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>p_L, std <span class="op">=</span> mc_sam.stats()</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>p_L_low, ss_std_low, p_L_up, ss_std_up <span class="op">=</span> ss_sam.stats()</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>plt.errorbar(sample_range, p_L, fmt<span class="op">=</span><span class="st">'--'</span>, c<span class="op">=</span><span class="st">"black"</span>, yerr<span class="op">=</span>std, label<span class="op">=</span><span class="st">"Direct MC"</span>)</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>plt.loglog(sample_range, p_L_low, label<span class="op">=</span><span class="st">'SS low'</span>)</span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>plt.fill_between(sample_range, p_L_low<span class="op">-</span>ss_std_low, p_L_low<span class="op">+</span>ss_std_low, alpha<span class="op">=</span><span class="fl">0.2</span>)</span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>plt.loglog(sample_range, p_L_up, label<span class="op">=</span><span class="st">'SS low'</span>)</span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>plt.fill_between(sample_range, p_L_up<span class="op">-</span>ss_std_up, p_L_up<span class="op">+</span>ss_std_up, alpha<span class="op">=</span><span class="fl">0.2</span>)</span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'$p_L$'</span>)</span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'$p$'</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <p><img src="09_examples_files/figure-html/cell-44-output-1.png" class="img-fluid"></p>
-</div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>ss_sam.tree.root.children</span>
-<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="co"># ss_sam.tree.deltas</span></span>
-<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a><span class="co"># [d.siblings for d in deltas]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display">
-<pre><code>(Delta('/X1a/δ'),
- Constant('/X1a/(0,)', count=361),
- Constant('/X1a/(1,)', count=115),
- Constant('/X1a/(2,)', count=21),
- Constant('/X1a/(3,)', count=3))</code></pre>
 </div>
 </div>
 </section>
 <section id="more-complex-noise" class="level3">
 <h3 class="anchored" data-anchor-id="more-complex-noise">More complex noise</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> qsample.noise <span class="im">import</span> E3, E3_1, E2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> qsample.noise <span class="im">import</span> E3, E3_1, E2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>p_max <span class="op">=</span> {</span>
-<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"q1"</span>: <span class="fl">0.1</span>,</span>
-<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"q2"</span>: <span class="fl">0.1</span>, </span>
-<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"meas"</span>: <span class="fl">0.1</span>,</span>
-<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"idle"</span>: <span class="fl">0.01</span>,</span>
-<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"init"</span>: <span class="fl">0.01</span></span>
-<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>err_params <span class="op">=</span> {</span>
-<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">'q1'</span>: <span class="dv">0</span>,</span>
-<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">'q2'</span>: sample_range,</span>
-<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">'meas'</span>: sample_range <span class="op">*</span> <span class="fl">0.1</span>,</span>
-<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">'idle'</span>: sample_range <span class="op">*</span> <span class="fl">0.01</span>,</span>
-<span id="cb40-13"><a href="#cb40-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">'init'</span>:sample_range <span class="op">*</span> <span class="fl">0.001</span></span>
-<span id="cb40-14"><a href="#cb40-14" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>p_max <span class="op">=</span> {</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"q1"</span>: <span class="fl">0.1</span>,</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"q2"</span>: <span class="fl">0.1</span>, </span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"meas"</span>: <span class="fl">0.1</span>,</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"idle"</span>: <span class="fl">0.01</span>,</span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"init"</span>: <span class="fl">0.01</span></span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a>err_params <span class="op">=</span> {</span>
+<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">'q1'</span>: <span class="dv">0</span>,</span>
+<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">'q2'</span>: sample_range,</span>
+<span id="cb39-11"><a href="#cb39-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">'meas'</span>: sample_range <span class="op">*</span> <span class="fl">0.1</span>,</span>
+<span id="cb39-12"><a href="#cb39-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">'idle'</span>: sample_range <span class="op">*</span> <span class="fl">0.01</span>,</span>
+<span id="cb39-13"><a href="#cb39-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">'init'</span>:sample_range <span class="op">*</span> <span class="fl">0.001</span></span>
+<span id="cb39-14"><a href="#cb39-14" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>mc_sam <span class="op">=</span> DirectSampler(ghz3, CHP, err_params<span class="op">=</span>err_params, err_model<span class="op">=</span>E3)</span>
-<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>mc_sam.run(<span class="dv">10000</span>, callbacks<span class="op">=</span>[PlotStats()])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>mc_sam <span class="op">=</span> DirectSampler(ghz3, CHP, err_params<span class="op">=</span>err_params, err_model<span class="op">=</span>E3)</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>mc_sam.run(<span class="dv">10000</span>, callbacks<span class="op">=</span>[PlotStats()])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"3fe41c6c8deb4e51a70f8d267351f5f1","version_major":2,"version_minor":0}
+{"model_id":"767b203cf91b4d7eaefb86b26b584f8c","version_major":2,"version_minor":0}
 </script>
 </div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"a8b3409dee664cfa8703af464e268dd1","version_major":2,"version_minor":0}
+{"model_id":"2725468324734cd9a34b2cd368ae4e3f","version_major":2,"version_minor":0}
 </script>
 </div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"9949341eae6f4cfc9e93bf250c081d7a","version_major":2,"version_minor":0}
+{"model_id":"2e05f93c69e14d62b11e5c716d5ab51f","version_major":2,"version_minor":0}
 </script>
 </div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"7f2c0f5d10194a1b9b02b23bd1cdc999","version_major":2,"version_minor":0}
+{"model_id":"f1135035c7ff4df69cd35ac489ca47c6","version_major":2,"version_minor":0}
 </script>
 </div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"939e4e11451a42a6b35403f6514e84f3","version_major":2,"version_minor":0}
+{"model_id":"c586a936a6b44bc89ae9728acf8b89ff","version_major":2,"version_minor":0}
 </script>
 </div>
 <div class="cell-output cell-output-display">
-<script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"3535fbf99d8c461a9a3767b2c1b862f5","version_major":2,"version_minor":0}
-</script>
-</div>
-<div class="cell-output cell-output-display">
-<script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"33fee2598f9645b89a9b1adf01f5ad95","version_major":2,"version_minor":0}
-</script>
-</div>
-<div class="cell-output cell-output-display">
-<script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"41ed2541acd7439189a2f0fa82a96aec","version_major":2,"version_minor":0}
-</script>
-</div>
-<div class="cell-output cell-output-display">
-<script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"4f3ca16455cc4ab4ae052b9dd4a6b662","version_major":2,"version_minor":0}
-</script>
-</div>
-<div class="cell-output cell-output-display">
-<script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"9dca71372b9f47bea38a1e25d4838596","version_major":2,"version_minor":0}
-</script>
-</div>
-<div class="cell-output cell-output-display">
-<script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"2f84176c7f5c45b3b87fb61fe34f0481","version_major":2,"version_minor":0}
-</script>
-</div>
-<div class="cell-output cell-output-display">
-<p><img src="09_examples_files/figure-html/cell-48-output-12.png" class="img-fluid"></p>
+<p><img src="09_examples_files/figure-html/cell-47-output-6.png" class="img-fluid"></p>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>ss_sam <span class="op">=</span> SubsetSampler(ghz3, CHP, p_max<span class="op">=</span>p_max, err_params<span class="op">=</span>err_params, err_model<span class="op">=</span>E3)</span>
-<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>ss_sam.run(<span class="dv">5000</span>, callbacks<span class="op">=</span>[PlotStats()])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>ss_sam <span class="op">=</span> SubsetSampler(ghz3, CHP, p_max<span class="op">=</span>p_max, err_params<span class="op">=</span>err_params, err_model<span class="op">=</span>E3)</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>ss_sam.run(<span class="dv">5000</span>, callbacks<span class="op">=</span>[PlotStats()])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"f0ee9f28467d489a984418a23a04e908","version_major":2,"version_minor":0}
+{"model_id":"0fa339766cf047f2a8db6f5b8ec35a33","version_major":2,"version_minor":0}
 </script>
 </div>
 <div class="cell-output cell-output-display">
-<p><img src="09_examples_files/figure-html/cell-49-output-2.png" class="img-fluid"></p>
+<p><img src="09_examples_files/figure-html/cell-48-output-2.png" class="img-fluid"></p>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>p_L, std <span class="op">=</span> mc_sam.stats()</span>
-<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>p_L_low, ss_std_low, p_L_up, ss_std_up <span class="op">=</span> ss_sam.stats()</span>
-<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>plt.errorbar(sample_range, p_L, fmt<span class="op">=</span><span class="st">'--'</span>, c<span class="op">=</span><span class="st">"black"</span>, yerr<span class="op">=</span>std, label<span class="op">=</span><span class="st">"Direct MC"</span>)</span>
-<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>plt.loglog(sample_range, p_L_low, label<span class="op">=</span><span class="st">'SS low'</span>)</span>
-<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>plt.fill_between(sample_range, p_L_low<span class="op">-</span>ss_std_low, p_L_low<span class="op">+</span>ss_std_low, alpha<span class="op">=</span><span class="fl">0.2</span>)</span>
-<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>plt.loglog(sample_range, p_L_up, label<span class="op">=</span><span class="st">'SS low'</span>)</span>
-<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a>plt.fill_between(sample_range, p_L_up<span class="op">-</span>ss_std_up, p_L_up<span class="op">+</span>ss_std_up, alpha<span class="op">=</span><span class="fl">0.2</span>)</span>
-<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a>plt.xscale(<span class="st">'log'</span>)</span>
-<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a>plt.yscale(<span class="st">'log'</span>)</span>
-<span id="cb43-12"><a href="#cb43-12" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'$p_L$'</span>)</span>
-<span id="cb43-13"><a href="#cb43-13" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'$p$'</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>p_L, std <span class="op">=</span> mc_sam.stats()</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>p_L_low, ss_std_low, p_L_up, ss_std_up <span class="op">=</span> ss_sam.stats()</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>plt.errorbar(sample_range, p_L, fmt<span class="op">=</span><span class="st">'--'</span>, c<span class="op">=</span><span class="st">"black"</span>, yerr<span class="op">=</span>std, label<span class="op">=</span><span class="st">"Direct MC"</span>)</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>plt.loglog(sample_range, p_L_low, label<span class="op">=</span><span class="st">'SS low'</span>)</span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>plt.fill_between(sample_range, p_L_low<span class="op">-</span>ss_std_low, p_L_low<span class="op">+</span>ss_std_low, alpha<span class="op">=</span><span class="fl">0.2</span>)</span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>plt.loglog(sample_range, p_L_up, label<span class="op">=</span><span class="st">'SS low'</span>)</span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>plt.fill_between(sample_range, p_L_up<span class="op">-</span>ss_std_up, p_L_up<span class="op">+</span>ss_std_up, alpha<span class="op">=</span><span class="fl">0.2</span>)</span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a>plt.xscale(<span class="st">'log'</span>)</span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a>plt.yscale(<span class="st">'log'</span>)</span>
+<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'$p_L$'</span>)</span>
+<span id="cb42-13"><a href="#cb42-13" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'$p$'</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-<p><img src="09_examples_files/figure-html/cell-50-output-1.png" class="img-fluid"></p>
+<p><img src="09_examples_files/figure-html/cell-49-output-1.png" class="img-fluid"></p>
 </div>
 </div>
 

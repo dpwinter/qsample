@@ -208,8 +208,6 @@ class Tree:
         Root node of the tree
     marked : set
         Marked leaf nodes, i.e. due to logical failure
-    deltas : set
-        Set of leaf nodes representing cutoff errors (deltas)
     """
     
     def __init__(self, constants):
@@ -222,7 +220,6 @@ class Tree:
         self.root = None
         self.constants = constants
         self.marked = set()
-        self.deltas = set()
     
     def add(self, name, node_type, parent=None, **kwargs):
         """Add node of `node_type` and `name` as child of `parent`.
@@ -415,7 +412,8 @@ class Tree:
             Variance
         """        
         if mode == 0:
-            leaves = set(self.root.leaves).intersection(self.marked.union(self.deltas))
+            deltas = [n for n in self.root.leaves if type(n) == Delta]
+            leaves = set(self.root.leaves).intersection(self.marked.union(deltas))
         elif mode == 1:
             leaves = set(self.root.leaves).intersection(self.marked)
         else:
@@ -467,7 +465,8 @@ class Tree:
             Sum of delta paths
         """
         acc = 0
-        for dnode in self.deltas:
+        deltas = [n for n in self.root.leaves if type(n) == Delta]
+        for dnode in deltas:
             acc += self.path_prod(self.root, dnode)
         return acc
             

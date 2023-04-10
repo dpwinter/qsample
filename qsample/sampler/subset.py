@@ -140,7 +140,6 @@ class SubsetSampler:
         for vsubset in [ss for ss in self.tree.constants[circuit.id].keys() if sum(ss) <= delta_weight]:
             self.tree.add(name=vsubset, parent=tnode, node_type=Constant)
             delta_node = self.tree.add(name='δ', node_type=Delta, parent=tnode)
-            self.tree.deltas.add(delta_node)
         
     def run(self, n_shots, callbacks=[]):
         """Execute n_shots of subset sampling
@@ -202,7 +201,6 @@ class SubsetSampler:
                         tnode.invariant = True
                     else:
                         delta_node = self.tree.add(name='δ', node_type=Delta, parent=tnode)
-                        self.tree.deltas.add(delta_node)
                     
                         subset = self._choose_subset(tnode, circuit)
                         fault_locs = self.err_model.choose_w(self.partitions[circuit.id], subset)

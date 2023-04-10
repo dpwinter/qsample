@@ -12,20 +12,20 @@ import numpy as np
 # %% ../../nbs/06e_sampler.experimental.ipynb 4
 class SubsetSamplerERV(SubsetSampler):
     """Subset sampler implementing ERV sampling technique
-    
+
     Attributes
     ----------
     k : int
         Application of ERV every k-th shots
     """
-    
+
     def __init__(self, protocol, simulator, p_max, err_model, err_params=None, k=1):
         super().__init__(protocol, simulator, p_max, err_model, err_params)
         self.k = k
-    
+
     def wplus1(self, tree_node, circuit):
         """Return subsets of this `tree_node` plus next important subset
-        
+
         Parameters
         ----------
         tree_node : Variable
@@ -35,138 +35,146 @@ class SubsetSamplerERV(SubsetSampler):
         """
         Aws = self.tree.constants[circuit.id]
         sampled_subsets = [n.name for n in tree_node.children if type(n) != Delta]
-        unsampled_Aws = {k:v for k,v in Aws.items() if k not in sampled_subsets}
+        unsampled_Aws = {k: v for k, v in Aws.items() if k not in sampled_subsets}
         if unsampled_Aws:
             next_important_subset = max(unsampled_Aws, key=lambda k: unsampled_Aws.get(k))
             subset_candidates = sampled_subsets + [next_important_subset]
         else:
             subset_candidates = sampled_subsets
-            
+
         return subset_candidates
-    
+
     def _choose_subset(self, circuit_node, circuit):
         """ERV criterium to choose subsets
-        
+
         For every k-th shot execute ERV, otherwise choose default routine
-        `SubsetSampler._choose_subset`. 
-        
+        `SubsetSampler._choose_subset`.
+
         Parameters
         ----------
         tree_node : Variable
             Current tree node we want to sample from
         circuit : Circuit
             Current circuit associated with tree node
-        
+
         Returns
         -------
         tuple
             Next subset to choose for `tree_node`
         """
-        
-        if self.tree.root.count % self.k != 0 :
+
+        if self.tree.root.count % self.k != 0:
             return super()._choose_subset(circuit_node, circuit)
-        
+
         subset_candidates = self.wplus1(circuit_node, circuit)
-        
+
         erv_vals = []
         logs = []
-        
-        delta_node = self.tree.add(name='δ', node_type=Delta, parent=circuit_node)
-        self.tree.deltas.add(delta_node)
-        
-        # delta = self.tree.delta
-        v_L = self.tree.var(mode=0)
-        # v_L_up = self.tree.var(mode=0)
-        
+
+        # exclude virtual nodes in calculation of delta
+        # vss_contrib = np.prod([self.tree.value(n) for n in circuit_node.children if type(n) == Delta or n.count==0])
+        # delta = self.tree.delta / (1 if vss_contrib==0 else vss_contrib)
+        d = self.tree.add(name='δ', parent=circuit_node, node_type=Delta)
+        self.tree.deltas.add(d)
+
+        delta = self.tree.delta
+
         for subset in subset_candidates:
-            
+
             subset_node = self.tree.add(name=subset, parent=circuit_node, node_type=Constant)
-            
+
             if circuit_node.ff_deterministic and not any(subset):
                 # erv_vals.append(delta - delta_prime)
                 erv_vals.append(0)
                 logs.append((subset, 0, 'ff_deterministic!'))
                 continue
-            
+
             children = subset_node.children
-                        
-            if len(children) == 0: 
-                child_node_minus = self.tree.add(name=None, parent=subset_node, circuit_id=circuit.id, node_type=Variable)
-                child_node_plus = self.tree.add(name='FAIL', parent=subset_node, circuit_id=circuit.id, node_type=Variable)
+
+            if len(children) == 0:
+                child_node_minus = self.tree.add(name=None, parent=subset_node, circuit_id=circuit.id,
+                                                 node_type=Variable)
+                child_node_plus = self.tree.add(name='FAIL', parent=subset_node, circuit_id=circuit.id,
+                                                node_type=Variable)
                 self.tree.marked.add(child_node_plus)
             elif len(children) == 1:
                 if children[0] in self.tree.marked:
-                    child_node_minus = self.tree.add(name=None, parent=subset_node, circuit_id=circuit.id, node_type=Variable)
+                    child_node_minus = self.tree.add(name=None, parent=subset_node, circuit_id=circuit.id,
+                                                     node_type=Variable)
                     child_node_plus = children[0]
                 else:
                     child_node_minus = children[0]
-                    child_node_plus = self.tree.add(name='FAIL', parent=subset_node, circuit_id=circuit.id, node_type=Variable)
+                    child_node_plus = self.tree.add(name='FAIL', parent=subset_node, circuit_id=circuit.id,
+                                                    node_type=Variable)
                     self.tree.marked.add(child_node_plus)
             elif len(children) == 2:
                 child_node_minus, child_node_plus = children
             else:
                 raise Exception("Subset nodes not allowed to have more than 2 children.")
-                
-            subset_node.count += 1 
-            
-            if subset_node.count > 0:  # already exists
-                delta_delta = 0
-            else:  # doesn't exist already
-                delta_delta = self.tree.path_prod(self.tree.root, subset_node)
-            
-            # delta_prime = self.tree.delta
 
+            subset_node.count += 1
+
+            delta_prime = self.tree.delta
+
+            #print(child_node_minus.count)
             child_node_minus.count += 1
-            q_minus = child_node_minus.rate
-            # delta_minus = self.tree.delta
-            v_L_minus = self.tree.var(mode=0)
-            # v_L_up_minus = self.tree.var(mode=0)
+            delta_minus = self.tree.delta
+            v_L_minus = self.tree.var(mode=1)
+            #minus_tree = deepcopy(self.tree)
+            #print(child_node_minus.count)
+            v_L_up_minus = self.tree.var(mode=0)
             child_node_minus.count -= 1
-            
+            #print(child_node_minus.count, v_L_minus, v_L_up_minus)
+
             child_node_plus.count += 1
-            q_plus = child_node_plus.rate
-            # delta_plus = self.tree.delta
-            v_L_plus = self.tree.var(mode=0)
-            # v_L_up_plus = self.tree.var(mode=0)
+            #plus_tree = deepcopy(self.tree)
+            delta_plus = self.tree.delta
+            v_L_plus = self.tree.var(mode=1)
+            v_L_up_plus = self.tree.var(mode=0)
             child_node_plus.count -= 1
-            
+
             subset_node.count -= 1
 
-            # err = np.sqrt(v_L) + np.sqrt(v_L_up) + delta
-            # err_plus = np.sqrt(v_L_plus) + np.sqrt(v_L_up_plus) + delta_plus
-            # err_minus = np.sqrt(v_L_minus) + np.sqrt(v_L_up_minus) + delta_minus
+            #print('plus-tree:', plus_tree)
+            #print('minus-tree:', minus_tree)
 
-            # v_L_exp = child_node_plus.rate * v_L_plus + child_node_minus.rate * v_L_minus
-            v_L_exp = q_plus * v_L_plus + q_minus * v_L_minus
-            
-            # delta_exp = child_node_plus.rate * delta_plus + child_node_minus.rate * delta_minus
+            v_L = self.tree.var(mode=1)
+            v_L_up = self.tree.var(mode=0)
 
-            # erv = abs(child_node_plus.rate * err_plus + child_node_minus.rate * err_minus - err)
-            # erv = np.sqrt(v_L) - np.sqrt(v_L_exp) + delta_exp - delta
-            erv = abs(np.sqrt(v_L_exp) - np.sqrt(v_L) + delta_delta)
-        
+            #print(self.tree)
+            #print(np.sqrt(v_L))
+
+            err = np.sqrt(v_L) + np.sqrt(v_L_up) + delta
+            err_plus = np.sqrt(v_L_plus) + np.sqrt(v_L_up_plus) + delta_plus
+            err_minus = np.sqrt(v_L_minus) + np.sqrt(v_L_up_minus) + delta_minus
+
+            v_L_exp = child_node_plus.rate * v_L_plus + child_node_minus.rate * v_L_minus
+            delta_exp = child_node_plus.rate * delta_plus + child_node_minus.rate * delta_minus
+
+            erv = -(child_node_plus.count/(child_node_plus.count + child_node_minus.count) * err_plus + child_node_minus.count/(child_node_plus.count + child_node_minus.count) * err_minus - err) if child_node_plus.count + child_node_minus.count != 0 else -(child_node_plus.rate * err_plus + (1-child_node_plus.rate) * err_minus - err)
+            # erv = np.sqrt(v_L) - np.sqrt(v_L_exp) + delta_exp - delta # orig
+            # erv = np.sqrt(v_L_exp) - np.sqrt(v_L) + delta_exp - delta
+            # erv = np.sqrt(v_L) - np.sqrt(v_L_exp) + delta_prime - delta
+            # erv = delta_prime - delta
+
+            # erv = abs(v_L - v_L_exp + delta - delta_prime)
+            # erv = child_node_plus.rate * (np.sqrt(v_L_plus) - delta_plus) + child_node_minus.rate * (np.sqrt(v_L_minus) - delta_minus) - (np.sqrt(v_L) - delta)
             erv_vals.append(erv)
-            # print(subset, child_node_minus.count, child_node_plus.count, child_node_minus.name, child_node_plus.name)
-            logs.append((subset, f'ERV = {erv:.4e}', 
-                                 f'√V = {np.sqrt(v_L):.4e}', 
-                                 f'q+ = {child_node_plus.rate:.4e}', 
-                                 f'√V+ = {np.sqrt(v_L_plus):.4e}', 
-                                 f'q- = {child_node_minus.rate:.4e}', 
-                                 f'√V- = {np.sqrt(v_L_minus):.4e}',
-                                 f'<√V> = {np.sqrt(v_L_exp):.4e}',
-                                 f'Δδ = {delta_delta:.4e}'))
-                                 # f'√V+up = {np.sqrt(v_L_up_plus):.4e}',
-                                 # f'√V-up = {np.sqrt(v_L_up_minus):.4e}',
-                                 # f'δ = {delta:.4e}', 
-                                 # f'<δ> = {delta_exp:.4e}', 
-                                 # f'δ+ = {delta_plus:.4e}', 
-                                 # f'δ- = {delta_minus:.4e}'))
-            
+            # logs.append((subset, erv, np.sqrt(v_L), child_node_plus.rate, np.sqrt(v_L_plus), child_node_minus.rate, np.sqrt(v_L_minus), delta, delta_plus, delta_minus))
+            logs.append((subset, 'ERV = ' + str(erv), '√V = ' + str(np.sqrt(v_L)), 'n+ = ' + str(child_node_plus.count),
+                         'n- = ' + str(child_node_minus.count), 'E+ = ' + str(err_plus),
+                         'E- = ' + str(err_minus),
+                         'E = ' + str(err),'q+ = ' + str(child_node_plus.rate),
+                         '√V+ = ' + str(np.sqrt(v_L_plus)), 'q- = ' + str(child_node_minus.rate),
+                         '1-q+ = ' + str((1 - child_node_plus.rate)), '√V- = ' + str(np.sqrt(v_L_minus)),
+                         'δ = ' + str(delta), '<δ> = ' + str(delta_exp), 'δ+ = ' + str(delta_plus),
+                         'δ- = ' + str(delta_minus)))
+
             if subset_node.count == 0: self.tree.remove(subset_node)
             if child_node_plus.count == 0: self.tree.remove(child_node_plus)
             if child_node_minus.count == 0: self.tree.remove(child_node_minus)
-        
-        idx = np.argmax(erv_vals)        
+
+        idx = np.argmax(erv_vals)
         self.erv_vals = erv_vals
         self.erv_idx = idx
         self.logs = logs
