@@ -173,6 +173,7 @@ class Variable(Node):
             Value of transition rate in range [0,1]
         """
         if self.is_root or self.parent.count == 0:# or self.count == 0:
+            # delta accessible via virtual circuits (self.count==0)
             return 1.0
         return self.count / self.parent.count
     
@@ -357,7 +358,7 @@ class Tree:
             if node == nodeA: break
         return prod
 
-    def path_var(self, node):
+    def path_var(self, node, zero_leaf=False):
         """Variance of path from `root` to `node`
         
         Parameters
@@ -373,7 +374,10 @@ class Tree:
         E2 = 1
         VpE2 = 1
         for n in node.path:
-            v = self.value(n)**2
+            if zero_leaf and n == node:
+                v = 0
+            else:
+                v = self.value(n)**2
             E2 *= v
             VpE2 *= (n.var + v) if type(n) == Variable else v
         return VpE2 - E2
@@ -412,6 +416,8 @@ class Tree:
         float
             Variance
         """
+        # leaves1 = 
+        
         if mode == 0:
             leaves = set(self.root.leaves).intersection(self.marked.union(self.deltas))
         elif mode == 1:
@@ -428,7 +434,11 @@ class Tree:
         acc = 0
         for leaf in leaves:
             acc += self.path_var(leaf)
-        acc_o = acc
+        
+        # Add contributions to variance from no-fail paths
+        nf_leaves = set(n for n in set(self.root.leaves).difference(self.marked) if type(n)==Variable and not n.invariant and len(n.siblings)==0)
+        for leaf in nf_leaves:
+            acc += self.path_var(leaf, zero_leaf=True)
             
         for ix_node in ix_nodes:
             cov = 0
