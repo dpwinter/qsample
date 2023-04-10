@@ -172,7 +172,7 @@ class Variable(Node):
         float
             Value of transition rate in range [0,1]
         """
-        if self.is_root or self.parent.count == 0:# or self.count == 0:
+        if self.is_root or self.parent.count == 0 or self.count == 0:
             # delta accessible via virtual circuits (self.count==0)
             return 1.0
         return self.count / self.parent.count
