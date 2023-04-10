@@ -172,7 +172,7 @@ class Variable(Node):
         float
             Value of transition rate in range [0,1]
         """
-        if self.is_root or self.parent.count == 0 or self.count == 0:
+        if self.is_root or self.count==0: #self.parent.count == 0:
             # delta accessible via virtual circuits (self.count==0)
             return 1.0
         return self.count / self.parent.count
@@ -374,10 +374,8 @@ class Tree:
         E2 = 1
         VpE2 = 1
         for n in node.path:
-            if zero_leaf and n == node:
-                v = 0
-            else:
-                v = self.value(n)**2
+            v = self.value(n)**2
+            if zero_leaf and n == node: v = 0
             E2 *= v
             VpE2 *= (n.var + v) if type(n) == Variable else v
         return VpE2 - E2
@@ -415,9 +413,7 @@ class Tree:
         -------
         float
             Variance
-        """
-        # leaves1 = 
-        
+        """        
         if mode == 0:
             leaves = set(self.root.leaves).intersection(self.marked.union(self.deltas))
         elif mode == 1:
