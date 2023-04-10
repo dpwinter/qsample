@@ -186,6 +186,10 @@ class SubsetSampler:
                         vcircuit = self.protocol.get_circuit(vpnode)
                         if vcircuit and vcircuit.noisy:
                             vtnode = self.tree.add(name=vpnode, parent=tnode.parent, node_type=Variable, circuit_id=vcircuit.id)
+                            path_weight = self.tree.path_weight(vtnode)
+                            if path_weight == 0:
+                                # Nodes along weight-0 path have no variance
+                                vtnode.invariant = True
                             self.__add_virtual_subsets(vtnode, path_weight)
                         
                 if circuit:

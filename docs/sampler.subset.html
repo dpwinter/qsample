@@ -226,8 +226,8 @@ ul.task-list li input[type="checkbox"] {
 </blockquote>
 <p>Class to represent subset sampler</p>
 <p>from qsample.examples import ghz1, ghz3, ghz_stab, ftsteane, flagstab, steane0, tele from qsample.sim.stabilizer import StabilizerSimulator as CHP from qsample.noise import E1 import qsample.callbacks as cb</p>
-<p>sample_range = np.logspace(-5,0,11) err_params = {‘q’: sample_range} p_max = {‘q’: 1e-2}</p>
-<p>ss_sam = SubsetSampler(protocol=ghz3, simulator=CHP, p_max=p_max, err_model=E1, err_params=err_params) # ss_sam.run(1, callbacks=[cb.PrintERVPerShot()]) ss_sam.run(100, callbacks=[cb.PlotStats()])</p>
+<p>sample_range = np.logspace(-5,0,11) err_params = {‘q’: sample_range} p_max = {‘q’: 0.01}</p>
+<p>ss_sam = SubsetSampler(protocol=ghz_stab, simulator=CHP, p_max=p_max, err_model=E1, err_params=err_params) # ss_sam.run(1, callbacks=[cb.PrintERVPerShot()]) ss_sam.run(100, callbacks=[cb.PlotStats()])</p>
 <p>ss_sam.tree.draw(verbose=True)</p>
 
 

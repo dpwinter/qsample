@@ -172,7 +172,7 @@ class Variable(Node):
         float
             Value of transition rate in range [0,1]
         """
-        if self.is_root or self.parent.count == 0 or self.count == 0:
+        if self.is_root or self.parent.count == 0:# or self.count == 0:
             return 1.0
         return self.count / self.parent.count
     
@@ -189,7 +189,7 @@ class Variable(Node):
         float
             Value of variance of transition rate
         """
-        if self.is_root or self.invariant or self.count == 0:
+        if self.is_root or self.invariant:
             return 0.0
         return math.Wilson_var(self.rate, self.parent.count)
     
