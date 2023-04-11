@@ -334,7 +334,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <pre><code>/home/dw/.local/lib/python3.10/site-packages/fastcore/docscrape.py:225: UserWarning: Unknown section Attributes
   else: warn(msg)</code></pre>
 <hr>
-<p><a href="https://github.com/dpwinter/qsample/tree/master/blob/master/qsample/sampler/tree.py#L200" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/dpwinter/qsample/tree/master/blob/master/qsample/sampler/tree.py#L201" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="tree" class="level3">
 <h3 class="anchored" data-anchor-id="tree">Tree</h3>
@@ -393,8 +393,16 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="co"># tree.draw(verbose=False)</span></span>
 <span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tree)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-error">
-<pre><code>AttributeError: 'Tree' object has no attribute 'deltas'</code></pre>
+<div class="cell-output cell-output-stdout">
+<pre><code>root (100, 0.00e+00)
+├── (0,) (40)
+│   └── None (40, 0.00e+00)
+├── (1,) (30)
+│   ├── fail (20, 7.20e-03)
+│   └── None (10, 7.20e-03)
+├── (2,) (30)
+│   └── None (25, 4.60e-03)
+└── δ</code></pre>
 </div>
 </div>
 <p>Test numerics of 1-level tree.</p>
