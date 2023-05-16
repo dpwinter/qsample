@@ -201,7 +201,7 @@ class SubsetSampler:
                         msmt = state.run(circuit)
                         tnode.invariant = True
                     else:
-                        self.tree.add(name='δ', node_type=Delta, parent=tnode, ff=False)
+                        self.tree.add(name='δ', node_type=Delta, parent=tnode)
                     
                         subset = self._choose_subset(tnode, circuit)
                         fault_locs = self.err_model.choose_w(self.partitions[circuit.id], subset)
