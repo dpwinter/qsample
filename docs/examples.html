@@ -754,7 +754,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>ss_sam.tree.draw(verbose<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"79e7f747b635431aa95ee35e42d74a52","version_major":2,"version_minor":0}
+{"model_id":"51b65b70595d42eb925ddf5729ff9ad7","version_major":2,"version_minor":0}
 </script>
 </div>
 <div class="cell-output cell-output-display">
@@ -762,10 +762,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>p_L, std <span class="op">=</span> mc_sam.stats()</span>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># p_L, std = mc_sam.stats()</span></span>
 <span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>p_L_low, ss_std_low, p_L_up, ss_std_up <span class="op">=</span> ss_sam.stats()</span>
 <span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>plt.errorbar(sample_range, p_L, fmt<span class="op">=</span><span class="st">'--'</span>, c<span class="op">=</span><span class="st">"black"</span>, yerr<span class="op">=</span>std, label<span class="op">=</span><span class="st">"Direct MC"</span>)</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a><span class="co"># plt.errorbar(sample_range, p_L, fmt='--', c="black", yerr=std, label="Direct MC")</span></span>
 <span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>plt.loglog(sample_range, p_L_low, label<span class="op">=</span><span class="st">'SS low'</span>)</span>
 <span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>plt.fill_between(sample_range, p_L_low<span class="op">-</span>ss_std_low, p_L_low<span class="op">+</span>ss_std_low, alpha<span class="op">=</span><span class="fl">0.2</span>)</span>

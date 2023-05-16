@@ -38,7 +38,7 @@ class SubsetSampler:
     tree : CountTree
         Tree data structure to keep track of sampled events
     """
-    def __init__(self, protocol, simulator, p_max, err_model, err_params=None):
+    def __init__(self, protocol, simulator, p_max, err_model, err_params=None, L=None):
         """
         Parameters
         ----------
@@ -62,8 +62,9 @@ class SubsetSampler:
         self.err_params = self.__err_params_to_matrix(err_params)
         
         self.partitions = {cid: self.err_model.group(circuit) for cid, circuit in self.protocol.circuits.items()}
-        self.tree = Tree(constants={cid: math.subset_probs(circuit, self.err_model, self.p_max) for cid, circuit in protocol.circuits.items()})
-         
+        constants = {cid: math.subset_probs(circuit, self.err_model, self.p_max) for cid, circuit in protocol.circuits.items()}
+        self.tree = Tree(constants, L)
+      
     def __err_params_to_matrix(self, err_params):
         sorted_params = [err_params[k] for k in self.err_model.groups]
         return np.array(np.broadcast_arrays(*sorted_params)).T
@@ -139,7 +140,7 @@ class SubsetSampler:
         delta_weight = (1 if self.protocol.fault_tolerant else 0) - path_weight
         for vsubset in [ss for ss in self.tree.constants[circuit.id].keys() if sum(ss) <= delta_weight]:
             self.tree.add(name=vsubset, parent=tnode, node_type=Constant)
-            delta_node = self.tree.add(name='δ', node_type=Delta, parent=tnode)
+            delta_node = self.tree.add(name='δ', node_type=Delta, parent=tnode, ff=True)
         
     def run(self, n_shots, callbacks=[]):
         """Execute n_shots of subset sampling
@@ -200,7 +201,7 @@ class SubsetSampler:
                         msmt = state.run(circuit)
                         tnode.invariant = True
                     else:
-                        delta_node = self.tree.add(name='δ', node_type=Delta, parent=tnode)
+                        self.tree.add(name='δ', node_type=Delta, parent=tnode, ff=False)
                     
                         subset = self._choose_subset(tnode, circuit)
                         fault_locs = self.err_model.choose_w(self.partitions[circuit.id], subset)

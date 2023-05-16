@@ -75,7 +75,7 @@ class SubsetSamplerERV(SubsetSampler):
         # vss_contrib = np.prod([self.tree.value(n) for n in circuit_node.children if type(n) == Delta or n.count==0])
         # delta = self.tree.delta / (1 if vss_contrib==0 else vss_contrib)
         d = self.tree.add(name='δ', parent=circuit_node, node_type=Delta)
-        self.tree.deltas.add(d)
+        # self.tree.deltas.add(d)
 
         delta = self.tree.delta
 
