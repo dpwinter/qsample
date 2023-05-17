@@ -119,7 +119,7 @@ class SubsetSampler:
             Aws[0] = np.ma.masked
         return subsets[ np.random.choice(len(subsets), p=Aws) ]
     
-    def __add_virtual_subsets(self, tnode, path_weight):
+    def __add_virtual_subsets(self, tnode, path_weight, ff_delta):
         """Append subset nodes with 0 count at tnode
         
         For F.T. protocols we know that all paths with a path weight
@@ -140,7 +140,7 @@ class SubsetSampler:
         delta_weight = (1 if self.protocol.fault_tolerant else 0) - path_weight
         for vsubset in [ss for ss in self.tree.constants[circuit.id].keys() if sum(ss) <= delta_weight]:
             self.tree.add(name=vsubset, parent=tnode, node_type=Constant)
-            delta_node = self.tree.add(name='δ', node_type=Delta, parent=tnode, ff=True)
+            delta_node = self.tree.add(name='δ', node_type=Delta, parent=tnode, ff=ff_delta)
         
     def run(self, n_shots, callbacks=[]):
         """Execute n_shots of subset sampling
@@ -190,7 +190,7 @@ class SubsetSampler:
                             if path_weight == 0:
                                 # Nodes along weight-0 path have no variance
                                 vtnode.invariant = True
-                            self.__add_virtual_subsets(vtnode, path_weight)
+                            self.__add_virtual_subsets(vtnode, path_weight, ff_delta=path_weight==0)
                         
                 if circuit:
                 
@@ -213,7 +213,7 @@ class SubsetSampler:
                         
                         # Add virtual subsets for this circuit node
                         if path_weight <= (1 if self.protocol.fault_tolerant else 0):
-                            self.__add_virtual_subsets(tnode.parent, path_weight)
+                            self.__add_virtual_subsets(tnode.parent, path_weight, ff_delta=True)
                         
                     msmt = msmt if msmt==None else int(msmt,2) # convert to int for comparison in checks
                     msmt_hist[pnode] = msmt_hist.get(pnode, []) + [msmt]

@@ -329,7 +329,7 @@ class Tree:
             return self.constants[node.parent.circuit_id][node.name]
         elif type(node) == Delta:
             
-            if node.ff and self.L: # delta node of fault-free path
+            if node.ff and self.L and node.parent.count == 0: # delta node of (virtual) fault-free path
                 excl_keys = [n.name for n in node.siblings]
                 A_w = np.max([v for k,v in self.constants[node.parent.circuit_id].items() if k not in excl_keys], axis=0)
                 return self.L * A_w * (1-self.M0)
