@@ -134,19 +134,6 @@ class Delta(Node):
         The (not necessarily unique) name of the node
     """
     
-    def __init__(self, name, count=0, parent=None, ff=False, **kwargs):
-        """
-        Parameters
-        ----------
-        name : str
-            The (not necessarily unique) name of the node
-        ff : bool
-            True if path leading to delta is fault-free
-        parent : Node
-            Reference to parent node object
-        """
-        super().__init__(name=name, count=count, parent=parent, ff=ff, **kwargs)
-        
     def __str__(self):
         return f"{self.name}"
         
@@ -186,7 +173,6 @@ class Variable(Node):
         float
             Value of transition rate in range [0,1]
         """
-        # if self.is_root or self.count==0: #self.parent.count == 0:
         if self.is_root:
             return 1.0
         elif self.parent.count == 0:
@@ -329,10 +315,8 @@ class Tree:
             return self.constants[node.parent.circuit_id][node.name]
         elif type(node) == Delta:
             
-            if node.ff and self.L and node.parent.count == 0: # delta node of (virtual) fault-free path
-                excl_keys = [n.name for n in node.siblings]
-                A_w = np.max([v for k,v in self.constants[node.parent.circuit_id].items() if k not in excl_keys], axis=0)
-                return self.L * A_w * (1-self.M0)
+            if node.parent.count == 0:
+                return self.L * (1 - self.M0)
             else: 
                 acc = 1.0
                 for n in node.siblings:
