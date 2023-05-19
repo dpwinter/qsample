@@ -136,6 +136,9 @@ class SubsetSampler:
         path_weight : int
             Weight of tree path from root to `tnode`
         """
+        if path_weight == 0: # circuit nodes along w=0 paths have no variance
+            tnode.invariant = True
+            
         circuit = self.protocol.get_circuit(tnode.name)
         delta_weight = (1 if self.protocol.fault_tolerant else 0) - path_weight
         ss_nodes = []
@@ -198,9 +201,9 @@ class SubsetSampler:
                 tnode.count += 1
                 
                 path_weight = self.tree.path_weight(tnode)
-                if path_weight == 0:
-                    # Nodes along weight-0 path have no variance
-                    tnode.invariant = True
+                # if path_weight == 0:
+                #     # Nodes along weight-0 path have no variance
+                #     tnode.invariant = True
                         
                 if circuit:
                 
@@ -215,9 +218,8 @@ class SubsetSampler:
                         vt_ss_nodes = self.__add_virtual_subsets(tnode, path_weight)
                         for ss_node in vt_ss_nodes:
                             vt_path_weight = self.tree.path_weight(ss_node)
-
                             if vt_path_weight > 0:
-                                vt_circ_nodes = self.__add_virtual_circuits(ss_node, _pnode)
+                                vt_circ_nodes = self.__add_virtual_circuits(ss_node, pnode)
                                 for vt_circ_node in vt_circ_nodes:
                                     self.__add_virtual_subsets(vt_circ_node, vt_path_weight)
                     
