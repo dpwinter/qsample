@@ -132,7 +132,11 @@ class Delta(Node):
     ----------
     name : str
         The (not necessarily unique) name of the node
+    value : float
+        Constant value, if not None is used for virtual Delta nodes (case III in paper)
     """
+    
+    value = None
     
     def __str__(self):
         return f"{self.name}"
@@ -226,7 +230,9 @@ class Tree:
         self.marked = set()
         
         self.L = L # longest circuit sequence for non-fail paths
-        self.M0 = np.min([list(v.values())[0] for v in constants.values()], axis=0) # Smallest A0 value
+        # self.M0 = np.min([list(v.values())[0] for v in constants.values()], axis=0) # Smallest A0 value
+        index_tuples = [(cid, sskey) for cid, ss in self.constants.items() for sskey in ss.keys() if sum(sskey) == 0]
+        self.M0_index = index_tuples[ np.argmin([self.constants[k][v] for k, v in index_tuples]) ]
     
     def add(self, name, node_type, parent=None, **kwargs):
         """Add node of `node_type` and `name` as child of `parent`.
@@ -316,7 +322,11 @@ class Tree:
         elif type(node) == Delta:
             
             if node.parent.count == 0:
-                return self.L * (1 - self.M0)
+                # return self.L * (1 - self.M0)
+                if node.value:
+                    return node.value
+                else:
+                    return self.L * (1 - self.constants[self.M0_index[0]][self.M0_index[1]])
             else: 
                 acc = 1.0
                 for n in node.siblings:
@@ -430,14 +440,14 @@ class Tree:
         else:
             raise Exception(f"Unknown mode {mode}")
         
-        ix_nodes = set()
+        ix_nodes = set() # Intersection nodes
         for (nodeA, nodeB) in it.combinations(leaves, 2):
             common_nodes = list(n1 for n1,n2 in zip(nodeA.path, nodeB.path) if n1 == n2)
             if len(common_nodes) > 0 and not common_nodes[-1].is_root:
                 ix_nodes.add(common_nodes[-1])
                     
         acc = 0
-        for leaf in leaves:
+        for leaf in leaves: # path variances
             acc += self.path_var(leaf)
         
         # Add contributions to variance from no-fail paths

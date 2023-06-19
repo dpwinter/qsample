@@ -6,7 +6,7 @@ __all__ = ['SubsetSamplerERV']
 # %% ../../nbs/06e_sampler.experimental.ipynb 3
 from .subset import SubsetSampler
 from .tree import Variable, Constant, Delta
-
+from copy import deepcopy
 import numpy as np
 
 # %% ../../nbs/06e_sampler.experimental.ipynb 4
@@ -19,8 +19,8 @@ class SubsetSamplerERV(SubsetSampler):
         Application of ERV every k-th shots
     """
 
-    def __init__(self, protocol, simulator, p_max, err_model, err_params=None, k=1):
-        super().__init__(protocol, simulator, p_max, err_model, err_params)
+    def __init__(self, protocol, simulator, p_max, err_model, err_params=None, k=1, L=1):
+        super().__init__(protocol, simulator, p_max, err_model, err_params, L)
         self.k = k
 
     def wplus1(self, tree_node, circuit):
@@ -75,20 +75,26 @@ class SubsetSamplerERV(SubsetSampler):
         # vss_contrib = np.prod([self.tree.value(n) for n in circuit_node.children if type(n) == Delta or n.count==0])
         # delta = self.tree.delta / (1 if vss_contrib==0 else vss_contrib)
         d = self.tree.add(name='δ', parent=circuit_node, node_type=Delta)
-        # self.tree.deltas.add(d)
+        #self.tree.deltas.add(d)
 
         delta = self.tree.delta
+
+        v_L = self.tree.var(mode=1)
+        v_L_up = self.tree.var(mode=0)
+
+        # print(self.tree)
+        # print(np.sqrt(v_L))
 
         for subset in subset_candidates:
 
             subset_node = self.tree.add(name=subset, parent=circuit_node, node_type=Constant)
-
+            """
             if circuit_node.ff_deterministic and not any(subset):
                 # erv_vals.append(delta - delta_prime)
                 erv_vals.append(0)
                 logs.append((subset, 0, 'ff_deterministic!'))
                 continue
-
+            """
             children = subset_node.children
 
             if len(children) == 0:
@@ -114,20 +120,20 @@ class SubsetSamplerERV(SubsetSampler):
 
             subset_node.count += 1
 
-            delta_prime = self.tree.delta
+            # delta_prime = self.tree.delta
 
             #print(child_node_minus.count)
             child_node_minus.count += 1
             delta_minus = self.tree.delta
             v_L_minus = self.tree.var(mode=1)
-            #minus_tree = deepcopy(self.tree)
+            minus_tree = deepcopy(self.tree)
             #print(child_node_minus.count)
             v_L_up_minus = self.tree.var(mode=0)
             child_node_minus.count -= 1
             #print(child_node_minus.count, v_L_minus, v_L_up_minus)
 
             child_node_plus.count += 1
-            #plus_tree = deepcopy(self.tree)
+            plus_tree = deepcopy(self.tree)
             delta_plus = self.tree.delta
             v_L_plus = self.tree.var(mode=1)
             v_L_up_plus = self.tree.var(mode=0)
@@ -135,18 +141,19 @@ class SubsetSamplerERV(SubsetSampler):
 
             subset_node.count -= 1
 
-            #print('plus-tree:', plus_tree)
-            #print('minus-tree:', minus_tree)
-
-            v_L = self.tree.var(mode=1)
-            v_L_up = self.tree.var(mode=0)
-
-            #print(self.tree)
-            #print(np.sqrt(v_L))
-
             err = np.sqrt(v_L) + np.sqrt(v_L_up) + delta
             err_plus = np.sqrt(v_L_plus) + np.sqrt(v_L_up_plus) + delta_plus
             err_minus = np.sqrt(v_L_minus) + np.sqrt(v_L_up_minus) + delta_minus
+
+            print('CURRENT TREE HAS: E = ' + str(err), '√V = ' + str(np.sqrt(v_L)), '√Vup = ' + str(np.sqrt(v_L_up)), 'δ = ' + str(delta))
+            print(self.tree)
+
+            print('PROBING', subset_node, 'AT', circuit_node)
+
+            print('plus-tree: E+ = ' + str(err_plus), '√V+ = ' + str(np.sqrt(v_L_plus)), '√Vup+ = ' + str(np.sqrt(v_L_up_plus)), 'δ+ = ' + str(delta_plus))
+            print(plus_tree)
+            print('minus-tree: E- = ' + str(err_minus), '√V- = ' + str(np.sqrt(v_L_minus)), '√Vup- = ' + str(np.sqrt(v_L_up_minus)), 'δ- = ' + str(delta_minus))
+            print(minus_tree)
 
             v_L_exp = child_node_plus.rate * v_L_plus + child_node_minus.rate * v_L_minus
             delta_exp = child_node_plus.rate * delta_plus + child_node_minus.rate * delta_minus
@@ -161,19 +168,21 @@ class SubsetSamplerERV(SubsetSampler):
             # erv = child_node_plus.rate * (np.sqrt(v_L_plus) - delta_plus) + child_node_minus.rate * (np.sqrt(v_L_minus) - delta_minus) - (np.sqrt(v_L) - delta)
             erv_vals.append(erv)
             # logs.append((subset, erv, np.sqrt(v_L), child_node_plus.rate, np.sqrt(v_L_plus), child_node_minus.rate, np.sqrt(v_L_minus), delta, delta_plus, delta_minus))
-            logs.append((subset, 'ERV = ' + str(erv), '√V = ' + str(np.sqrt(v_L)), 'n+ = ' + str(child_node_plus.count),
-                         'n- = ' + str(child_node_minus.count), 'E+ = ' + str(err_plus),
-                         'E- = ' + str(err_minus),
-                         'E = ' + str(err),'q+ = ' + str(child_node_plus.rate),
-                         '√V+ = ' + str(np.sqrt(v_L_plus)), 'q- = ' + str(child_node_minus.rate),
-                         '1-q+ = ' + str((1 - child_node_plus.rate)), '√V- = ' + str(np.sqrt(v_L_minus)),
-                         'δ = ' + str(delta), '<δ> = ' + str(delta_exp), 'δ+ = ' + str(delta_plus),
-                         'δ- = ' + str(delta_minus)))
+            logs.append((subset, 'ERV = ' + str(erv),
+                         'E = ' + str(err),
+                         '√V = ' + str(np.sqrt(v_L)),
+                         'δ = ' + str(delta),
+                         'n+ = ' + str(child_node_plus.count),
+                         'n- = ' + str(child_node_minus.count),
+                         'q+ = ' + str(child_node_plus.rate),
+                         '1-q+ = ' + str((1 - child_node_plus.rate)),
+                         'q- = ' + str(child_node_minus.rate)))
 
             if subset_node.count == 0: self.tree.remove(subset_node)
             if child_node_plus.count == 0: self.tree.remove(child_node_plus)
             if child_node_minus.count == 0: self.tree.remove(child_node_minus)
 
+        erv_vals[erv_vals == 0] = -np.inf
         idx = np.argmax(erv_vals)
         self.erv_vals = erv_vals
         self.erv_idx = idx
