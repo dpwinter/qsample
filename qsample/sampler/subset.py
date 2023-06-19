@@ -200,10 +200,9 @@ class SubsetSampler:
                 tnode = self.tree.add(name=pnode, parent=tnode, node_type=Variable)
                 tnode.count += 1
                 
-                # path_weight = self.tree.path_weight(tnode)
-                # if path_weight == 0:
-                #     # Nodes along weight-0 path have no variance
-                #     tnode.invariant = True
+                path_weight = self.tree.path_weight(tnode)
+                if path_weight == 0:
+                    tnode.invariant = True # Nodes along weight-0 path have no variance
                         
                 if circuit:
                 
@@ -257,6 +256,7 @@ class SubsetSampler:
                                 other_circuit = self.protocol.get_circuit(other)
                                 if other_circuit.noisy:
                                     tnode_ = self.tree.add(name=other, parent=tnode, node_type=Variable, circuit_id=other_circuit.id)
+                                    tnode_.invariant = True # Nodes along weight-0 path have no variance
                                     delta_ = self.tree.add(name='δ', node_type=Delta, parent=tnode_)
                                     delta_.value = delta_value # custom delta value
                                     
