@@ -225,7 +225,18 @@ class SubsetSampler:
                         # circuit node
                         if self.protocol.fault_tolerant and self.tree.path_weight(tnode) == 0: # Case IV
                             for virt_sskey in [sskey for sskey in self.tree.constants[circuit.id].keys() if sum(sskey) == 1]:
-                                self.tree.add(name=virt_sskey, parent=tnode, node_type=Constant)
+                                ss_node = self.tree.add(name=virt_sskey, parent=tnode, node_type=Constant)
+                                # expand circuits and subsets for each virtual subset
+                                for vcirc_name in [n for n in self.protocol.successors(pnode)]:
+                                    circuit_ = self.protocol.get_circuit(vcirc_name)
+                                    if circuit_:
+                                        if circuit_.noisy:
+                                            tnode_ = self.tree.add(name=vcirc_name, parent=ss_node, node_type=Variable, circuit_id=circuit_.id)
+                                            # add subsets
+                                            for circ_virt_sskey in [sskey for sskey in self.tree.constants[circuit_.id].keys() if sum(sskey) == 0]:
+                                                self.tree.add(name=circ_virt_sskey, parent=tnode_, node_type=Constant)
+                                            self.tree.add(name='δ', node_type=Delta, parent=tnode_)
+
                         self.tree.add(name='δ', node_type=Delta, parent=tnode)
                                                 
                         subset = self._choose_subset(tnode, circuit)
@@ -254,12 +265,19 @@ class SubsetSampler:
                                 # add virtual circuit and its delta
                                 other = [n for n in self.protocol.successors(pnode) if n != tnode.parent.name][0] # other circuit from protocol
                                 other_circuit = self.protocol.get_circuit(other)
-                                if other_circuit.noisy:
+                                print(other, other_circuit)
+                                # if other_circuit.noisy:
+                                if other_circuit:
                                     tnode_ = self.tree.add(name=other, parent=tnode, node_type=Variable, circuit_id=other_circuit.id)
                                     tnode_.invariant = True # Nodes along weight-0 path have no variance
                                     delta_ = self.tree.add(name='δ', node_type=Delta, parent=tnode_)
                                     delta_.value = delta_value # custom delta value
                                     
+                                    # print(tnode_)
+                                    # # Append virtual subsets to "complementary" circuit
+                                    # for virt_sskey in [sskey for sskey in self.tree.constants[other_circuit.id].keys() if sum(sskey) <= 1]:
+                                    #     self.tree.add(name=virt_sskey, parent=tnode_, node_type=Constant)
+                                    # self.tree.add(name='δ', node_type=Delta, parent=tnode_)
                         
                     msmt = msmt if msmt==None else int(msmt,2) # convert to int for comparison in checks
                     msmt_hist[pnode] = msmt_hist.get(pnode, []) + [msmt]

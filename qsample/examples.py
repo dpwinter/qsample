@@ -70,7 +70,8 @@ sz_123 = Circuit([{"init": {8}},
                 {"measure": {8}}])
 
 # %% ../nbs/09_examples.ipynb 13
-meas7 = Circuit([ {"measure": {0,1,2,3,4,5,6}} ], noisy=False)
+# meas7 = Circuit([ {"measure": {0,1,2,3,4,5,6}} ], noisy=False)
+meas7 = Circuit([ {"measure": {0,1,2,3,4,5,6}} ], noisy=True)
 
 # %% ../nbs/09_examples.ipynb 15
 fmx_1 = Circuit([{"init": {8,9}},
