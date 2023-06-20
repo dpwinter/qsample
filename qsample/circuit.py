@@ -108,7 +108,7 @@ class Circuit(MutableSequence):
         Unique circuit identifier
     """
     
-    def __init__(self, ticks=None, noisy=True, ff_deterministic=None):
+    def __init__(self, ticks=None, noisy=True):#, ff_deterministic=False):
         """
         Parameters
         ----------
@@ -123,29 +123,30 @@ class Circuit(MutableSequence):
         """
         self._ticks = ticks if ticks else [] # Must do this way, else keeps appending to same instance
         self.noisy = noisy
-        if ff_deterministic == None: # fault-free deterministic
-            self.ff_deterministic = self.__is_ff_det()
-        else:
-            self.ff_deterministic = ff_deterministic
+        # self.ff_deterministic = ff_deterministic
+        # if ff_deterministic == None: # fault-free deterministic
+        #     self.ff_deterministic = self.__is_ff_det()
+        # else:
+        #     self.ff_deterministic = ff_deterministic
         
-    def __is_ff_det(self):
-        """Determine if a circuit return value is deterministic under
-        fault-free execution. The circuit return value is determined by all measurements
-        executed in a circuit. If no measurement is executed the return value is `None` and
-        thus also deterministic (with respect to its outcome, *not* the resulting state). 
+#     def __is_ff_det(self):
+#         """Determine if a circuit return value is deterministic under
+#         fault-free execution. The circuit return value is determined by all measurements
+#         executed in a circuit. If no measurement is executed the return value is `None` and
+#         thus also deterministic (with respect to its outcome, *not* the resulting state). 
         
-        Otherwise only circuits which initialize all the qubits they "touch" are guaranteed to
-        result in the same result under fault-free execution.
+#         Otherwise only circuits which initialize all the qubits they "touch" are guaranteed to
+#         result in the same result under fault-free execution.
         
-        Returns
-        -------
-        bool
-            True if circuit fault-free deterministic
-        """
-        initialized_qubits = set(unpack([qbs for t in self for g, qbs in t.items() if g in GATES['init']]))
-        measured_qubits = set(unpack([qbs for t in self for g, qbs in t.items() if g in GATES['meas']]))
-        all_qubits = set(unpack(self))
-        return all_qubits == initialized_qubits or len(measured_qubits) == 0
+#         Returns
+#         -------
+#         bool
+#             True if circuit fault-free deterministic
+#         """
+#         initialized_qubits = set(unpack([qbs for t in self for g, qbs in t.items() if g in GATES['init']]))
+#         measured_qubits = set(unpack([qbs for t in self for g, qbs in t.items() if g in GATES['meas']]))
+#         all_qubits = set(unpack(self))
+#         return all_qubits == initialized_qubits or len(measured_qubits) == 0
         
     def __getitem__(self, tick_index):
         return self._ticks[tick_index]

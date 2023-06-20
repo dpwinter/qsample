@@ -114,58 +114,19 @@ class SubsetSampler:
             Next subset to choose for `tnode`
         """
         subsets, Aws = zip(*self.tree.constants[circuit.id].items())
-        if circuit.ff_deterministic and subsets[0] in {n.name for n in tnode.children}:
-            Aws = np.ma.masked_array(Aws)
-            Aws[0] = np.ma.masked
-        return subsets[ np.random.choice(len(subsets), p=Aws) ]
-    
-#     def __add_virtual_subsets(self, tnode, path_weight):
-#         """Append subset nodes with 0 count at tnode
-        
-#         For F.T. protocols we know that all paths with a path weight
-#         up to the F.T. level of the protocol result in a fault-free
-#         execution. Thus we add virtual subsets to circuit nodes during
-#         sampling to obtain a more realistic estimate of the cutoff error.
-#         By "virtual" we denote nodes which have a count of 0 (but anyway
-#         contribute to the calculation of estimates).
-        
-#         Parameters
-#         ----------
-#         tnode : Variable
-#             Circuit node at which to append subsets
-#         path_weight : int
-#             Weight of tree path from root to `tnode`
-#         """
-#         if path_weight == 0: # circuit nodes along w=0 paths have no variance
-#             tnode.invariant = True
-            
-#         circuit = self.protocol.get_circuit(tnode.name)
-#         delta_weight = (1 if self.protocol.fault_tolerant else 0) - path_weight
-#         ss_nodes = []
-#         for vsubset in [ss for ss in self.tree.constants[circuit.id].keys() if sum(ss) <= delta_weight]:
-#             ss_node = self.tree.add(name=vsubset, parent=tnode, node_type=Constant)
-#             ss_nodes.append(ss_node)
-#         self.tree.add(name='δ', node_type=Delta, parent=tnode)
-#         return [n for n in tnode.children if type(n) != Delta]
-    
-#     def __add_virtual_circuits(self, tnode, gcirc_parent):
-#         """Append all possible virtual circuits to tnode
-        
-#         Parameters
-#         ----------
-#         tnode : Constant
-#             Subset node to which virtual circuits are appended
-#         gcirc_parent : str
-#             Name of protocol node refering to prior circuit
-#         """
-#         vt_circ_nodes = []
-#         for vg_circ_node in [n for n in self.protocol.successors(gcirc_parent) if n != tnode.parent.name]:
-#             vcircuit = self.protocol.get_circuit(vg_circ_node)
-#             if vcircuit and vcircuit.noisy: # only add noisy circuits
-#                 vt_circ_node = self.tree.add(name=vg_circ_node, parent=tnode, node_type=Variable, circuit_id=vcircuit.id)
-#                 vt_circ_nodes.append(vt_circ_node)
-#         return vt_circ_nodes
                 
+        # this doesn't work right: if ff_det the 0-subset would NEVER
+        # be selected ever, even though it can lead to a fail eventually.
+        # Better: Let the use choose a sampling distribution by setting p_max.
+        # Special case: repeat until success -> Here we want to avoid ever going into
+        # the 0-subset, but this is not always the case!
+        ## Give user choice to omit sampling from 0-subset (default do not)
+        
+        # if circuit.ff_deterministic and subsets[0] in {n.name for n in tnode.children}:
+        #     Aws = np.ma.masked_array(Aws)
+        #     Aws[0] = np.ma.masked
+        return subsets[ np.random.choice(len(subsets), p=Aws) ]
+
         
     def run(self, n_shots, callbacks=[]):
         """Execute n_shots of subset sampling
@@ -195,7 +156,6 @@ class SubsetSampler:
             while True:
                 callbacks.on_circuit_begin()
                 
-                # _pnode = pnode
                 pnode, circuit = self.protocol.successor(pnode, msmt_hist)
                 tnode = self.tree.add(name=pnode, parent=tnode, node_type=Variable)
                 tnode.count += 1
@@ -206,21 +166,16 @@ class SubsetSampler:
                         
                 if circuit:
                 
-                    tnode.ff_deterministic = circuit.ff_deterministic
+                    # tnode.ff_deterministic = circuit.ff_deterministic
                     tnode.circuit_id = circuit.id
                     
                     if not circuit.noisy:
                         msmt = state.run(circuit)
                         tnode.invariant = True
+                        # add 0-subset for not noisy circuits
+                        tnode = self.tree.add(name=(0,), parent=tnode, node_type=Constant, const_val=1)
+                        tnode.count += 1
                     else:
-                        
-                        # vt_ss_nodes = self.__add_virtual_subsets(tnode, path_weight)
-                        # for ss_node in vt_ss_nodes:
-                        #     vt_path_weight = self.tree.path_weight(ss_node)
-                        #     if vt_path_weight > 0:
-                        #         vt_circ_nodes = self.__add_virtual_circuits(ss_node, pnode)
-                        #         for vt_circ_node in vt_circ_nodes:
-                        #             self.__add_virtual_subsets(vt_circ_node, vt_path_weight)
                     
                         # circuit node
                         if self.protocol.fault_tolerant and self.tree.path_weight(tnode) == 0: # Case IV
@@ -236,9 +191,8 @@ class SubsetSampler:
                                             for circ_virt_sskey in [sskey for sskey in self.tree.constants[circuit_.id].keys() if sum(sskey) == 0]:
                                                 self.tree.add(name=circ_virt_sskey, parent=tnode_, node_type=Constant)
                                             self.tree.add(name='δ', node_type=Delta, parent=tnode_)
-
                         self.tree.add(name='δ', node_type=Delta, parent=tnode)
-                                                
+             
                         subset = self._choose_subset(tnode, circuit)
                         fault_locs = self.err_model.choose_w(self.partitions[circuit.id], subset)
                         fault_circuit = self.err_model.run(circuit, fault_locs)
@@ -265,19 +219,11 @@ class SubsetSampler:
                                 # add virtual circuit and its delta
                                 other = [n for n in self.protocol.successors(pnode) if n != tnode.parent.name][0] # other circuit from protocol
                                 other_circuit = self.protocol.get_circuit(other)
-                                print(other, other_circuit)
                                 # if other_circuit.noisy:
                                 if other_circuit:
                                     tnode_ = self.tree.add(name=other, parent=tnode, node_type=Variable, circuit_id=other_circuit.id)
-                                    tnode_.invariant = True # Nodes along weight-0 path have no variance
                                     delta_ = self.tree.add(name='δ', node_type=Delta, parent=tnode_)
                                     delta_.value = delta_value # custom delta value
-                                    
-                                    # print(tnode_)
-                                    # # Append virtual subsets to "complementary" circuit
-                                    # for virt_sskey in [sskey for sskey in self.tree.constants[other_circuit.id].keys() if sum(sskey) <= 1]:
-                                    #     self.tree.add(name=virt_sskey, parent=tnode_, node_type=Constant)
-                                    # self.tree.add(name='δ', node_type=Delta, parent=tnode_)
                         
                     msmt = msmt if msmt==None else int(msmt,2) # convert to int for comparison in checks
                     msmt_hist[pnode] = msmt_hist.get(pnode, []) + [msmt]

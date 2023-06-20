@@ -109,7 +109,7 @@ class Constant(Node):
         Node visit counter variable
     """
     
-    def __init__(self, name, count=0, parent=None, **kwargs):
+    def __init__(self, name, count=0, parent=None, const_val=None, **kwargs):
         """
         Parameters
         ----------
@@ -120,6 +120,7 @@ class Constant(Node):
         parent : Node
             Reference to parent node object
         """
+        self.const_val = const_val
         super().__init__(name=name, count=count, parent=parent, **kwargs)
     
     def __str__(self):
@@ -318,10 +319,13 @@ class Tree:
         if type(node) == Variable:
             return node.rate
         elif type(node) == Constant:
-            return self.constants[node.parent.circuit_id][node.name]
+            if node.const_val:
+                return node.const_val
+            else:
+                return self.constants[node.parent.circuit_id][node.name]
         elif type(node) == Delta:
             
-            if node.parent.count == 0:
+            if node.parent.count == 0: # ? Instead of parent, check count of sibling ? -> Additional condition
                 # return self.L * (1 - self.M0)
                 if node.value:
                     return node.value
@@ -356,8 +360,8 @@ class Tree:
         for n in node.iter_path_reverse():
             if type(n) == Constant:
                 weight += sum(n.name)
-            elif n.ff_deterministic:
-                break
+            # elif n.ff_deterministic:
+            #     break
         return weight
     
     def path_prod(self, nodeA, nodeB):
@@ -391,11 +395,13 @@ class Tree:
         """
         E2 = 1
         VpE2 = 1
+        
         for n in node.path:
             v = self.value(n)**2
             if zero_leaf and n == node: v = 0
             E2 *= v
             VpE2 *= (n.var + v) if type(n) == Variable else v
+                
         return VpE2 - E2
     
     def subtree_sum(self, node, leaves):
@@ -448,7 +454,8 @@ class Tree:
                     
         acc = 0
         for leaf in leaves: # path variances
-            acc += self.path_var(leaf)
+            if self.path_weight(leaf) >= 1: # exclude weight-0 paths
+                acc += self.path_var(leaf)
         
         # Add contributions to variance from no-fail paths
         nf_leaves = set(n for n in set(self.root.leaves).difference(self.marked) if type(n)==Variable and not n.invariant and len(n.siblings)==0)
@@ -458,13 +465,15 @@ class Tree:
         for ix_node in ix_nodes:
             cov = 0
             for (nodeA, nodeB) in it.combinations(ix_node.children, 2):
-                cov += self.subtree_sum(nodeA, leaves) * self.subtree_sum(nodeB, leaves)
-                if type(ix_node) == Constant:
-                    q = nodeA.rate * nodeB.rate
-                    if q != 0: 
-                        # must exclude rate at Constant intersection node
-                        cov /= nodeA.rate * nodeB.rate 
-            
+
+                if type(ix_node) == Constant: # ignore branching ratio (is here random var)
+                    accA, accB = 0, 0
+                    for child in nodeA.children:
+                        accA += self.subtree_sum(child, leaves)
+                    for child in nodeB.children:
+                        accB += self.subtree_sum(child, leaves)
+                    cov += accA * accB
+                    
             if type(ix_node) == Constant:
                 q = ix_node.children[0]
                 cov *= 2 * (q.rate * self.path_var(ix_node) - self.path_var(q))

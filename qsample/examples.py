@@ -43,7 +43,7 @@ ghz_stabs = Circuit([{"init": {4}},
                 {"init": {4}},
                 {"CNOT": {(2,4)}},
                 {"CNOT": {(3,4)}},
-                {"measure": {4}}], noisy=False)
+                {"measure": {4}}], noisy=True)#noisy=False)
 
 # %% ../nbs/09_examples.ipynb 9
 eft = Circuit([ {"init": {0,1,2,4,3,5,6,7}},
@@ -349,7 +349,7 @@ def gen_steane0():
     init = Protocol(check_functions=functions, fault_tolerant=True)
 
     init.add_nodes_from(['ENC', 'Z2', 'meas'], circuits=[eft, sz_123, meas7])
-    init.add_node('X_COR', circuit=Circuit([{'X': {6}}], noisy=False))
+    init.add_node('X_COR', circuit=Circuit([{'X': {6}}], noisy=True))
 
     init.add_edge('START', 'ENC', check='True')
 
