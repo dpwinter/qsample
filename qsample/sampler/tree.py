@@ -456,6 +456,8 @@ class Tree:
         for leaf in leaves: # path variances
             if self.path_weight(leaf) >= 1: # exclude weight-0 paths
                 acc += self.path_var(leaf)
+                # print(leaf, self.path_var(leaf))
+        
         
         # Add contributions to variance from no-fail paths
         nf_leaves = set(n for n in set(self.root.leaves).difference(self.marked) if type(n)==Variable and not n.invariant and len(n.siblings)==0)
@@ -473,7 +475,10 @@ class Tree:
                     for child in nodeB.children:
                         accB += self.subtree_sum(child, leaves)
                     cov += accA * accB
+                elif type(ix_node) == Variable:
+                    cov += self.subtree_sum(nodeA, leaves) * self.subtree_sum(nodeB, leaves)
                     
+
             if type(ix_node) == Constant:
                 q = ix_node.children[0]
                 cov *= 2 * (q.rate * self.path_var(ix_node) - self.path_var(q))
@@ -481,6 +486,8 @@ class Tree:
                 cov *= 2 * self.path_var(ix_node)
             else:
                 raise Exception(f"Node {ix_node.name} of type {type(ix_node)} shouldn't be common.")
+            
+
             acc += cov
             
         return acc

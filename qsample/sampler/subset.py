@@ -179,7 +179,7 @@ class SubsetSampler:
                     
                         # circuit node
                         if self.protocol.fault_tolerant and self.tree.path_weight(tnode) == 0: # Case IV
-                            for virt_sskey in [sskey for sskey in self.tree.constants[circuit.id].keys() if sum(sskey) == 1]:
+                            for virt_sskey in [sskey for sskey in self.tree.constants[circuit.id].keys() if sum(sskey) <= 1]: # == 1]: 
                                 ss_node = self.tree.add(name=virt_sskey, parent=tnode, node_type=Constant)
                                 # expand circuits and subsets for each virtual subset
                                 for vcirc_name in [n for n in self.protocol.successors(pnode)]:
