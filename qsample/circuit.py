@@ -178,8 +178,8 @@ class Circuit(MutableSequence):
             str_list.append(f"{i}: {str(tick)}")
         return "\n".join(str_list)
     
-    def __repr__(self):
-        return self.__str__()
+    # def __repr__(self):
+    #     return self.__str__()
     
     @cached_property
     def qubits(self):  

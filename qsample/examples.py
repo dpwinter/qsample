@@ -403,12 +403,16 @@ def gen_flagstab():
 
         sx = ''.join([formatter(i,m) for i in range(3)])
         sz = ''.join([formatter(i,m) for i in range(3,6)])
-
+        
+        print(sx, sz)
         if (sz == '001' and flagged([f2a,f2b])) or (sz == '010' and (flagged([f1a,f1b]) or flagged([f3a,f3b]))):
             corrs = {'010': {5, 6}, '001': {4, 6}}
             return Circuit([{'X': corrs[sz]}], noisy=False)
         else: 
-            return Circuit(noisy=False)
+            # return Circuit(noisy=False)
+            # return True
+            return Circuit([{}], noisy=False)
+        print('after return')
 
     def rep_check(m):
         # no flag triggered, run second round regardless of syndrome
