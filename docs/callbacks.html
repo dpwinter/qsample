@@ -185,6 +185,8 @@ ul.task-list li input[type="checkbox"] {
   <ul>
   <li><a href="#callbacklist" id="toc-callbacklist" class="nav-link active" data-scroll-target="#callbacklist">CallbackList</a></li>
   <li><a href="#callback" id="toc-callback" class="nav-link" data-scroll-target="#callback">Callback</a></li>
+  <li><a href="#collectstatspershot" id="toc-collectstatspershot" class="nav-link" data-scroll-target="#collectstatspershot">CollectStatsPerShot</a></li>
+  <li><a href="#stopatnohits" id="toc-stopatnohits" class="nav-link" data-scroll-target="#stopatnohits">StopAtNoHits</a></li>
   <li><a href="#plotstats" id="toc-plotstats" class="nav-link" data-scroll-target="#plotstats">PlotStats</a></li>
   <li><a href="#relstdtarget" id="toc-relstdtarget" class="nav-link" data-scroll-target="#relstdtarget">RelStdTarget</a></li>
   <li><a href="#statspershot" id="toc-statspershot" class="nav-link" data-scroll-target="#statspershot">StatsPerShot</a></li>
@@ -244,6 +246,24 @@ ul.task-list li input[type="checkbox"] {
 <hr>
 <p><a href="https://github.com/dpwinter/qsample/tree/master/blob/master/qsample/callbacks.py#L107" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
+<section id="collectstatspershot" class="level3">
+<h3 class="anchored" data-anchor-id="collectstatspershot">CollectStatsPerShot</h3>
+<blockquote class="blockquote">
+<pre><code> CollectStatsPerShot (log_dir=None)</code></pre>
+</blockquote>
+<p>Store information of Sampler.stats() with each shot and plot each statistic as as function of shots after sampler ends</p>
+<hr>
+<p><a href="https://github.com/dpwinter/qsample/tree/master/blob/master/qsample/callbacks.py#L149" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="stopatnohits" class="level3">
+<h3 class="anchored" data-anchor-id="stopatnohits">StopAtNoHits</h3>
+<blockquote class="blockquote">
+<pre><code> StopAtNoHits ()</code></pre>
+</blockquote>
+<p>Callback for DirectSampler only</p>
+<hr>
+<p><a href="https://github.com/dpwinter/qsample/tree/master/blob/master/qsample/callbacks.py#L160" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
 <section id="plotstats" class="level3">
 <h3 class="anchored" data-anchor-id="plotstats">PlotStats</h3>
 <blockquote class="blockquote">
@@ -251,7 +271,7 @@ ul.task-list li input[type="checkbox"] {
 </blockquote>
 <p>Plot sampler statistics at end of sampling process</p>
 <hr>
-<p><a href="https://github.com/dpwinter/qsample/tree/master/blob/master/qsample/callbacks.py#L174" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/dpwinter/qsample/tree/master/blob/master/qsample/callbacks.py#L227" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="relstdtarget" class="level3">
 <h3 class="anchored" data-anchor-id="relstdtarget">RelStdTarget</h3>
@@ -260,7 +280,7 @@ ul.task-list li input[type="checkbox"] {
 </blockquote>
 <p>Callback to stop sampling when the relative standard deviation target <code>target</code> is reached</p>
 <hr>
-<p><a href="https://github.com/dpwinter/qsample/tree/master/blob/master/qsample/callbacks.py#L215" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/dpwinter/qsample/tree/master/blob/master/qsample/callbacks.py#L268" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="statspershot" class="level3">
 <h3 class="anchored" data-anchor-id="statspershot">StatsPerShot</h3>
@@ -269,7 +289,7 @@ ul.task-list li input[type="checkbox"] {
 </blockquote>
 <p>Store information of <code>Sampler.stats()</code> with each shot and plot each statistic as as function of shots after sampler ends</p>
 <hr>
-<p><a href="https://github.com/dpwinter/qsample/tree/master/blob/master/qsample/callbacks.py#L269" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/dpwinter/qsample/tree/master/blob/master/qsample/callbacks.py#L322" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="verbosecircuitexec" class="level3">
 <h3 class="anchored" data-anchor-id="verbosecircuitexec">VerboseCircuitExec</h3>
@@ -278,7 +298,7 @@ ul.task-list li input[type="checkbox"] {
 </blockquote>
 <p>Callback to output detailed information about circuit selection, specific fault that occured, measurement outcome and next circuit</p>
 <hr>
-<p><a href="https://github.com/dpwinter/qsample/tree/master/blob/master/qsample/callbacks.py#L291" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/dpwinter/qsample/tree/master/blob/master/qsample/callbacks.py#L344" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="plotervpershot" class="level3">
 <h3 class="anchored" data-anchor-id="plotervpershot">PlotERVPerShot</h3>
@@ -287,7 +307,7 @@ ul.task-list li input[type="checkbox"] {
 </blockquote>
 <p>Callback to plot statistics about ERV values and selected subsets due to ERV</p>
 <hr>
-<p><a href="https://github.com/dpwinter/qsample/tree/master/blob/master/qsample/callbacks.py#L342" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/dpwinter/qsample/tree/master/blob/master/qsample/callbacks.py#L395" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="printervpershot" class="level3">
 <h3 class="anchored" data-anchor-id="printervpershot">PrintERVPerShot</h3>
@@ -296,7 +316,7 @@ ul.task-list li input[type="checkbox"] {
 </blockquote>
 <p>Callback to print ERV statistics per shot</p>
 <hr>
-<p><a href="https://github.com/dpwinter/qsample/tree/master/blob/master/qsample/callbacks.py#L362" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/dpwinter/qsample/tree/master/blob/master/qsample/callbacks.py#L415" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="pathproducts" class="level3">
 <h3 class="anchored" data-anchor-id="pathproducts">PathProducts</h3>
@@ -305,7 +325,7 @@ ul.task-list li input[type="checkbox"] {
 </blockquote>
 <p>Callback to plot distribution of sampled paths</p>
 <hr>
-<p><a href="https://github.com/dpwinter/qsample/tree/master/blob/master/qsample/callbacks.py#L402" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/dpwinter/qsample/tree/master/blob/master/qsample/callbacks.py#L455" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="subsetrates" class="level3">
 <h3 class="anchored" data-anchor-id="subsetrates">SubsetRates</h3>

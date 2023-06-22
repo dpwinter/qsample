@@ -357,6 +357,8 @@ def gen_steane0():
 
     init.add_edge('ENC', 'Z2', check='ENC[-1]==1')
     init.add_edge('Z2', 'X_COR', check='lut(Z2[-1])')
+    
+    init.add_edge('Z2', 'meas', check='not lut(Z2[-1])')
 
     init.add_edge('X_COR', 'meas', check='True')
 

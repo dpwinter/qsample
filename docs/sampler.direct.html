@@ -184,6 +184,7 @@ ul.task-list li input[type="checkbox"] {
    
   <ul>
   <li><a href="#directsampler" id="toc-directsampler" class="nav-link active" data-scroll-target="#directsampler">DirectSampler</a></li>
+  <li><a href="#ss_sam.tree.drawverbosetrue" id="toc-ss_sam.tree.drawverbosetrue" class="nav-link" data-scroll-target="#ss_sam.tree.drawverbosetrue">ss_sam.tree.draw(verbose=True)</a></li>
   </ul>
 <div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/dpwinter/qsample/tree/master/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
@@ -223,6 +224,12 @@ ul.task-list li input[type="checkbox"] {
 <pre><code> DirectSampler (protocol, simulator, err_model, err_params=None)</code></pre>
 </blockquote>
 <p>Direct Monte Carlo Sampler</p>
+<p>from qsample.examples import ghz1, ghz3, ghz_stab, ftsteane, flagstab, steane0, tele from qsample.sim.stabilizer import StabilizerSimulator as CHP from qsample.noise import E1, E1_1, S1 import qsample.callbacks as cb</p>
+<p>sample_range = np.logspace(-3,0,5) err_params = {‘q’: sample_range} p_max = {‘q’: 1e-2}</p>
+<p>ss_sam = DirectSampler(protocol=ftsteane, simulator=CHP, err_model=S1, err_params=err_params) ss_sam.run(1, callbacks=[cb.PlotStats(), cb.StopAtNoHits()])</p>
+</section>
+<section id="ss_sam.tree.drawverbosetrue" class="level1">
+<h1>ss_sam.tree.draw(verbose=True)</h1>
 
 
 </section>
