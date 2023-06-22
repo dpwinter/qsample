@@ -167,7 +167,8 @@ class SubsetSampler:
                 try: # set circuit node invariant if there is only one protocol transition from parent to it
                     tparent = tnode.parent.parent.name
                     if len(list(self.protocol.successors(tparent))) == 1:
-                        tnode.invariant = True
+                        if tnode.name != "FAIL":
+                            tnode.invariant = True
                 except:
                     pass
                         
@@ -241,13 +242,14 @@ class SubsetSampler:
                     msmt = msmt if msmt==None else int(msmt,2) # convert to int for comparison in checks
                     msmt_hist[pnode] = msmt_hist.get(pnode, []) + [msmt]
                 else:
+                    if path_weight <= (1 if self.protocol.fault_tolerant else 0):
+                        # Leaf nodes of fault tolerant paths have not variance
+                        tnode.invariant = True
                     if pnode != None:
                         # "Interesting" event happened
                         self.tree.marked.add(tnode)
-                    elif path_weight <= (1 if self.protocol.fault_tolerant else 0):
-                        # Leaf nodes of fault tolerant paths have not variance
-                        tnode.invariant = True
                     break
+
                 callbacks.on_circuit_end(locals())
                 
             callbacks.on_protocol_end()
