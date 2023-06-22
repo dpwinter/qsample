@@ -224,13 +224,19 @@ class SubsetSampler:
                             elif path_weight >= smallest_failure_exponent: # case II
                                 delta_value = 1
                             # add virtual circuit and its delta
-                            other = [n for n in self.protocol.successors(pnode) if n != tnode.parent.name][0] # other circuit from protocol
-                            other_circuit = self.protocol.get_circuit(other)
-                            # if other_circuit.noisy:
-                            if other_circuit:
-                                tnode_ = self.tree.add(name=other, parent=tnode, node_type=Variable, circuit_id=other_circuit.id)
-                                delta_ = self.tree.add(name='δ', node_type=Delta, parent=tnode_)
-                                delta_.value = delta_value # custom delta value
+                            # print([n for n in self.protocol.successors(pnode) if n != tnode.parent.name])
+                            
+                            # other = [n for n in self.protocol.successors(pnode) if n != tnode.parent.name][0] # other circuit from protocol
+                            # print(repr(tnode), list(self.protocol.successors(pnode)), other)
+                            for vcirc_name in self.protocol.successors(pnode):
+                                circuit_ = self.protocol.get_circuit(vcirc_name)
+
+                                # if other_circuit.noisy:
+                                if circuit_:
+                                    # print('circ:', other)
+                                    tnode_ = self.tree.add(name=vcirc_name, parent=tnode, node_type=Variable, circuit_id=circuit_.id)
+                                    delta_ = self.tree.add(name='δ', node_type=Delta, parent=tnode_)
+                                    delta_.value = delta_value # custom delta value
 
                     msmt = msmt if msmt==None else int(msmt,2) # convert to int for comparison in checks
                     msmt_hist[pnode] = msmt_hist.get(pnode, []) + [msmt]
