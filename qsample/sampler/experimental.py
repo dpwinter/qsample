@@ -120,7 +120,7 @@ class SubsetSamplerERV(SubsetSampler):
 
             subset_node.count += 1
 
-            # delta_prime = self.tree.delta
+            delta_prime = self.tree.delta
 
             #print(child_node_minus.count)
             child_node_minus.count += 1
