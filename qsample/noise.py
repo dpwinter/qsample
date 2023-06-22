@@ -2,7 +2,7 @@
 
 # %% auto 0
 __all__ = ['DEPOLAR1', 'DEPOLAR2', 'XFLIP', 'ZFLIP', 'ErrorModel', 'E0', 'E1', 'E1_1', 'E2', 'E3', 'E3_1', 'InnsbruckTrap', 'S4',
-           'S1']
+           'S1', 'S2']
 
 # %% ../nbs/07_noise.ipynb 3
 import numpy as np
@@ -333,6 +333,31 @@ class S1(ErrorModel):
             "q2": DEPOLAR2,
             'meas': DEPOLAR1,
             'init': DEPOLAR1
+        }
+
+        for grp, locs in fgroups.items():
+            for loc in locs:
+                if isinstance(loc[1], tuple):
+                    errset = errsets["q2"]
+                else:
+                    errset = errsets["q1"]
+                fop = list(errset)[np.random.choice(len(errset))]
+                yield loc, fop
+
+# %% ../nbs/07_noise.ipynb 16
+class S2(ErrorModel):
+    """Individual errors on 1-qubit and 2-qubit gates. Depolarizing noise with 1-qubit rate on init and meas"""
+    groups = ["q1", "q2"]
+
+    def group(self, circuit):
+        gates = {"q1": GATES["q1"] | GATES["meas"] | GATES["init"], "q2": GATES["q2"]}
+        return {grp: [(ti, q) for ti, t in enumerate(circuit) for g, qs in t.items()
+                      for q in qs if g in gset] for grp, gset in gates.items()}
+
+    def generate(self, fgroups, circuit):
+        errsets = {
+            "q1": DEPOLAR1,
+            "q2": DEPOLAR2
         }
 
         for grp, locs in fgroups.items():
