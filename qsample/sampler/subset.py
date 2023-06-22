@@ -177,6 +177,9 @@ class SubsetSampler:
                         tnode.count += 1
                     else:
                     
+                        if len(self.protocol.siblings(pnode)) == 0:
+                            tnode.invariant = True
+                            
                         # circuit node
                         if self.protocol.fault_tolerant and self.tree.path_weight(tnode) == 0: # Case IV
                             for virt_sskey in [sskey for sskey in self.tree.constants[circuit.id].keys() if sum(sskey) == 1]: # == 1]: 

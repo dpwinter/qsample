@@ -194,3 +194,8 @@ class Protocol(nx.DiGraph):
     def draw(self, *args, **kwargs):
         """Draw protocol"""
         return draw_protocol(self, *args, **kwargs)
+    
+    def siblings(self, name):
+        sibs = set([n for n in self.successors(list(self.predecessors(name))[0])])
+        sibs.remove(name)
+        return sibs
