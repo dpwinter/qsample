@@ -163,6 +163,13 @@ class SubsetSampler:
                 path_weight = self.tree.path_weight(tnode)
                 if path_weight == 0:
                     tnode.invariant = True # Nodes along weight-0 path have no variance
+                    
+                try: # set circuit node invariant if there is only one protocol transition from parent to it
+                    tparent = tnode.parent.parent.name
+                    if len(list(self.protocol.successors(tparent))) == 1:
+                        tnode.invariant = True
+                except:
+                    pass
                         
                 if circuit:
                 
@@ -176,9 +183,6 @@ class SubsetSampler:
                         tnode = self.tree.add(name=(0,), parent=tnode, node_type=Constant, const_val=1)
                         tnode.count += 1
                     else:
-                    
-                        if len(self.protocol.siblings(pnode)) == 0:
-                            tnode.invariant = True
                             
                         # circuit node
                         if self.protocol.fault_tolerant and self.tree.path_weight(tnode) == 0: # Case IV
@@ -214,20 +218,20 @@ class SubsetSampler:
                             else:
                                 smallest_failure_exponent = 1
                             
-                            if len(tnode.children) == 1:
-                                if self.protocol.fault_tolerant and path_weight == 1: # case III
-                                    delta_value = None
-                                elif path_weight >= smallest_failure_exponent: # case II
-                                    delta_value = 1
-                                # add virtual circuit and its delta
-                                other = [n for n in self.protocol.successors(pnode) if n != tnode.parent.name][0] # other circuit from protocol
-                                other_circuit = self.protocol.get_circuit(other)
-                                # if other_circuit.noisy:
-                                if other_circuit:
-                                    tnode_ = self.tree.add(name=other, parent=tnode, node_type=Variable, circuit_id=other_circuit.id)
-                                    delta_ = self.tree.add(name='δ', node_type=Delta, parent=tnode_)
-                                    delta_.value = delta_value # custom delta value
-                        
+
+                            if self.protocol.fault_tolerant and path_weight == 1: # case III
+                                delta_value = None
+                            elif path_weight >= smallest_failure_exponent: # case II
+                                delta_value = 1
+                            # add virtual circuit and its delta
+                            other = [n for n in self.protocol.successors(pnode) if n != tnode.parent.name][0] # other circuit from protocol
+                            other_circuit = self.protocol.get_circuit(other)
+                            # if other_circuit.noisy:
+                            if other_circuit:
+                                tnode_ = self.tree.add(name=other, parent=tnode, node_type=Variable, circuit_id=other_circuit.id)
+                                delta_ = self.tree.add(name='δ', node_type=Delta, parent=tnode_)
+                                delta_.value = delta_value # custom delta value
+
                     msmt = msmt if msmt==None else int(msmt,2) # convert to int for comparison in checks
                     msmt_hist[pnode] = msmt_hist.get(pnode, []) + [msmt]
                 else:

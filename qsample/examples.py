@@ -349,7 +349,7 @@ def gen_steane0():
     init = Protocol(check_functions=functions, fault_tolerant=True)
 
     init.add_nodes_from(['ENC', 'Z2', 'meas'], circuits=[eft, sz_123, meas7])
-    init.add_node('X_COR', circuit=Circuit([{'X': {6}}], noisy=True))
+    init.add_node('X_COR', circuit=Circuit([{'X': {6}}], noisy=True))#True))
 
     init.add_edge('START', 'ENC', check='True')
 
