@@ -350,15 +350,25 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span>(ghz1.successor(<span class="st">'START'</span>, {})[<span class="dv">0</span>] <span class="op">==</span> <span class="st">'ghz'</span>)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span>(ghz1.successor(<span class="st">'ghz'</span>, {<span class="st">'ghz'</span>: [<span class="dv">1</span>]})[<span class="dv">0</span>] <span class="op">==</span> <span class="st">'FAIL'</span>)</span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>ghz1.successor(<span class="st">'ghz'</span>, {<span class="st">'ghz'</span>: [<span class="dv">1</span>]})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>in successor [('ghz', True)] {'ghz': True} START
+in successor [('FAIL', True)] {'FAIL': True} ghz
+in successor [('FAIL', True)] {'FAIL': True} ghz</code></pre>
+</div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <pre><code>('FAIL', None)</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> qsample.examples <span class="im">import</span> ghz3</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span>(ghz3.successor(<span class="st">'START'</span>, {})[<span class="dv">0</span>] <span class="op">==</span> <span class="st">'ghz'</span>)</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span>(ghz3.successor(<span class="st">'ghz'</span>, {<span class="st">'ghz'</span>: [<span class="dv">1</span>]})[<span class="dv">0</span>] <span class="op">==</span> <span class="st">'ghz'</span>)</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span>(ghz3.successor(<span class="st">'ghz'</span>, {<span class="st">'ghz'</span>: [<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>]})[<span class="dv">0</span>] <span class="op">==</span> <span class="st">'FAIL'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> qsample.examples <span class="im">import</span> ghz3</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span>(ghz3.successor(<span class="st">'START'</span>, {})[<span class="dv">0</span>] <span class="op">==</span> <span class="st">'ghz'</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span>(ghz3.successor(<span class="st">'ghz'</span>, {<span class="st">'ghz'</span>: [<span class="dv">1</span>]})[<span class="dv">0</span>] <span class="op">==</span> <span class="st">'ghz'</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span>(ghz3.successor(<span class="st">'ghz'</span>, {<span class="st">'ghz'</span>: [<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>]})[<span class="dv">0</span>] <span class="op">==</span> <span class="st">'FAIL'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>in successor [('ghz', True)] {'ghz': True} START
+in successor [('ghz', True)] {'ghz': True, 'FAIL': False} ghz
+in successor [('FAIL', True)] {'ghz': False, 'FAIL': True} ghz</code></pre>
+</div>
 </div>
 
 

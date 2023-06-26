@@ -617,36 +617,103 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="co"># test_close(vLup, tree.var(mode=0))</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>constants <span class="op">=</span> {<span class="st">'ENC'</span>: {(<span class="dv">0</span>,): <span class="fl">0.977251</span>, (<span class="dv">1</span>,): <span class="fl">0.0224993</span>}, <span class="co"># c0</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>             <span class="st">'meas'</span>: {(<span class="dv">0</span>,): <span class="fl">0.993021</span>, (<span class="dv">1</span>,): <span class="fl">0.0069581</span>}, <span class="co"># c1</span></span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>            } <span class="co"># corresp. p_max = 1e-3</span></span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>tree <span class="op">=</span> Tree(constants, L<span class="op">=</span><span class="dv">2</span>)</span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>root <span class="op">=</span> tree.add(name<span class="op">=</span><span class="st">'ENC'</span>, circuit_id<span class="op">=</span><span class="st">'ENC'</span>, node_type<span class="op">=</span>Variable, count<span class="op">=</span><span class="dv">2</span>)</span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>root0 <span class="op">=</span> tree.add(name<span class="op">=</span>(<span class="dv">0</span>,), node_type<span class="op">=</span>Constant, parent<span class="op">=</span>root, count<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>root1 <span class="op">=</span> tree.add(name<span class="op">=</span>(<span class="dv">1</span>,), node_type<span class="op">=</span>Constant, parent<span class="op">=</span>root, count<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>d <span class="op">=</span> tree.add(name<span class="op">=</span><span class="st">'δ'</span>, node_type<span class="op">=</span>Delta, parent<span class="op">=</span>root)</span>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 10 samples test</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>constants <span class="op">=</span> {<span class="st">'ENC'</span>: {(<span class="dv">0</span>,): <span class="fl">0.977251</span>, (<span class="dv">1</span>,): <span class="fl">0.0224993</span>}, <span class="co"># c0</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>             <span class="st">'meas'</span>: {(<span class="dv">0</span>,): <span class="fl">0.993021</span>, (<span class="dv">1</span>,): <span class="fl">0.0069581</span>}, <span class="co"># c1</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>             <span class="st">'Z2'</span>: {(<span class="dv">0</span>,): <span class="fl">0.994015</span>, (<span class="dv">1</span>,): <span class="fl">0.00597006</span>}</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>            } <span class="co"># corresp. p_max = 1e-3</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>M0 <span class="op">=</span> constants[<span class="st">'ENC'</span>][(<span class="dv">0</span>,)]</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>L <span class="op">=</span> <span class="dv">2</span></span>
 <span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>root1enc <span class="op">=</span> tree.add(name<span class="op">=</span><span class="st">'ENC'</span>, circuit_id<span class="op">=</span><span class="st">'ENC'</span>, node_type<span class="op">=</span>Variable, parent<span class="op">=</span>root1, count<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>root1enc0 <span class="op">=</span> tree.add(name<span class="op">=</span>(<span class="dv">0</span>,), node_type<span class="op">=</span>Constant, parent<span class="op">=</span>root1enc, count<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>root1encd <span class="op">=</span> tree.add(name<span class="op">=</span><span class="st">'δ'</span>, node_type<span class="op">=</span>Delta, parent<span class="op">=</span>root1enc)</span>
-<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>root1meas <span class="op">=</span> tree.add(name<span class="op">=</span><span class="st">'meas'</span>, circuit_id<span class="op">=</span><span class="st">'meas'</span>, node_type<span class="op">=</span>Variable, parent<span class="op">=</span>root1, count<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>root1meas0 <span class="op">=</span> tree.add(name<span class="op">=</span>(<span class="dv">0</span>,), node_type<span class="op">=</span>Constant, parent<span class="op">=</span>root1meas, count<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>root1meas0none <span class="op">=</span> tree.add(name<span class="op">=</span><span class="st">'None'</span>, node_type<span class="op">=</span>Variable, parent<span class="op">=</span>root1meas0, count<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>root1meas0none.invariant <span class="op">=</span> <span class="va">True</span> <span class="co"># Set leaf node to inv (FT PATH!)</span></span>
-<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>root1measd <span class="op">=</span> tree.add(name<span class="op">=</span><span class="st">'δ'</span>, node_type<span class="op">=</span>Delta, parent<span class="op">=</span>root1meas)</span>
-<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a>root0meas <span class="op">=</span> tree.add(name<span class="op">=</span><span class="st">'meas'</span>, circuit_id<span class="op">=</span><span class="st">'meas'</span>, node_type<span class="op">=</span>Variable, parent<span class="op">=</span>root0, count<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a>root0meas0 <span class="op">=</span> tree.add(name<span class="op">=</span>(<span class="dv">0</span>,), node_type<span class="op">=</span>Constant, parent<span class="op">=</span>root0meas, count<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a>root0meas1 <span class="op">=</span> tree.add(name<span class="op">=</span>(<span class="dv">1</span>,), node_type<span class="op">=</span>Constant, parent<span class="op">=</span>root0meas, count<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>tree <span class="op">=</span> Tree(constants, L<span class="op">=</span>L)</span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>root <span class="op">=</span> tree.add(name<span class="op">=</span><span class="st">'ENC'</span>, circuit_id<span class="op">=</span><span class="st">'ENC'</span>, node_type<span class="op">=</span>Variable, count<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>root1 <span class="op">=</span> tree.add(name<span class="op">=</span>(<span class="dv">1</span>,), node_type<span class="op">=</span>Constant, parent<span class="op">=</span>root, count<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>root0 <span class="op">=</span> tree.add(name<span class="op">=</span>(<span class="dv">0</span>,), node_type<span class="op">=</span>Constant, parent<span class="op">=</span>root, count<span class="op">=</span><span class="dv">9</span>)</span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>rootd <span class="op">=</span> tree.add(name<span class="op">=</span><span class="st">'δ'</span>, node_type<span class="op">=</span>Delta, parent<span class="op">=</span>root)</span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>root0meas <span class="op">=</span> tree.add(name<span class="op">=</span><span class="st">'meas'</span>, circuit_id<span class="op">=</span><span class="st">'meas'</span>, node_type<span class="op">=</span>Variable, parent<span class="op">=</span>root0, count<span class="op">=</span><span class="dv">9</span>)</span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>root0meas0 <span class="op">=</span> tree.add(name<span class="op">=</span>(<span class="dv">0</span>,), node_type<span class="op">=</span>Constant, parent<span class="op">=</span>root0meas, count<span class="op">=</span><span class="dv">9</span>)</span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>root0meas0None <span class="op">=</span> tree.add(name<span class="op">=</span><span class="st">"None"</span>, node_type<span class="op">=</span>Variable, parent<span class="op">=</span>root0meas0, count<span class="op">=</span><span class="dv">9</span>)</span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a>root0meas0None.invariant <span class="op">=</span> <span class="va">True</span></span>
+<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a>root0meas1 <span class="op">=</span> tree.add(name<span class="op">=</span>(<span class="dv">1</span>,), node_type<span class="op">=</span>Constant, parent<span class="op">=</span>root0meas, count<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a>root0measd <span class="op">=</span> tree.add(name<span class="op">=</span><span class="st">'δ'</span>, node_type<span class="op">=</span>Delta, parent<span class="op">=</span>root0meas)</span>
 <span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a>root0meas0none <span class="op">=</span> tree.add(name<span class="op">=</span><span class="st">'None'</span>, node_type<span class="op">=</span>Variable, parent<span class="op">=</span>root0meas0, count<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb20-27"><a href="#cb20-27" aria-hidden="true" tabindex="-1"></a>root0meas0none.invariant <span class="op">=</span> <span class="va">True</span> <span class="co"># Set leaf node to inv</span></span>
-<span id="cb20-28"><a href="#cb20-28" aria-hidden="true" tabindex="-1"></a>root0measd <span class="op">=</span> tree.add(name<span class="op">=</span><span class="st">'δ'</span>, node_type<span class="op">=</span>Delta, parent<span class="op">=</span>root0meas)</span>
-<span id="cb20-29"><a href="#cb20-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-30"><a href="#cb20-30" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tree)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-27"><a href="#cb20-27" aria-hidden="true" tabindex="-1"></a>root1enc <span class="op">=</span> tree.add(name<span class="op">=</span><span class="st">'meas'</span>, circuit_id<span class="op">=</span><span class="st">'meas'</span>, node_type<span class="op">=</span>Variable, parent<span class="op">=</span>root1, count<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb20-28"><a href="#cb20-28" aria-hidden="true" tabindex="-1"></a>root1enc0 <span class="op">=</span> tree.add(name<span class="op">=</span>(<span class="dv">0</span>,), node_type<span class="op">=</span>Constant, parent<span class="op">=</span>root1enc, count<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb20-29"><a href="#cb20-29" aria-hidden="true" tabindex="-1"></a>root1enc0 <span class="op">=</span> tree.add(name<span class="op">=</span><span class="st">"None"</span>, node_type<span class="op">=</span>Variable, parent<span class="op">=</span>root1enc0, count<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb20-30"><a href="#cb20-30" aria-hidden="true" tabindex="-1"></a>root1enc0.invariant <span class="op">=</span> <span class="va">True</span></span>
+<span id="cb20-31"><a href="#cb20-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-32"><a href="#cb20-32" aria-hidden="true" tabindex="-1"></a><span class="co"># tree.marked.add(root1enc0)</span></span>
+<span id="cb20-33"><a href="#cb20-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-34"><a href="#cb20-34" aria-hidden="true" tabindex="-1"></a>root1encd <span class="op">=</span> tree.add(name<span class="op">=</span><span class="st">'δ'</span>, node_type<span class="op">=</span>Delta, parent<span class="op">=</span>root1enc)</span>
+<span id="cb20-35"><a href="#cb20-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-36"><a href="#cb20-36" aria-hidden="true" tabindex="-1"></a>root1meas <span class="op">=</span> tree.add(name<span class="op">=</span><span class="st">'Z2'</span>, circuit_id<span class="op">=</span><span class="st">'Z2'</span>, node_type<span class="op">=</span>Variable, parent<span class="op">=</span>root1, count<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb20-37"><a href="#cb20-37" aria-hidden="true" tabindex="-1"></a>root1meas0 <span class="op">=</span> tree.add(name<span class="op">=</span>(<span class="dv">0</span>,), node_type<span class="op">=</span>Constant, parent<span class="op">=</span>root1meas, count<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb20-38"><a href="#cb20-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-39"><a href="#cb20-39" aria-hidden="true" tabindex="-1"></a>root1measd <span class="op">=</span> tree.add(name<span class="op">=</span><span class="st">'δ'</span>, node_type<span class="op">=</span>Delta, parent<span class="op">=</span>root1meas)</span>
+<span id="cb20-40"><a href="#cb20-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-41"><a href="#cb20-41" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tree)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>ENC (10, 0.00e+00)
+├── (1,) (1)
+│   ├── meas (1, 6.25e-02)
+│   │   ├── (0,) (1)
+│   │   │   └── None (1, 0.00e+00)
+│   │   └── δ
+│   └── Z2 (0, 6.25e-02)
+│       ├── (0,) (0)
+│       └── δ
+├── (0,) (9)
+│   └── meas (9, 2.50e-03)
+│       ├── (0,) (9)
+│       │   └── None (9, 0.00e+00)
+│       ├── (1,) (0)
+│       └── δ
+└── δ</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>np.sqrt(tree.var(mode<span class="op">=</span><span class="dv">0</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>0.00021666263417500052</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>constants <span class="op">=</span> {<span class="st">'ENC'</span>: {(<span class="dv">0</span>,): <span class="fl">0.977251</span>, (<span class="dv">1</span>,): <span class="fl">0.0224993</span>}, <span class="co"># c0</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>             <span class="st">'meas'</span>: {(<span class="dv">0</span>,): <span class="fl">0.993021</span>, (<span class="dv">1</span>,): <span class="fl">0.0069581</span>}, <span class="co"># c1</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>            } <span class="co"># corresp. p_max = 1e-3</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>tree <span class="op">=</span> Tree(constants, L<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>root <span class="op">=</span> tree.add(name<span class="op">=</span><span class="st">'ENC'</span>, circuit_id<span class="op">=</span><span class="st">'ENC'</span>, node_type<span class="op">=</span>Variable, count<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>root0 <span class="op">=</span> tree.add(name<span class="op">=</span>(<span class="dv">0</span>,), node_type<span class="op">=</span>Constant, parent<span class="op">=</span>root, count<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>root1 <span class="op">=</span> tree.add(name<span class="op">=</span>(<span class="dv">1</span>,), node_type<span class="op">=</span>Constant, parent<span class="op">=</span>root, count<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>d <span class="op">=</span> tree.add(name<span class="op">=</span><span class="st">'δ'</span>, node_type<span class="op">=</span>Delta, parent<span class="op">=</span>root)</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>root1enc <span class="op">=</span> tree.add(name<span class="op">=</span><span class="st">'ENC'</span>, circuit_id<span class="op">=</span><span class="st">'ENC'</span>, node_type<span class="op">=</span>Variable, parent<span class="op">=</span>root1, count<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>root1enc0 <span class="op">=</span> tree.add(name<span class="op">=</span>(<span class="dv">0</span>,), node_type<span class="op">=</span>Constant, parent<span class="op">=</span>root1enc, count<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>root1encd <span class="op">=</span> tree.add(name<span class="op">=</span><span class="st">'δ'</span>, node_type<span class="op">=</span>Delta, parent<span class="op">=</span>root1enc)</span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>root1meas <span class="op">=</span> tree.add(name<span class="op">=</span><span class="st">'meas'</span>, circuit_id<span class="op">=</span><span class="st">'meas'</span>, node_type<span class="op">=</span>Variable, parent<span class="op">=</span>root1, count<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>root1meas0 <span class="op">=</span> tree.add(name<span class="op">=</span>(<span class="dv">0</span>,), node_type<span class="op">=</span>Constant, parent<span class="op">=</span>root1meas, count<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>root1meas0none <span class="op">=</span> tree.add(name<span class="op">=</span><span class="st">'None'</span>, node_type<span class="op">=</span>Variable, parent<span class="op">=</span>root1meas0, count<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>root1meas0none.invariant <span class="op">=</span> <span class="va">True</span> <span class="co"># Set leaf node to inv (FT PATH!)</span></span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>root1measd <span class="op">=</span> tree.add(name<span class="op">=</span><span class="st">'δ'</span>, node_type<span class="op">=</span>Delta, parent<span class="op">=</span>root1meas)</span>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a>root0meas <span class="op">=</span> tree.add(name<span class="op">=</span><span class="st">'meas'</span>, circuit_id<span class="op">=</span><span class="st">'meas'</span>, node_type<span class="op">=</span>Variable, parent<span class="op">=</span>root0, count<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a>root0meas0 <span class="op">=</span> tree.add(name<span class="op">=</span>(<span class="dv">0</span>,), node_type<span class="op">=</span>Constant, parent<span class="op">=</span>root0meas, count<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a>root0meas1 <span class="op">=</span> tree.add(name<span class="op">=</span>(<span class="dv">1</span>,), node_type<span class="op">=</span>Constant, parent<span class="op">=</span>root0meas, count<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb24-25"><a href="#cb24-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-26"><a href="#cb24-26" aria-hidden="true" tabindex="-1"></a>root0meas0none <span class="op">=</span> tree.add(name<span class="op">=</span><span class="st">'None'</span>, node_type<span class="op">=</span>Variable, parent<span class="op">=</span>root0meas0, count<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb24-27"><a href="#cb24-27" aria-hidden="true" tabindex="-1"></a>root0meas0none.invariant <span class="op">=</span> <span class="va">True</span> <span class="co"># Set leaf node to inv</span></span>
+<span id="cb24-28"><a href="#cb24-28" aria-hidden="true" tabindex="-1"></a>root0measd <span class="op">=</span> tree.add(name<span class="op">=</span><span class="st">'δ'</span>, node_type<span class="op">=</span>Delta, parent<span class="op">=</span>root0meas)</span>
+<span id="cb24-29"><a href="#cb24-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-30"><a href="#cb24-30" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tree)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>ENC (2, 0.00e+00)
 ├── (0,) (1)
@@ -667,22 +734,32 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>d1 <span class="op">=</span> <span class="dv">1</span> <span class="op">-</span> constants[<span class="st">'ENC'</span>][(<span class="dv">0</span>,)] <span class="op">-</span> constants[<span class="st">'ENC'</span>][(<span class="dv">1</span>,)]</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>d2 <span class="op">=</span> constants[<span class="st">'ENC'</span>][(<span class="dv">0</span>,)] <span class="op">*</span> (<span class="dv">1</span> <span class="op">-</span> constants[<span class="st">'meas'</span>][(<span class="dv">0</span>,)] <span class="op">-</span> constants[<span class="st">'meas'</span>][(<span class="dv">1</span>,)])</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>d3 <span class="op">=</span> constants[<span class="st">'ENC'</span>][(<span class="dv">1</span>,)] <span class="op">*</span> (<span class="dv">1</span> <span class="op">-</span> constants[<span class="st">'meas'</span>][(<span class="dv">0</span>,)])</span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>delta <span class="op">=</span> d1 <span class="op">+</span> d2 <span class="op">+</span> d3</span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>test_close(tree.delta, delta)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>d1 <span class="op">=</span> <span class="dv">1</span> <span class="op">-</span> constants[<span class="st">'ENC'</span>][(<span class="dv">0</span>,)] <span class="op">-</span> constants[<span class="st">'ENC'</span>][(<span class="dv">1</span>,)]</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>d2 <span class="op">=</span> constants[<span class="st">'ENC'</span>][(<span class="dv">0</span>,)] <span class="op">*</span> (<span class="dv">1</span> <span class="op">-</span> constants[<span class="st">'meas'</span>][(<span class="dv">0</span>,)] <span class="op">-</span> constants[<span class="st">'meas'</span>][(<span class="dv">1</span>,)])</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>d3 <span class="op">=</span> constants[<span class="st">'ENC'</span>][(<span class="dv">1</span>,)] <span class="op">*</span> (<span class="dv">1</span> <span class="op">-</span> constants[<span class="st">'meas'</span>][(<span class="dv">0</span>,)])</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>delta <span class="op">=</span> d1 <span class="op">+</span> d2 <span class="op">+</span> d3</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>test_close(tree.delta, delta)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>M0 <span class="op">=</span> constants[<span class="st">'ENC'</span>][(<span class="dv">0</span>,)] <span class="co"># smallest possible A0.</span></span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>test_close(tree.constants[tree.M0_index[<span class="dv">0</span>]][tree.M0_index[<span class="dv">1</span>]], M0)</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>L <span class="op">=</span> <span class="dv">2</span></span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>V1 <span class="op">=</span> <span class="fl">6.25e-02</span></span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>VLup <span class="op">=</span> constants[<span class="st">'ENC'</span>][(<span class="dv">1</span>,)]<span class="op">**</span><span class="dv">2</span> <span class="op">*</span> (<span class="dv">1</span> <span class="op">-</span> constants[<span class="st">'meas'</span>][(<span class="dv">0</span>,)] <span class="op">-</span> L <span class="op">*</span> (<span class="dv">1</span> <span class="op">-</span> M0))<span class="op">**</span><span class="dv">2</span> <span class="op">*</span> V1</span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>test_close(np.sqrt(VLup), np.sqrt(tree.var(mode<span class="op">=</span><span class="dv">0</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>M0 <span class="op">=</span> constants[<span class="st">'ENC'</span>][(<span class="dv">0</span>,)] <span class="co"># smallest possible A0.</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>test_close(tree.constants[tree.M0_index[<span class="dv">0</span>]][tree.M0_index[<span class="dv">1</span>]], M0)</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>L <span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>V1 <span class="op">=</span> <span class="fl">6.25e-02</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>VLup <span class="op">=</span> constants[<span class="st">'ENC'</span>][(<span class="dv">1</span>,)]<span class="op">**</span><span class="dv">2</span> <span class="op">*</span> (<span class="dv">1</span> <span class="op">-</span> constants[<span class="st">'meas'</span>][(<span class="dv">0</span>,)] <span class="op">-</span> L <span class="op">*</span> (<span class="dv">1</span> <span class="op">-</span> M0))<span class="op">**</span><span class="dv">2</span> <span class="op">*</span> V1</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>test_close(np.sqrt(VLup), np.sqrt(tree.var(mode<span class="op">=</span><span class="dv">0</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Example 4</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>constants = {‘ENC’: {(0,): 0.977251, (1,): 0.0224993}, # c0 ‘meas’: {(0,): 0.993021, (1,): 0.0069581}, # c1 } # corresp. p_max = 1e-3</p>
+<p>tree = Tree(constants, L=2) root = tree.add(name=‘ENC’, circuit_id=‘ENC’, node_type=Variable, count=2) root0 = tree.add(name=(0,), node_type=Constant, parent=root, count=1) root1 = tree.add(name=(1,), node_type=Constant, parent=root, count=1) d = tree.add(name=‘δ’, node_type=Delta, parent=root)</p>
+<p>root1enc = tree.add(name=‘ENC’, circuit_id=‘ENC’, node_type=Variable, parent=root1, count=0) root1enc0 = tree.add(name=(0,), node_type=Constant, parent=root1enc, count=0) root1encd = tree.add(name=‘δ’, node_type=Delta, parent=root1enc)</p>
+<p>root1meas = tree.add(name=‘meas’, circuit_id=‘meas’, node_type=Variable, parent=root1, count=1) root1meas0 = tree.add(name=(0,), node_type=Constant, parent=root1meas, count=1) root1meas0none = tree.add(name=‘None’, node_type=Variable, parent=root1meas0, count=1) root1meas0none.invariant = True # Set leaf node to inv (FT PATH!) root1measd = tree.add(name=‘δ’, node_type=Delta, parent=root1meas)</p>
+<p>root0meas = tree.add(name=‘meas’, circuit_id=‘meas’, node_type=Variable, parent=root0, count=1) root0meas0 = tree.add(name=(0,), node_type=Constant, parent=root0meas, count=1) root0meas1 = tree.add(name=(1,), node_type=Constant, parent=root0meas, count=0)</p>
+<p>root0meas0none = tree.add(name=‘None’, node_type=Variable, parent=root0meas0, count=1) root0meas0none.invariant = True # Set leaf node to inv root0measd = tree.add(name=‘δ’, node_type=Delta, parent=root0meas)</p>
+<p>print(tree)</p>
 
 
 </section>

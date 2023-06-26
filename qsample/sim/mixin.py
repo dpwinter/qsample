@@ -55,7 +55,7 @@ class CircuitRunnerMixin:
             msmts = []
             
             for gate, qubits in circuit[tick_index].items():
-                for qubit in qubits:
+                for qubit in sorted(qubits):
                     if 'measure' in gate:
                         msmts.append( (gate,qubit) ) # store measure gate, do not execute right away.
                         continue

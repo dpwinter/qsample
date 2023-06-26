@@ -394,8 +394,13 @@ def gen_flagstab():
             return False
 
     def flagged(m):
-        v = 0b01 in m or 0b11 in m if m is not None else False
-        #print('flag', [format(i, '02b') for i in m], ':', v)
+        v = [0b01] in m or [0b11] in m if m is not None else False
+        for i in m:
+            if i is not None:
+                # print()
+                print('flag', [format(i, '02b') for i in m], ':', v)
+        # v = 0b01 in m or 0b11 in m if m is not None else False
+        # #print('flag', [format(i, '02b') for i in m], ':', v)
         return v
 
     def flut(m, f1a, f1b, f2a, f2b, f3a, f3b):
