@@ -98,8 +98,6 @@ class SubsetSampler:
         """Choose a subset for `circuit`, based on current `tnode`
         
         Choice is based on subset occurence probability (Aws).
-        Exclude 0-weight-subsets if a circuit is fault-free determinstic and
-        the 0-weight-subset has already been sampled in the past.
         
         Parameters
         ----------
@@ -114,17 +112,6 @@ class SubsetSampler:
             Next subset to choose for `tnode`
         """
         subsets, Aws = zip(*self.tree.constants[circuit.id].items())
-                
-        # this doesn't work right: if ff_det the 0-subset would NEVER
-        # be selected ever, even though it can lead to a fail eventually.
-        # Better: Let the use choose a sampling distribution by setting p_max.
-        # Special case: repeat until success -> Here we want to avoid ever going into
-        # the 0-subset, but this is not always the case!
-        ## Give user choice to omit sampling from 0-subset (default do not)
-        
-        # if circuit.ff_deterministic and subsets[0] in {n.name for n in tnode.children}:
-        #     Aws = np.ma.masked_array(Aws)
-        #     Aws[0] = np.ma.masked
         return subsets[ np.random.choice(len(subsets), p=Aws) ]
 
         
@@ -173,12 +160,10 @@ class SubsetSampler:
                         
                 if circuit:
                 
-                    # tnode.ff_deterministic = circuit.ff_deterministic
                     tnode.circuit_id = circuit.id
                     
                     if not circuit.noisy:
                         msmt = state.run(circuit)
-                        tnode.invariant = True
                         # add 0-subset for not noisy circuits
                         tnode = self.tree.add(name=(0,), parent=tnode, node_type=Constant, const_val=1)
                         tnode.count += 1
@@ -186,7 +171,7 @@ class SubsetSampler:
                             
                         # circuit node
                         if self.protocol.fault_tolerant and self.tree.path_weight(tnode) == 0: # Case IV
-                            for virt_sskey in [sskey for sskey in self.tree.constants[circuit.id].keys() if sum(sskey) == 1]: # == 1]: 
+                            for virt_sskey in [sskey for sskey in self.tree.constants[circuit.id].keys() if sum(sskey) == 1]:
                                 ss_node = self.tree.add(name=virt_sskey, parent=tnode, node_type=Constant)
                                 # expand circuits and subsets for each virtual subset
                                 for vcirc_name in [n for n in self.protocol.successors(pnode)]:
@@ -218,22 +203,17 @@ class SubsetSampler:
                             else:
                                 smallest_failure_exponent = 1
                             
-
                             if self.protocol.fault_tolerant and path_weight == 1: # case III
                                 delta_value = None
                             elif path_weight >= smallest_failure_exponent: # case II
                                 delta_value = 1
                             # add virtual circuit and its delta
-                            # print([n for n in self.protocol.successors(pnode) if n != tnode.parent.name])
-                            
-                            # other = [n for n in self.protocol.successors(pnode) if n != tnode.parent.name][0] # other circuit from protocol
-                            # print(repr(tnode), list(self.protocol.successors(pnode)), other)
+        
                             for vcirc_name in self.protocol.successors(pnode):
                                 circuit_ = self.protocol.get_circuit(vcirc_name)
 
                                 # if other_circuit.noisy:
                                 if circuit_:
-                                    # print('circ:', other)
                                     tnode_ = self.tree.add(name=vcirc_name, parent=tnode, node_type=Variable, circuit_id=circuit_.id)
                                     delta_ = self.tree.add(name='δ', node_type=Delta, parent=tnode_)
                                     delta_.value = delta_value # custom delta value
