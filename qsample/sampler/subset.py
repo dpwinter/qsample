@@ -92,7 +92,7 @@ class SubsetSampler:
         
     
     def save(self, path):
-        utils.save(path)
+        utils.save(self, path)
         
     def _choose_subset(self, tnode, circuit):
         """Choose a subset for `circuit`, based on current `tnode`

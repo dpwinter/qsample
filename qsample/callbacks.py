@@ -377,7 +377,7 @@ class PlotERVPerShot(Callback):
         plt.figure(figsize=(6,4))
         for k,vlist in sorted(data.items()):
             p1 = k[0] / (max_levels + 1)
-            p2 = sum(k[-1]) / max_subset_weight
+            p2 = sum(k[-1]) / max_subset_weight if max_subset_weight != 0 else 0
 
             xs = [x for x,_ in vlist]
             ys = [np.nan if np.ma.is_masked(y) else y for _,y in vlist]

@@ -249,11 +249,11 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="p_max-q1-1e-2-q2-1e-2" class="level1">
 <h1>p_max = {‘q1’: 1e-2, ‘q2’: 1e-2}</h1>
-<p>ss_sam = SubsetSampler(protocol=flagstab, simulator=CHP, p_max=p_max, err_model=E1, err_params=err_params, L=2) ss_sam.run(1, callbacks=[cb.PlotStats()])</p>
+<p>ss_sam = SubsetSampler(protocol=steane0, simulator=CHP, p_max=p_max, err_model=E1, err_params=err_params, L=2) ss_sam.run(1, callbacks=[cb.PlotStats()])</p>
 </section>
 <section id="ss_sam.tree.drawverbosetrue" class="level1">
 <h1>ss_sam.tree.draw(verbose=True)</h1>
-<p>print(ss_sam.tree)</p>
+<p>print(ss_sam.tree) # utils.save(ss_sam, ‘./test’) ss_sam.save(‘./test’)</p>
 
 
 </section>

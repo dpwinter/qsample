@@ -2,62 +2,62 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://dpwinter.github.io/qsample/protocol.html</loc>
-    <lastmod>2023-06-28T13:53:26.503Z</lastmod>
+    <lastmod>2023-06-29T07:46:50.028Z</lastmod>
   </url>
   <url>
     <loc>https://dpwinter.github.io/qsample/sampler.tree.html</loc>
-    <lastmod>2023-06-28T13:53:26.903Z</lastmod>
+    <lastmod>2023-06-29T07:46:50.428Z</lastmod>
   </url>
   <url>
     <loc>https://dpwinter.github.io/qsample/examples.html</loc>
-    <lastmod>2023-06-28T13:53:27.375Z</lastmod>
+    <lastmod>2023-06-29T07:46:50.904Z</lastmod>
   </url>
   <url>
     <loc>https://dpwinter.github.io/qsample/sampler.experimental.html</loc>
-    <lastmod>2023-06-28T13:53:27.587Z</lastmod>
+    <lastmod>2023-06-29T07:46:51.112Z</lastmod>
   </url>
   <url>
     <loc>https://dpwinter.github.io/qsample/noise.html</loc>
-    <lastmod>2023-06-28T13:53:27.807Z</lastmod>
+    <lastmod>2023-06-29T07:46:51.340Z</lastmod>
   </url>
   <url>
     <loc>https://dpwinter.github.io/qsample/utils.html</loc>
-    <lastmod>2023-06-28T13:53:28.015Z</lastmod>
+    <lastmod>2023-06-29T07:46:51.544Z</lastmod>
   </url>
   <url>
     <loc>https://dpwinter.github.io/qsample/math.html</loc>
-    <lastmod>2023-06-28T13:53:28.279Z</lastmod>
+    <lastmod>2023-06-29T07:46:51.828Z</lastmod>
   </url>
   <url>
     <loc>https://dpwinter.github.io/qsample/circuit.html</loc>
-    <lastmod>2023-06-28T13:53:28.499Z</lastmod>
+    <lastmod>2023-06-29T07:46:52.076Z</lastmod>
   </url>
   <url>
     <loc>https://dpwinter.github.io/qsample/sim.mixin.html</loc>
-    <lastmod>2023-06-28T13:53:28.715Z</lastmod>
+    <lastmod>2023-06-29T07:46:52.288Z</lastmod>
   </url>
   <url>
     <loc>https://dpwinter.github.io/qsample/sampler.direct.html</loc>
-    <lastmod>2023-06-28T13:53:28.931Z</lastmod>
+    <lastmod>2023-06-29T07:46:52.492Z</lastmod>
   </url>
   <url>
     <loc>https://dpwinter.github.io/qsample/callbacks.html</loc>
-    <lastmod>2023-06-28T13:53:29.175Z</lastmod>
+    <lastmod>2023-06-29T07:46:52.708Z</lastmod>
   </url>
   <url>
     <loc>https://dpwinter.github.io/qsample/sim.stabilizer.html</loc>
-    <lastmod>2023-06-28T13:53:29.399Z</lastmod>
+    <lastmod>2023-06-29T07:46:52.912Z</lastmod>
   </url>
   <url>
     <loc>https://dpwinter.github.io/qsample/sim.statevector.html</loc>
-    <lastmod>2023-06-28T13:53:29.619Z</lastmod>
+    <lastmod>2023-06-29T07:46:53.116Z</lastmod>
   </url>
   <url>
     <loc>https://dpwinter.github.io/qsample/index.html</loc>
-    <lastmod>2023-06-28T13:53:29.915Z</lastmod>
+    <lastmod>2023-06-29T07:46:53.412Z</lastmod>
   </url>
   <url>
     <loc>https://dpwinter.github.io/qsample/sampler.subset.html</loc>
-    <lastmod>2023-06-28T13:53:30.123Z</lastmod>
+    <lastmod>2023-06-29T07:46:53.616Z</lastmod>
   </url>
 </urlset>

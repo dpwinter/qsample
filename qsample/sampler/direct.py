@@ -65,7 +65,7 @@ class DirectSampler:
         path : str
             File path to save to
         """
-        utils.save(path)
+        utils.save(self, path)
             
     def stats(self, idx=None):
         """Calculate sampling statistics
