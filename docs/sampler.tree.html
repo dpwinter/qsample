@@ -411,11 +411,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>test_eq(tree.root_leaf_rate, <span class="dv">20</span><span class="op">/</span><span class="dv">100</span>)</span>
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>test_eq(tree.subtree_sum(tree.root, tree.marked), <span class="fl">0.1</span> <span class="op">*</span> <span class="dv">20</span><span class="op">/</span><span class="dv">30</span>)</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co"># test_close(tree.subtree_sum(tree.root, tree.marked | tree.deltas), 1 - (0.8 + 0.1 * 10/30 + 0.05 * 25/30), eps=1e-05)</span></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>vL <span class="op">=</span> <span class="fl">0.1</span><span class="op">**</span><span class="dv">2</span> <span class="op">*</span> fail_1.var <span class="op">+</span> <span class="fl">0.05</span><span class="op">**</span><span class="dv">2</span> <span class="op">*</span> none_2.var <span class="co"># vL = vL^up</span></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>test_close(tree.var(mode<span class="op">=</span><span class="dv">1</span>), vL, eps<span class="op">=</span><span class="fl">1e-05</span>)</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>test_close(tree.var(mode<span class="op">=</span><span class="dv">0</span>), vL, eps<span class="op">=</span><span class="fl">1e-05</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>vL <span class="op">=</span> <span class="fl">0.1</span><span class="op">**</span><span class="dv">2</span> <span class="op">*</span> fail_1.var <span class="op">+</span> <span class="fl">0.05</span><span class="op">**</span><span class="dv">2</span> <span class="op">*</span> none_2.var <span class="co"># vL = vL^up</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>test_close(tree.var(mode<span class="op">=</span><span class="dv">1</span>), vL, eps<span class="op">=</span><span class="fl">1e-05</span>)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>test_close(tree.var(mode<span class="op">=</span><span class="dv">0</span>), vL, eps<span class="op">=</span><span class="fl">1e-05</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Test creation of 2-level tree.</p>
 <div class="cell">

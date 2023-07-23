@@ -123,30 +123,6 @@ class Circuit(MutableSequence):
         """
         self._ticks = ticks if ticks else [] # Must do this way, else keeps appending to same instance
         self.noisy = noisy
-        # self.ff_deterministic = ff_deterministic
-        # if ff_deterministic == None: # fault-free deterministic
-        #     self.ff_deterministic = self.__is_ff_det()
-        # else:
-        #     self.ff_deterministic = ff_deterministic
-        
-#     def __is_ff_det(self):
-#         """Determine if a circuit return value is deterministic under
-#         fault-free execution. The circuit return value is determined by all measurements
-#         executed in a circuit. If no measurement is executed the return value is `None` and
-#         thus also deterministic (with respect to its outcome, *not* the resulting state). 
-        
-#         Otherwise only circuits which initialize all the qubits they "touch" are guaranteed to
-#         result in the same result under fault-free execution.
-        
-#         Returns
-#         -------
-#         bool
-#             True if circuit fault-free deterministic
-#         """
-#         initialized_qubits = set(unpack([qbs for t in self for g, qbs in t.items() if g in GATES['init']]))
-#         measured_qubits = set(unpack([qbs for t in self for g, qbs in t.items() if g in GATES['meas']]))
-#         all_qubits = set(unpack(self))
-#         return all_qubits == initialized_qubits or len(measured_qubits) == 0
         
     def __getitem__(self, tick_index):
         return self._ticks[tick_index]
@@ -173,13 +149,12 @@ class Circuit(MutableSequence):
         self._ticks.insert(tick_index, tick)
     
     def __str__(self):
+        if self._ticks == []:
+            return "__empty__"
         str_list = []
         for i, tick in enumerate(self._ticks):
             str_list.append(f"{i}: {str(tick)}")
         return "\n".join(str_list)
-    
-    # def __repr__(self):
-    #     return self.__str__()
     
     @cached_property
     def qubits(self):  

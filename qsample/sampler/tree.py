@@ -231,7 +231,6 @@ class Tree:
         self.marked = set()
         
         self.L = L # longest circuit sequence for non-fail paths
-        # self.M0 = np.min([list(v.values())[0] for v in constants.values()], axis=0) # Smallest A0 value
         index_tuples = [(cid, sskey) for cid, ss in self.constants.items() for sskey in ss.keys() if sum(sskey) == 0]
         self.M0_index = index_tuples[ np.argmin([self.constants[k][v] for k, v in index_tuples]) ]
     
@@ -325,8 +324,7 @@ class Tree:
                 return self.constants[node.parent.circuit_id][node.name]
         elif type(node) == Delta:
             
-            if node.parent.count == 0: # ? Instead of parent, check count of sibling ? -> Additional condition
-                # return self.L * (1 - self.M0)
+            if node.parent.count == 0:
                 if node.value:
                     return node.value
                 else:
@@ -360,8 +358,6 @@ class Tree:
         for n in node.iter_path_reverse():
             if type(n) == Constant:
                 weight += sum(n.name)
-            # elif n.ff_deterministic:
-            #     break
         return weight
     
     def path_prod(self, nodeA, nodeB):
@@ -456,7 +452,6 @@ class Tree:
         for leaf in leaves: # path variances
             if self.path_weight(leaf) >= 1: # exclude weight-0 paths
                 acc += self.path_var(leaf)
-                # print(leaf, self.path_var(leaf))
         
         
         # Add contributions to variance from no-fail paths

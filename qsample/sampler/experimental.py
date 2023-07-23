@@ -71,19 +71,12 @@ class SubsetSamplerERV(SubsetSampler):
         erv_vals = []
         logs = []
 
-        # exclude virtual nodes in calculation of delta
-        # vss_contrib = np.prod([self.tree.value(n) for n in circuit_node.children if type(n) == Delta or n.count==0])
-        # delta = self.tree.delta / (1 if vss_contrib==0 else vss_contrib)
         d = self.tree.add(name='δ', parent=circuit_node, node_type=Delta)
-        #self.tree.deltas.add(d)
 
         delta = self.tree.delta
 
         v_L = self.tree.var(mode=1)
         v_L_up = self.tree.var(mode=0)
-
-        # print(self.tree)
-        # print(np.sqrt(v_L))
 
         for subset in subset_candidates:
 
@@ -122,15 +115,12 @@ class SubsetSamplerERV(SubsetSampler):
 
             delta_prime = self.tree.delta
 
-            #print(child_node_minus.count)
             child_node_minus.count += 1
             delta_minus = self.tree.delta
             v_L_minus = self.tree.var(mode=1)
             minus_tree = deepcopy(self.tree)
-            #print(child_node_minus.count)
             v_L_up_minus = self.tree.var(mode=0)
             child_node_minus.count -= 1
-            #print(child_node_minus.count, v_L_minus, v_L_up_minus)
 
             child_node_plus.count += 1
             plus_tree = deepcopy(self.tree)
@@ -159,13 +149,6 @@ class SubsetSamplerERV(SubsetSampler):
             delta_exp = child_node_plus.rate * delta_plus + child_node_minus.rate * delta_minus
 
             erv = -(child_node_plus.count/(child_node_plus.count + child_node_minus.count) * err_plus + child_node_minus.count/(child_node_plus.count + child_node_minus.count) * err_minus - err) if child_node_plus.count + child_node_minus.count != 0 else -(child_node_plus.rate * err_plus + (1-child_node_plus.rate) * err_minus - err)
-            # erv = np.sqrt(v_L) - np.sqrt(v_L_exp) + delta_exp - delta # orig
-            # erv = np.sqrt(v_L_exp) - np.sqrt(v_L) + delta_exp - delta
-            # erv = np.sqrt(v_L) - np.sqrt(v_L_exp) + delta_prime - delta
-            # erv = delta_prime - delta
-
-            # erv = abs(v_L - v_L_exp + delta - delta_prime)
-            # erv = child_node_plus.rate * (np.sqrt(v_L_plus) - delta_plus) + child_node_minus.rate * (np.sqrt(v_L_minus) - delta_minus) - (np.sqrt(v_L) - delta)
             erv_vals.append(erv)
             # logs.append((subset, erv, np.sqrt(v_L), child_node_plus.rate, np.sqrt(v_L_plus), child_node_minus.rate, np.sqrt(v_L_minus), delta, delta_plus, delta_minus))
             logs.append((subset, 'ERV = ' + str(erv),

@@ -405,7 +405,6 @@ class PrintERVPerShot(Callback):
         name = local_vars.get('pnode', None)
         print(f"# ERV for circuit {name}")
         for ss, log in zip(sampler.erv_subset_candidates, sampler.logs):
-            # erv_str = f"{ss}: {erv:.3e}"
             erv_str = ", ".join(list(map(str,log)))
             if ss == sampler.erv_subset_candidates[sampler.erv_idx]:
                 erv_str = "\033[1m" + erv_str + "\033[0m"

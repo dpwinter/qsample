@@ -176,7 +176,7 @@ class Protocol(nx.DiGraph):
                                        names=lambda n: hist.get(n.id, None), 
                                        functions=self.check_functions) 
                   for pair in self.out_edges(name)}
-        next_nodes = [(n,check) for n,check in checks.items() if check]
+        next_nodes = [(n,check) for n,check in checks.items() if check != False]
 
         assert(len(next_nodes) <= 1), f"Too many checks True for for node {name}"
         if len(next_nodes) == 0:

@@ -146,7 +146,7 @@ class SubsetSampler:
                 pnode, circuit = self.protocol.successor(pnode, msmt_hist)
                 tnode = self.tree.add(name=pnode, parent=tnode, node_type=Variable)
                 tnode.count += 1
-                
+                                
                 path_weight = self.tree.path_weight(tnode)
                 if path_weight == 0:
                     tnode.invariant = True # Nodes along weight-0 path have no variance
@@ -158,8 +158,7 @@ class SubsetSampler:
                 except:
                     pass
                         
-                if circuit:
-                
+                if circuit != None:
                     tnode.circuit_id = circuit.id
                     
                     if not circuit.noisy:
@@ -168,7 +167,7 @@ class SubsetSampler:
                         tnode = self.tree.add(name=(0,), parent=tnode, node_type=Constant, const_val=1)
                         tnode.count += 1
                     else:
-                            
+                        
                         # circuit node
                         if self.protocol.fault_tolerant and self.tree.path_weight(tnode) == 0: # Case IV
                             for virt_sskey in [sskey for sskey in self.tree.constants[circuit.id].keys() if sum(sskey) == 1]:
@@ -217,7 +216,6 @@ class SubsetSampler:
                                     tnode_ = self.tree.add(name=vcirc_name, parent=tnode, node_type=Variable, circuit_id=circuit_.id)
                                     delta_ = self.tree.add(name='δ', node_type=Delta, parent=tnode_)
                                     delta_.value = delta_value # custom delta value
-
                     msmt = msmt if msmt==None else int(msmt,2) # convert to int for comparison in checks
                     msmt_hist[pnode] = msmt_hist.get(pnode, []) + [msmt]
                 else:
