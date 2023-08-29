@@ -530,27 +530,27 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"578481b5787a426ba8f4ed526ada2ec8","version_major":2,"version_minor":0}
+{"model_id":"2e7c611790e34202996aebebde080305","version_major":2,"version_minor":0}
 </script>
 </div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"903d46c686b640cabf73ba0c3bae6197","version_major":2,"version_minor":0}
+{"model_id":"84b4c9128be243e28f77d93f10a47fc7","version_major":2,"version_minor":0}
 </script>
 </div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"600f7841105b442f90615612c77abaeb","version_major":2,"version_minor":0}
+{"model_id":"40b2572b242142dfbeb5f4af9da12a4d","version_major":2,"version_minor":0}
 </script>
 </div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"f09038cdcd704357aedff6b4c4c5da2a","version_major":2,"version_minor":0}
+{"model_id":"8b09099f2d0648c489305637392328aa","version_major":2,"version_minor":0}
 </script>
 </div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"da6269a4a62e482585f4b4fcfcee3f05","version_major":2,"version_minor":0}
+{"model_id":"402a760e73e7482a914042425963715d","version_major":2,"version_minor":0}
 </script>
 </div>
 <div class="cell-output cell-output-stdout">
@@ -558,7 +558,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"4fd1352d52f747dd806c2c309f3771fb","version_major":2,"version_minor":0}
+{"model_id":"f91f5f10a2074a24a14faf5ed92289c9","version_major":2,"version_minor":0}
 </script>
 </div>
 <div class="cell-output cell-output-display">
@@ -642,93 +642,93 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb9-68"><a href="#cb9-68" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-69"><a href="#cb9-69" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> flagged(m):</span>
 <span id="cb9-70"><a href="#cb9-70" aria-hidden="true" tabindex="-1"></a>    v <span class="op">=</span> [<span class="bn">0b01</span>] <span class="kw">in</span> m <span class="kw">or</span> [<span class="bn">0b11</span>] <span class="kw">in</span> m <span class="cf">if</span> m <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span> <span class="cf">else</span> <span class="va">False</span></span>
-<span id="cb9-71"><a href="#cb9-71" aria-hidden="true" tabindex="-1"></a>    <span class="co"># for i in m:</span></span>
-<span id="cb9-72"><a href="#cb9-72" aria-hidden="true" tabindex="-1"></a>    <span class="co">#     if i:</span></span>
-<span id="cb9-73"><a href="#cb9-73" aria-hidden="true" tabindex="-1"></a>    <span class="co">#         print('flag:', [format(j, '02b') for j in i], ":", v)</span></span>
-<span id="cb9-74"><a href="#cb9-74" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> v</span>
+<span id="cb9-71"><a href="#cb9-71" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> v</span>
+<span id="cb9-72"><a href="#cb9-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-73"><a href="#cb9-73" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> flut(m, f1a, f1b, f2a, f2b, f3a, f3b):</span>
+<span id="cb9-74"><a href="#cb9-74" aria-hidden="true" tabindex="-1"></a>    formatter <span class="op">=</span> <span class="kw">lambda</span> i,m: <span class="bu">str</span>(<span class="bu">format</span>(m, <span class="st">'06b'</span>)[i])</span>
 <span id="cb9-75"><a href="#cb9-75" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-76"><a href="#cb9-76" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> flut(m, f1a, f1b, f2a, f2b, f3a, f3b):</span>
-<span id="cb9-77"><a href="#cb9-77" aria-hidden="true" tabindex="-1"></a>    formatter <span class="op">=</span> <span class="kw">lambda</span> i,m: <span class="bu">str</span>(<span class="bu">format</span>(m, <span class="st">'06b'</span>)[i])</span>
+<span id="cb9-76"><a href="#cb9-76" aria-hidden="true" tabindex="-1"></a>    sx <span class="op">=</span> <span class="st">''</span>.join([formatter(i,m) <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>)])</span>
+<span id="cb9-77"><a href="#cb9-77" aria-hidden="true" tabindex="-1"></a>    sz <span class="op">=</span> <span class="st">''</span>.join([formatter(i,m) <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>,<span class="dv">6</span>)])</span>
 <span id="cb9-78"><a href="#cb9-78" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-79"><a href="#cb9-79" aria-hidden="true" tabindex="-1"></a>    sx <span class="op">=</span> <span class="st">''</span>.join([formatter(i,m) <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>)])</span>
-<span id="cb9-80"><a href="#cb9-80" aria-hidden="true" tabindex="-1"></a>    sz <span class="op">=</span> <span class="st">''</span>.join([formatter(i,m) <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>,<span class="dv">6</span>)])</span>
-<span id="cb9-81"><a href="#cb9-81" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-82"><a href="#cb9-82" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (sz <span class="op">==</span> <span class="st">'001'</span> <span class="kw">and</span> flagged([f2a,f2b])) <span class="kw">or</span> (sz <span class="op">==</span> <span class="st">'010'</span> <span class="kw">and</span> (flagged([f1a,f1b]) <span class="kw">or</span> flagged([f3a,f3b]))):</span>
-<span id="cb9-83"><a href="#cb9-83" aria-hidden="true" tabindex="-1"></a>        corrs <span class="op">=</span> {<span class="st">'010'</span>: {<span class="dv">5</span>, <span class="dv">6</span>}, <span class="st">'001'</span>: {<span class="dv">4</span>, <span class="dv">6</span>}}</span>
-<span id="cb9-84"><a href="#cb9-84" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> Circuit([{<span class="st">'X'</span>: corrs[sz]}], noisy<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb9-85"><a href="#cb9-85" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>: </span>
-<span id="cb9-86"><a href="#cb9-86" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> Circuit([{}], noisy<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb9-87"><a href="#cb9-87" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-88"><a href="#cb9-88" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> rep_check(m):</span>
-<span id="cb9-89"><a href="#cb9-89" aria-hidden="true" tabindex="-1"></a>    <span class="co"># no flag triggered, run second round regardless of syndrome</span></span>
-<span id="cb9-90"><a href="#cb9-90" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> m[<span class="op">-</span><span class="dv">1</span>] <span class="op">==</span> <span class="bn">0b00</span> <span class="kw">or</span> m[<span class="op">-</span><span class="dv">1</span>] <span class="op">==</span> <span class="bn">0b10</span></span>
-<span id="cb9-91"><a href="#cb9-91" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-92"><a href="#cb9-92" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> nft_check1(m):</span>
-<span id="cb9-93"><a href="#cb9-93" aria-hidden="true" tabindex="-1"></a>    <span class="co"># flag triggered in first or second round OR no flag triggered, syndromes disagree in second round</span></span>
-<span id="cb9-94"><a href="#cb9-94" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (m[<span class="op">-</span><span class="dv">1</span>] <span class="op">==</span> <span class="bn">0b01</span> <span class="kw">or</span> m[<span class="op">-</span><span class="dv">1</span>] <span class="op">==</span> <span class="bn">0b11</span> <span class="kw">or</span> (m[<span class="op">-</span><span class="dv">1</span>] <span class="op">==</span> <span class="bn">0b01</span>) <span class="kw">or</span> m[<span class="op">-</span><span class="dv">1</span>] <span class="op">==</span> <span class="bn">0b11</span>)</span>
+<span id="cb9-79"><a href="#cb9-79" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (sz <span class="op">==</span> <span class="st">'001'</span> <span class="kw">and</span> flagged([f2a,f2b])) <span class="kw">or</span> (sz <span class="op">==</span> <span class="st">'010'</span> <span class="kw">and</span> (flagged([f1a,f1b]) <span class="kw">or</span> flagged([f3a,f3b]))):</span>
+<span id="cb9-80"><a href="#cb9-80" aria-hidden="true" tabindex="-1"></a>        corrs <span class="op">=</span> {<span class="st">'010'</span>: {<span class="dv">5</span>, <span class="dv">6</span>}, <span class="st">'001'</span>: {<span class="dv">4</span>, <span class="dv">6</span>}}</span>
+<span id="cb9-81"><a href="#cb9-81" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> qs.Circuit([{<span class="st">'X'</span>: corrs[sz]}], noisy<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb9-82"><a href="#cb9-82" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>: </span>
+<span id="cb9-83"><a href="#cb9-83" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> qs.Circuit([{}], noisy<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb9-84"><a href="#cb9-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-85"><a href="#cb9-85" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> rep_check(m):</span>
+<span id="cb9-86"><a href="#cb9-86" aria-hidden="true" tabindex="-1"></a>    <span class="co"># no flag triggered, run second round regardless of syndrome</span></span>
+<span id="cb9-87"><a href="#cb9-87" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> m[<span class="op">-</span><span class="dv">1</span>] <span class="op">==</span> <span class="bn">0b00</span> <span class="kw">or</span> m[<span class="op">-</span><span class="dv">1</span>] <span class="op">==</span> <span class="bn">0b10</span></span>
+<span id="cb9-88"><a href="#cb9-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-89"><a href="#cb9-89" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> nft_check1(m):</span>
+<span id="cb9-90"><a href="#cb9-90" aria-hidden="true" tabindex="-1"></a>    <span class="co"># flag triggered in first or second round OR no flag triggered, syndromes disagree in second round</span></span>
+<span id="cb9-91"><a href="#cb9-91" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (m[<span class="op">-</span><span class="dv">1</span>] <span class="op">==</span> <span class="bn">0b01</span> <span class="kw">or</span> m[<span class="op">-</span><span class="dv">1</span>] <span class="op">==</span> <span class="bn">0b11</span> <span class="kw">or</span> (m[<span class="op">-</span><span class="dv">1</span>] <span class="op">==</span> <span class="bn">0b01</span>) <span class="kw">or</span> m[<span class="op">-</span><span class="dv">1</span>] <span class="op">==</span> <span class="bn">0b11</span>)</span>
+<span id="cb9-92"><a href="#cb9-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-93"><a href="#cb9-93" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> nft_check2(m1,m2):</span>
+<span id="cb9-94"><a href="#cb9-94" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (m2[<span class="op">-</span><span class="dv">1</span>] <span class="op">==</span> <span class="bn">0b00</span> <span class="kw">and</span> m1[<span class="op">-</span><span class="dv">1</span>] <span class="op">==</span> <span class="bn">0b10</span>) <span class="kw">or</span> (m2[<span class="op">-</span><span class="dv">1</span>] <span class="op">==</span> <span class="bn">0b10</span> <span class="kw">and</span> m1[<span class="op">-</span><span class="dv">1</span>] <span class="op">==</span> <span class="bn">0b00</span>) <span class="kw">or</span> (m2[<span class="op">-</span><span class="dv">1</span>] <span class="op">==</span> <span class="bn">0b01</span> <span class="kw">or</span> m2[<span class="op">-</span><span class="dv">1</span>] <span class="op">==</span> <span class="bn">0b11</span>)</span>
 <span id="cb9-95"><a href="#cb9-95" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-96"><a href="#cb9-96" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> nft_check2(m1,m2):</span>
-<span id="cb9-97"><a href="#cb9-97" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (m2[<span class="op">-</span><span class="dv">1</span>] <span class="op">==</span> <span class="bn">0b00</span> <span class="kw">and</span> m1[<span class="op">-</span><span class="dv">1</span>] <span class="op">==</span> <span class="bn">0b10</span>) <span class="kw">or</span> (m2[<span class="op">-</span><span class="dv">1</span>] <span class="op">==</span> <span class="bn">0b10</span> <span class="kw">and</span> m1[<span class="op">-</span><span class="dv">1</span>] <span class="op">==</span> <span class="bn">0b00</span>) <span class="kw">or</span> (m2[<span class="op">-</span><span class="dv">1</span>] <span class="op">==</span> <span class="bn">0b01</span> <span class="kw">or</span> m2[<span class="op">-</span><span class="dv">1</span>] <span class="op">==</span> <span class="bn">0b11</span>)</span>
-<span id="cb9-98"><a href="#cb9-98" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-99"><a href="#cb9-99" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> syn_check(m1,m2):</span>
-<span id="cb9-100"><a href="#cb9-100" aria-hidden="true" tabindex="-1"></a>    <span class="co"># no flag triggered, syndromes agree in second round</span></span>
-<span id="cb9-101"><a href="#cb9-101" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (m2[<span class="op">-</span><span class="dv">1</span>] <span class="op">==</span> <span class="bn">0b00</span> <span class="kw">and</span> m1[<span class="op">-</span><span class="dv">1</span>] <span class="op">==</span> <span class="bn">0b00</span>) <span class="kw">or</span> (m2[<span class="op">-</span><span class="dv">1</span>] <span class="op">==</span> <span class="bn">0b10</span> <span class="kw">and</span> m1[<span class="op">-</span><span class="dv">1</span>] <span class="op">==</span> <span class="bn">0b10</span>)</span>
-<span id="cb9-102"><a href="#cb9-102" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-103"><a href="#cb9-103" aria-hidden="true" tabindex="-1"></a>functions <span class="op">=</span> {<span class="st">"logErr"</span>: logErr, <span class="st">"flut"</span>: flut, <span class="st">"rep_check"</span>: rep_check, <span class="st">"nft_check1"</span>: nft_check1, <span class="st">'nft_check2'</span>: nft_check2, <span class="st">"syn_check"</span>: syn_check}</span>
-<span id="cb9-104"><a href="#cb9-104" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-105"><a href="#cb9-105" aria-hidden="true" tabindex="-1"></a><span class="co"># Define protocol</span></span>
-<span id="cb9-106"><a href="#cb9-106" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-107"><a href="#cb9-107" aria-hidden="true" tabindex="-1"></a>flagstab <span class="op">=</span> qs.Protocol(check_functions<span class="op">=</span>functions, fault_tolerant<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb9-108"><a href="#cb9-108" aria-hidden="true" tabindex="-1"></a>flagstab.add_nodes_from([<span class="st">'X1a'</span>, <span class="st">'X1b'</span>, <span class="st">'X2a'</span>, <span class="st">'X2b'</span>, <span class="st">'X3a'</span>, <span class="st">'X3b'</span>, <span class="st">'nonFT'</span>, <span class="st">'meas'</span>], circuits<span class="op">=</span>[fmx_1, fmx_1, fmx_2,fmx_2, fmx_3,fmx_3, nfs, meas7])</span>
-<span id="cb9-109"><a href="#cb9-109" aria-hidden="true" tabindex="-1"></a>flagstab.add_node(<span class="st">'COR'</span>)</span>
-<span id="cb9-110"><a href="#cb9-110" aria-hidden="true" tabindex="-1"></a>flagstab.add_edge(<span class="st">'START'</span>, <span class="st">'X1a'</span>, check<span class="op">=</span><span class="st">'True'</span>)</span>
-<span id="cb9-111"><a href="#cb9-111" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-112"><a href="#cb9-112" aria-hidden="true" tabindex="-1"></a><span class="co"># no flag triggered, run second round regardless of syndrome</span></span>
-<span id="cb9-113"><a href="#cb9-113" aria-hidden="true" tabindex="-1"></a>flagstab.add_edge(<span class="st">'X1a'</span>, <span class="st">'X2a'</span>, check<span class="op">=</span><span class="st">'rep_check(X1a)'</span>)</span>
-<span id="cb9-114"><a href="#cb9-114" aria-hidden="true" tabindex="-1"></a>flagstab.add_edge(<span class="st">'X2a'</span>, <span class="st">'X3a'</span>, check<span class="op">=</span><span class="st">'rep_check(X2a)'</span>)</span>
-<span id="cb9-115"><a href="#cb9-115" aria-hidden="true" tabindex="-1"></a>flagstab.add_edge(<span class="st">'X3a'</span>, <span class="st">'X1b'</span>, check<span class="op">=</span><span class="st">'rep_check(X3a)'</span>)</span>
-<span id="cb9-116"><a href="#cb9-116" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-117"><a href="#cb9-117" aria-hidden="true" tabindex="-1"></a><span class="co"># flag triggered in first or second round OR no flag triggered, syndromes disagree in second round</span></span>
-<span id="cb9-118"><a href="#cb9-118" aria-hidden="true" tabindex="-1"></a>flagstab.add_edge(<span class="st">'X1b'</span>, <span class="st">'nonFT'</span>, check<span class="op">=</span><span class="st">'nft_check2(X1a,X1b)'</span>)</span>
-<span id="cb9-119"><a href="#cb9-119" aria-hidden="true" tabindex="-1"></a>flagstab.add_edge(<span class="st">'X2b'</span>, <span class="st">'nonFT'</span>, check<span class="op">=</span><span class="st">'nft_check2(X2a,X2b)'</span>)</span>
-<span id="cb9-120"><a href="#cb9-120" aria-hidden="true" tabindex="-1"></a>flagstab.add_edge(<span class="st">'X3b'</span>, <span class="st">'nonFT'</span>, check<span class="op">=</span><span class="st">'nft_check2(X3a,X3b)'</span>)</span>
-<span id="cb9-121"><a href="#cb9-121" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-122"><a href="#cb9-122" aria-hidden="true" tabindex="-1"></a><span class="co"># flag triggered in first or second round OR no flag triggered, syndromes disagree in second round</span></span>
-<span id="cb9-123"><a href="#cb9-123" aria-hidden="true" tabindex="-1"></a>flagstab.add_edge(<span class="st">'X1a'</span>, <span class="st">'nonFT'</span>, check<span class="op">=</span><span class="st">'nft_check1(X1a)'</span>)</span>
-<span id="cb9-124"><a href="#cb9-124" aria-hidden="true" tabindex="-1"></a>flagstab.add_edge(<span class="st">'X2a'</span>, <span class="st">'nonFT'</span>, check<span class="op">=</span><span class="st">'nft_check1(X2a)'</span>)</span>
-<span id="cb9-125"><a href="#cb9-125" aria-hidden="true" tabindex="-1"></a>flagstab.add_edge(<span class="st">'X3a'</span>, <span class="st">'nonFT'</span>, check<span class="op">=</span><span class="st">'nft_check1(X3a)'</span>)</span>
-<span id="cb9-126"><a href="#cb9-126" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-127"><a href="#cb9-127" aria-hidden="true" tabindex="-1"></a><span class="co"># no flag triggered, syndromes agree in second round</span></span>
-<span id="cb9-128"><a href="#cb9-128" aria-hidden="true" tabindex="-1"></a>flagstab.add_edge(<span class="st">'X1b'</span>, <span class="st">'X2b'</span>, check<span class="op">=</span><span class="st">'syn_check(X1a,X1b)'</span>)</span>
-<span id="cb9-129"><a href="#cb9-129" aria-hidden="true" tabindex="-1"></a>flagstab.add_edge(<span class="st">'X2b'</span>, <span class="st">'X3b'</span>, check<span class="op">=</span><span class="st">'syn_check(X2a,X2b)'</span>)</span>
-<span id="cb9-130"><a href="#cb9-130" aria-hidden="true" tabindex="-1"></a>flagstab.add_edge(<span class="st">'X3b'</span>, <span class="st">'meas'</span>, check<span class="op">=</span><span class="st">'syn_check(X3a,X3b)'</span>)</span>
-<span id="cb9-131"><a href="#cb9-131" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-132"><a href="#cb9-132" aria-hidden="true" tabindex="-1"></a><span class="co"># apply flag correction after nonFT if a flag was triggered</span></span>
-<span id="cb9-133"><a href="#cb9-133" aria-hidden="true" tabindex="-1"></a>flagstab.add_edge(<span class="st">'nonFT'</span>, <span class="st">'COR'</span>, check<span class="op">=</span><span class="st">'flut(nonFT[-1], X1a,X1b, X2a,X2b, X3a,X3b)'</span>)</span>
-<span id="cb9-134"><a href="#cb9-134" aria-hidden="true" tabindex="-1"></a>flagstab.add_edge(<span class="st">'COR'</span>, <span class="st">'meas'</span>, check<span class="op">=</span><span class="st">'True'</span>)</span>
-<span id="cb9-135"><a href="#cb9-135" aria-hidden="true" tabindex="-1"></a>flagstab.add_edge(<span class="st">'meas'</span>, <span class="st">'FAIL'</span>, check<span class="op">=</span><span class="st">'logErr(meas[-1])'</span>)</span>
-<span id="cb9-136"><a href="#cb9-136" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-137"><a href="#cb9-137" aria-hidden="true" tabindex="-1"></a><span class="co"># Sample protocol</span></span>
-<span id="cb9-138"><a href="#cb9-138" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-139"><a href="#cb9-139" aria-hidden="true" tabindex="-1"></a><span class="co"># Sampling parameters</span></span>
-<span id="cb9-140"><a href="#cb9-140" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-141"><a href="#cb9-141" aria-hidden="true" tabindex="-1"></a>sample_range <span class="op">=</span> np.logspace(<span class="op">-</span><span class="dv">3</span>,<span class="dv">0</span>,<span class="dv">5</span>)</span>
-<span id="cb9-142"><a href="#cb9-142" aria-hidden="true" tabindex="-1"></a>err_params <span class="op">=</span> {<span class="st">'q'</span>: sample_range}</span>
-<span id="cb9-143"><a href="#cb9-143" aria-hidden="true" tabindex="-1"></a>err_model <span class="op">=</span> qs.noise.E1</span>
-<span id="cb9-144"><a href="#cb9-144" aria-hidden="true" tabindex="-1"></a>CHP <span class="op">=</span> qs.StabilizerSimulator</span>
-<span id="cb9-145"><a href="#cb9-145" aria-hidden="true" tabindex="-1"></a>p_max <span class="op">=</span> {<span class="st">'q'</span>: <span class="fl">0.05</span>}</span>
+<span id="cb9-96"><a href="#cb9-96" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> syn_check(m1,m2):</span>
+<span id="cb9-97"><a href="#cb9-97" aria-hidden="true" tabindex="-1"></a>    <span class="co"># no flag triggered, syndromes agree in second round</span></span>
+<span id="cb9-98"><a href="#cb9-98" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (m2[<span class="op">-</span><span class="dv">1</span>] <span class="op">==</span> <span class="bn">0b00</span> <span class="kw">and</span> m1[<span class="op">-</span><span class="dv">1</span>] <span class="op">==</span> <span class="bn">0b00</span>) <span class="kw">or</span> (m2[<span class="op">-</span><span class="dv">1</span>] <span class="op">==</span> <span class="bn">0b10</span> <span class="kw">and</span> m1[<span class="op">-</span><span class="dv">1</span>] <span class="op">==</span> <span class="bn">0b10</span>)</span>
+<span id="cb9-99"><a href="#cb9-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-100"><a href="#cb9-100" aria-hidden="true" tabindex="-1"></a>functions <span class="op">=</span> {<span class="st">"logErr"</span>: logErr, <span class="st">"flut"</span>: flut, <span class="st">"rep_check"</span>: rep_check, <span class="st">"nft_check1"</span>: nft_check1, <span class="st">'nft_check2'</span>: nft_check2, <span class="st">"syn_check"</span>: syn_check}</span>
+<span id="cb9-101"><a href="#cb9-101" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-102"><a href="#cb9-102" aria-hidden="true" tabindex="-1"></a><span class="co"># Define protocol</span></span>
+<span id="cb9-103"><a href="#cb9-103" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-104"><a href="#cb9-104" aria-hidden="true" tabindex="-1"></a>flagstab <span class="op">=</span> qs.Protocol(check_functions<span class="op">=</span>functions, fault_tolerant<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb9-105"><a href="#cb9-105" aria-hidden="true" tabindex="-1"></a>flagstab.add_nodes_from([<span class="st">'X1a'</span>, <span class="st">'X1b'</span>, <span class="st">'X2a'</span>, <span class="st">'X2b'</span>, <span class="st">'X3a'</span>, <span class="st">'X3b'</span>, <span class="st">'nonFT'</span>, <span class="st">'meas'</span>], circuits<span class="op">=</span>[fmx_1, fmx_1, fmx_2,fmx_2, fmx_3,fmx_3, nfs, meas7])</span>
+<span id="cb9-106"><a href="#cb9-106" aria-hidden="true" tabindex="-1"></a>flagstab.add_node(<span class="st">'COR'</span>)</span>
+<span id="cb9-107"><a href="#cb9-107" aria-hidden="true" tabindex="-1"></a>flagstab.add_edge(<span class="st">'START'</span>, <span class="st">'X1a'</span>, check<span class="op">=</span><span class="st">'True'</span>)</span>
+<span id="cb9-108"><a href="#cb9-108" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-109"><a href="#cb9-109" aria-hidden="true" tabindex="-1"></a><span class="co"># no flag triggered, run second round regardless of syndrome</span></span>
+<span id="cb9-110"><a href="#cb9-110" aria-hidden="true" tabindex="-1"></a>flagstab.add_edge(<span class="st">'X1a'</span>, <span class="st">'X2a'</span>, check<span class="op">=</span><span class="st">'rep_check(X1a)'</span>)</span>
+<span id="cb9-111"><a href="#cb9-111" aria-hidden="true" tabindex="-1"></a>flagstab.add_edge(<span class="st">'X2a'</span>, <span class="st">'X3a'</span>, check<span class="op">=</span><span class="st">'rep_check(X2a)'</span>)</span>
+<span id="cb9-112"><a href="#cb9-112" aria-hidden="true" tabindex="-1"></a>flagstab.add_edge(<span class="st">'X3a'</span>, <span class="st">'X1b'</span>, check<span class="op">=</span><span class="st">'rep_check(X3a)'</span>)</span>
+<span id="cb9-113"><a href="#cb9-113" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-114"><a href="#cb9-114" aria-hidden="true" tabindex="-1"></a><span class="co"># flag triggered in first or second round OR no flag triggered, syndromes disagree in second round</span></span>
+<span id="cb9-115"><a href="#cb9-115" aria-hidden="true" tabindex="-1"></a>flagstab.add_edge(<span class="st">'X1b'</span>, <span class="st">'nonFT'</span>, check<span class="op">=</span><span class="st">'nft_check2(X1a,X1b)'</span>)</span>
+<span id="cb9-116"><a href="#cb9-116" aria-hidden="true" tabindex="-1"></a>flagstab.add_edge(<span class="st">'X2b'</span>, <span class="st">'nonFT'</span>, check<span class="op">=</span><span class="st">'nft_check2(X2a,X2b)'</span>)</span>
+<span id="cb9-117"><a href="#cb9-117" aria-hidden="true" tabindex="-1"></a>flagstab.add_edge(<span class="st">'X3b'</span>, <span class="st">'nonFT'</span>, check<span class="op">=</span><span class="st">'nft_check2(X3a,X3b)'</span>)</span>
+<span id="cb9-118"><a href="#cb9-118" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-119"><a href="#cb9-119" aria-hidden="true" tabindex="-1"></a><span class="co"># flag triggered in first or second round OR no flag triggered, syndromes disagree in second round</span></span>
+<span id="cb9-120"><a href="#cb9-120" aria-hidden="true" tabindex="-1"></a>flagstab.add_edge(<span class="st">'X1a'</span>, <span class="st">'nonFT'</span>, check<span class="op">=</span><span class="st">'nft_check1(X1a)'</span>)</span>
+<span id="cb9-121"><a href="#cb9-121" aria-hidden="true" tabindex="-1"></a>flagstab.add_edge(<span class="st">'X2a'</span>, <span class="st">'nonFT'</span>, check<span class="op">=</span><span class="st">'nft_check1(X2a)'</span>)</span>
+<span id="cb9-122"><a href="#cb9-122" aria-hidden="true" tabindex="-1"></a>flagstab.add_edge(<span class="st">'X3a'</span>, <span class="st">'nonFT'</span>, check<span class="op">=</span><span class="st">'nft_check1(X3a)'</span>)</span>
+<span id="cb9-123"><a href="#cb9-123" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-124"><a href="#cb9-124" aria-hidden="true" tabindex="-1"></a><span class="co"># no flag triggered, syndromes agree in second round</span></span>
+<span id="cb9-125"><a href="#cb9-125" aria-hidden="true" tabindex="-1"></a>flagstab.add_edge(<span class="st">'X1b'</span>, <span class="st">'X2b'</span>, check<span class="op">=</span><span class="st">'syn_check(X1a,X1b)'</span>)</span>
+<span id="cb9-126"><a href="#cb9-126" aria-hidden="true" tabindex="-1"></a>flagstab.add_edge(<span class="st">'X2b'</span>, <span class="st">'X3b'</span>, check<span class="op">=</span><span class="st">'syn_check(X2a,X2b)'</span>)</span>
+<span id="cb9-127"><a href="#cb9-127" aria-hidden="true" tabindex="-1"></a>flagstab.add_edge(<span class="st">'X3b'</span>, <span class="st">'meas'</span>, check<span class="op">=</span><span class="st">'syn_check(X3a,X3b)'</span>)</span>
+<span id="cb9-128"><a href="#cb9-128" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-129"><a href="#cb9-129" aria-hidden="true" tabindex="-1"></a><span class="co"># apply flag correction after nonFT if a flag was triggered</span></span>
+<span id="cb9-130"><a href="#cb9-130" aria-hidden="true" tabindex="-1"></a>flagstab.add_edge(<span class="st">'nonFT'</span>, <span class="st">'COR'</span>, check<span class="op">=</span><span class="st">'flut(nonFT[-1], X1a,X1b, X2a,X2b, X3a,X3b)'</span>)</span>
+<span id="cb9-131"><a href="#cb9-131" aria-hidden="true" tabindex="-1"></a>flagstab.add_edge(<span class="st">'COR'</span>, <span class="st">'meas'</span>, check<span class="op">=</span><span class="st">'True'</span>)</span>
+<span id="cb9-132"><a href="#cb9-132" aria-hidden="true" tabindex="-1"></a>flagstab.add_edge(<span class="st">'meas'</span>, <span class="st">'FAIL'</span>, check<span class="op">=</span><span class="st">'logErr(meas[-1])'</span>)</span>
+<span id="cb9-133"><a href="#cb9-133" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-134"><a href="#cb9-134" aria-hidden="true" tabindex="-1"></a><span class="co"># Sample protocol</span></span>
+<span id="cb9-135"><a href="#cb9-135" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-136"><a href="#cb9-136" aria-hidden="true" tabindex="-1"></a><span class="co"># Sampling parameters</span></span>
+<span id="cb9-137"><a href="#cb9-137" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-138"><a href="#cb9-138" aria-hidden="true" tabindex="-1"></a><span class="co"># sample_range = np.logspace(-4,-1,7)</span></span>
+<span id="cb9-139"><a href="#cb9-139" aria-hidden="true" tabindex="-1"></a>sample_range <span class="op">=</span> np.logspace(<span class="op">-</span><span class="dv">3</span>,<span class="dv">0</span>,<span class="dv">5</span>)</span>
+<span id="cb9-140"><a href="#cb9-140" aria-hidden="true" tabindex="-1"></a>err_params <span class="op">=</span> {<span class="st">'q'</span>: sample_range}</span>
+<span id="cb9-141"><a href="#cb9-141" aria-hidden="true" tabindex="-1"></a>err_model <span class="op">=</span> qs.noise.E1</span>
+<span id="cb9-142"><a href="#cb9-142" aria-hidden="true" tabindex="-1"></a><span class="co"># err_model = qs.noise.S1</span></span>
+<span id="cb9-143"><a href="#cb9-143" aria-hidden="true" tabindex="-1"></a>CHP <span class="op">=</span> qs.StabilizerSimulator</span>
+<span id="cb9-144"><a href="#cb9-144" aria-hidden="true" tabindex="-1"></a><span class="co"># p_max = {'q': 0.05}</span></span>
+<span id="cb9-145"><a href="#cb9-145" aria-hidden="true" tabindex="-1"></a>p_max <span class="op">=</span> {<span class="st">'q'</span>: <span class="fl">1e-2</span>}</span>
 <span id="cb9-146"><a href="#cb9-146" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-147"><a href="#cb9-147" aria-hidden="true" tabindex="-1"></a><span class="co"># Direct MC sampling</span></span>
 <span id="cb9-148"><a href="#cb9-148" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-149"><a href="#cb9-149" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"--- Direct MC sampling ---"</span>)</span>
 <span id="cb9-150"><a href="#cb9-150" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-151"><a href="#cb9-151" aria-hidden="true" tabindex="-1"></a>mc_sam <span class="op">=</span> qs.DirectSampler(ftsteane, CHP, err_params<span class="op">=</span>err_params, err_model<span class="op">=</span>err_model)</span>
-<span id="cb9-152"><a href="#cb9-152" aria-hidden="true" tabindex="-1"></a>mc_sam.run(<span class="dv">20000</span>)</span>
+<span id="cb9-151"><a href="#cb9-151" aria-hidden="true" tabindex="-1"></a>mc_sam <span class="op">=</span> qs.DirectSampler(flagstab, CHP, err_params<span class="op">=</span>err_params, err_model<span class="op">=</span>err_model)</span>
+<span id="cb9-152"><a href="#cb9-152" aria-hidden="true" tabindex="-1"></a>mc_sam.run(<span class="dv">10000</span>)</span>
 <span id="cb9-153"><a href="#cb9-153" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-154"><a href="#cb9-154" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"--- Subset sampling ---"</span>)</span>
 <span id="cb9-155"><a href="#cb9-155" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-156"><a href="#cb9-156" aria-hidden="true" tabindex="-1"></a>ss_sam <span class="op">=</span> qs.SubsetSampler(ftsteane, CHP,  p_max<span class="op">=</span>p_max, err_model<span class="op">=</span>err_model, err_params<span class="op">=</span>err_params, L<span class="op">=</span><span class="dv">8</span>)</span>
-<span id="cb9-157"><a href="#cb9-157" aria-hidden="true" tabindex="-1"></a>ss_sam.run(<span class="dv">5000</span>)</span>
+<span id="cb9-156"><a href="#cb9-156" aria-hidden="true" tabindex="-1"></a>ss_sam <span class="op">=</span> qs.SubsetSampler(flagstab, CHP,  p_max<span class="op">=</span>p_max, err_model<span class="op">=</span>err_model, err_params<span class="op">=</span>err_params, L<span class="op">=</span><span class="dv">8</span>)</span>
+<span id="cb9-157"><a href="#cb9-157" aria-hidden="true" tabindex="-1"></a>ss_sam.run(<span class="dv">10000</span>)</span>
 <span id="cb9-158"><a href="#cb9-158" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-159"><a href="#cb9-159" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot results</span></span>
 <span id="cb9-160"><a href="#cb9-160" aria-hidden="true" tabindex="-1"></a></span>
@@ -747,27 +747,27 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"31e9e39d5d51475eb740ddc1c9d322f9","version_major":2,"version_minor":0}
+{"model_id":"8c592585d5b844d1956df23bc047e14f","version_major":2,"version_minor":0}
 </script>
 </div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"87243bb99eb84f6ba46f35a6c73ee9ed","version_major":2,"version_minor":0}
+{"model_id":"c65a6d0d20a94e57a700dfa03a385c5a","version_major":2,"version_minor":0}
 </script>
 </div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"82a00e1052a24e648b84782091666dae","version_major":2,"version_minor":0}
+{"model_id":"49b81206c4814397a34ba5ebf89e6ea6","version_major":2,"version_minor":0}
 </script>
 </div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"3b2c0eaf6b234877ac9a38c585d5072b","version_major":2,"version_minor":0}
+{"model_id":"8426d41135b142fcab023f7b667df58b","version_major":2,"version_minor":0}
 </script>
 </div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"ca025ca38aa24d1fa827c1eeb502e710","version_major":2,"version_minor":0}
+{"model_id":"8d7ed9bd4716460a81d8640e20ae3033","version_major":2,"version_minor":0}
 </script>
 </div>
 <div class="cell-output cell-output-stdout">
@@ -775,7 +775,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"9d33eb78499a45e78da58bc2e79c06ab","version_major":2,"version_minor":0}
+{"model_id":"02ea617c30674615ae3ac5e682c8b219","version_major":2,"version_minor":0}
 </script>
 </div>
 <div class="cell-output cell-output-display">
