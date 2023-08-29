@@ -114,7 +114,7 @@ class DirectSampler:
                 while True:
                     callbacks.on_circuit_begin()
                     pnode, circuit = self.protocol.successor(pnode, msmt_hist)
-                    if circuit:
+                    if circuit != None:
                         if not circuit.noisy:
                             msmt = state.run(circuit)
                         else:
