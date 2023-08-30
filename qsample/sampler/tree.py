@@ -171,7 +171,7 @@ class Variable(Node):
         for which we would like to determine the rate p that a transition from
         parent node to this node (X=1) took place, i.e.:
         
-        .. math:: p(X=1) = self.count / self.parent.count
+        p(X=1) = self.count / self.parent.count (see Eq. 4 in paper)
         
         Returns
         -------
@@ -187,7 +187,7 @@ class Variable(Node):
     @property
     def var(self):
         """Calculate the variance of the transition rate between
-        the parent node and this node. 
+        the parent node and this node. (see Eq. C12 in paper)
         
         As the variance of the Wald interval results in unrealistic variances
         at small sample sizes, we use the variance of the Wilson interval instead.
@@ -422,7 +422,7 @@ class Tree:
         return acc
     
     def var(self, mode=1):
-        """Variance of tree
+        """Variance of tree (see Eq. 18 and 19 in paper)
         
         Parameters
         ----------
@@ -489,7 +489,7 @@ class Tree:
 
     @property
     def delta(self):
-        """Cutoff error of tree
+        """Cutoff error of tree (see Eq. 16 in paper)
         
         Returns
         -------

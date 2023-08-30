@@ -12,9 +12,7 @@ from fastcore.test import *
 
 # %% ../nbs/01_math.ipynb 4
 def comb(n, k):
-    """Vectorized combination
-    
-    .. math:: comb(n,k) = n! / ((n-k)!k!)
+    """Vectorized combination: `comb(n,k)` = n! / ((n-k)!k!)
     
     Parameters
     ----------
@@ -32,7 +30,7 @@ def comb(n, k):
 
 # %% ../nbs/01_math.ipynb 5
 def binom(k, n, p):
-    """Vectorized binomial distribution
+    """Vectorized binomial distribution: `binom(k,n,p)`=`comb(n,k)` p^k (1-p)^n-k
     
     Example
     -------
@@ -59,7 +57,9 @@ def binom(k, n, p):
 # %% ../nbs/01_math.ipynb 7
 def joint_binom(k, n, p):
     """Product of independent binomial distributions with
-    parameters `k`, `n` and `p` (can be list of lists)
+    parameters `k`, `n` and `p` (can be list of lists), i.e.:
+    
+    `joint_binom(k,n,p)`=`binom(k[0],n[0],p[0])`×...×`binom(k[-1],n[-1],p[-1])`
     
     Example
     -------
@@ -84,15 +84,15 @@ def joint_binom(k, n, p):
 
 # %% ../nbs/01_math.ipynb 9
 def Wilson_var(p, N):
-    """Wilson estimator of binomial variance
+    """Wilson estimator of binomial variance (see Eq. C12 in paper)
     
     The formula for the Wilson interval is:
     
-    .. math:: CI = p+z^2/(2n) \pm z\sqrt{pq/n + z^2/(4n^2)}/(1 + z^2/n)
+        CI = p+z^2/(2n) \pm z\sqrt{pq/n + z^2/(4n^2)}/(1 + z^2/n)
     
     we can extract the var (z=1) as:
     
-    .. math: Var[p] = (CI/2)^2 = (npq + 0.25) / (1 + n)^2
+        Var(p) = (CI/2)^2 = (npq + 0.25) / (1 + n)^2
     
     Parameters
     ----------
@@ -110,7 +110,7 @@ def Wilson_var(p, N):
 
 # %% ../nbs/01_math.ipynb 10
 def Wald_var(p, N):
-    """Wald estimation of binomial variance
+    """Wald estimation of binomial variance (see Eq. C11 in paper)
     
     Parameters
     ----------
@@ -172,7 +172,7 @@ def cartesian_product(list_of_sets):
 def subset_probs(circuit, error_model, prob):
     """Calculate occurence probability of subsets in `circuit` with physical
     error rate `prob`. `error_model` defines how the circuit is to be 
-    partitioned before occurence probabilities are calculated.
+    partitioned before occurence probabilities are calculated. (see Eq. 2 in paper)
     
     Example
     -------

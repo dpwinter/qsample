@@ -108,7 +108,7 @@ class Circuit(MutableSequence):
         Unique circuit identifier
     """
     
-    def __init__(self, ticks=None, noisy=True):#, ff_deterministic=False):
+    def __init__(self, ticks=None, noisy=True):
         """
         Parameters
         ----------
@@ -116,10 +116,6 @@ class Circuit(MutableSequence):
             List of ticks defining a circuit
         noisy : bool
             If true, circuit is subject to noise during sampling
-        ff_deterministic : bool or None
-            If true, the measurement result of the circuit in the
-            fault-free case is always deterministic. If None the truth
-            value is automatically inferred.
         """
         self._ticks = ticks if ticks else [] # Must do this way, else keeps appending to same instance
         self.noisy = noisy

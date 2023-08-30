@@ -15,11 +15,10 @@ class ChpSimulator:
     """The bare minimum needed for the CHP simulation.
     
     Original author:
-        Craig Gidney
-        https://github.com/Strilanc/python-chp-stabilizer-simulator
+        Craig Gidney (https://github.com/Strilanc/python-chp-stabilizer-simulator)
         
     Changes:
-        * np.bool -> bool (np.bool is deprecated since numpy>=1.23)
+        np.bool -> bool (reason: np.bool is deprecated since numpy>=1.23)
 
     Reference:
         "Improved Simulation of Stabilizer Circuits"
