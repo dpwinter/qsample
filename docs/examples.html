@@ -378,12 +378,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"--- Direct MC sampling ---"</span>)</span>
 <span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>mc_sam <span class="op">=</span> qs.DirectSampler(ftsteane, CHP, err_params<span class="op">=</span>err_params, err_model<span class="op">=</span>err_model)</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>mc_sam <span class="op">=</span> qs.DirectSampler(steane0, CHP, err_params<span class="op">=</span>err_params, err_model<span class="op">=</span>err_model)</span>
 <span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>mc_sam.run(<span class="dv">20000</span>)</span>
 <span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"--- Subset sampling ---"</span>)</span>
 <span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>ss_sam <span class="op">=</span> qs.SubsetSampler(ftsteane, CHP,  p_max<span class="op">=</span>p_max, err_model<span class="op">=</span>err_model, err_params<span class="op">=</span>err_params, L<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>ss_sam <span class="op">=</span> qs.SubsetSampler(steane0, CHP,  p_max<span class="op">=</span>p_max, err_model<span class="op">=</span>err_model, err_params<span class="op">=</span>err_params, L<span class="op">=</span><span class="dv">3</span>)</span>
 <span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>ss_sam.run(<span class="dv">2000</span>)</span>
 <span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot results</span></span>
@@ -403,27 +403,27 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"2e7c611790e34202996aebebde080305","version_major":2,"version_minor":0}
+{"model_id":"9851560e06d148b9b6c94fac82289153","version_major":2,"version_minor":0}
 </script>
 </div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"84b4c9128be243e28f77d93f10a47fc7","version_major":2,"version_minor":0}
+{"model_id":"225aa8ed16694c79b882a8771c09f8a9","version_major":2,"version_minor":0}
 </script>
 </div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"40b2572b242142dfbeb5f4af9da12a4d","version_major":2,"version_minor":0}
+{"model_id":"5ea4e9038db04e249d0df7b09aa193ee","version_major":2,"version_minor":0}
 </script>
 </div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"8b09099f2d0648c489305637392328aa","version_major":2,"version_minor":0}
+{"model_id":"40be1e1afe574221877314c2baf6d10a","version_major":2,"version_minor":0}
 </script>
 </div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"402a760e73e7482a914042425963715d","version_major":2,"version_minor":0}
+{"model_id":"10c91125df064e98bd2350aba0302022","version_major":2,"version_minor":0}
 </script>
 </div>
 <div class="cell-output cell-output-stdout">
@@ -431,14 +431,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"f91f5f10a2074a24a14faf5ed92289c9","version_major":2,"version_minor":0}
+{"model_id":"197a8b3125e04dc1b4fee6b36276cb2f","version_major":2,"version_minor":0}
 </script>
 </div>
 <div class="cell-output cell-output-display">
 <pre><code>Text(0.5, 0, '$p$')</code></pre>
 </div>
 <div class="cell-output cell-output-display">
-<p><img src="09_examples_files/figure-html/cell-11-output-10.png" class="img-fluid"></p>
+<p><img src="09_examples_files/figure-html/cell-12-output-10.png" class="img-fluid"></p>
 </div>
 </div>
 </section>
@@ -520,7 +520,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <pre><code>Text(0.5, 0, '$p$')</code></pre>
 </div>
 <div class="cell-output cell-output-display">
-<p><img src="09_examples_files/figure-html/cell-18-output-10.png" class="img-fluid"></p>
+<p><img src="09_examples_files/figure-html/cell-19-output-10.png" class="img-fluid"></p>
 </div>
 </div>
 
