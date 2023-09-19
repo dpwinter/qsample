@@ -18,6 +18,8 @@ def draw_tree(tree, verbose=False, path=None):
 
     To display the image in command line call .show() on the returned
     PIL image object.
+    
+    see Fig. 1 in paper
 
     Parameters
     ----------
@@ -101,6 +103,8 @@ class Constant(Node):
     The `Constant` class complements the common tree node by a `count` attribute
     which represents the number of times a node has been visited during sampling.
     
+    See Appendix C in paper
+    
     Attributes
     ----------
     name : str
@@ -129,12 +133,14 @@ class Constant(Node):
 class Delta(Node):
     """Representation of subset cutoff error inside `Tree`
     
+    See Appendix C in paper
+    
     Attributes
     ----------
     name : str
         The (not necessarily unique) name of the node
     value : float
-        Constant value, if not None is used for virtual Delta nodes (case III in paper)
+        Constant value, if not None is used for virtual Delta nodes
     """
     
     value = None
@@ -144,6 +150,8 @@ class Delta(Node):
         
 class Variable(Node):
     """Representation of a random variable inside `Tree`
+    
+    See Appendix C in paper
     
     Attributes
     ----------
@@ -171,7 +179,9 @@ class Variable(Node):
         for which we would like to determine the rate p that a transition from
         parent node to this node (X=1) took place, i.e.:
         
-        p(X=1) = self.count / self.parent.count (see Eq. 4 in paper)
+        p(X=1) = self.count / self.parent.count 
+        
+        see Eq. C14 in paper
         
         Returns
         -------
@@ -187,10 +197,9 @@ class Variable(Node):
     @property
     def var(self):
         """Calculate the variance of the transition rate between
-        the parent node and this node. (see Eq. C12 in paper)
+        the parent node and this node according to Wilson interval.
         
-        As the variance of the Wald interval results in unrealistic variances
-        at small sample sizes, we use the variance of the Wilson interval instead.
+        see Eq. C12 in paper
         
         Returns
         -------
@@ -219,6 +228,10 @@ class Tree:
     
     def __init__(self, constants, L=None):
         """
+        
+        For determination of M0 see Eq. B39 in paper
+        For definition of L see App. B4 in paper
+        
         Parameters
         ----------
         constants : list
@@ -275,10 +288,12 @@ class Tree:
     def root_leaf_rate(self):
         """Sum of rates marked leaf Variable node.count / root.count.
         
+        see Eq. 1 in paper
+        
         Returns
         -------
         float
-            Direct MC estimate of logical failure rate
+            Direct MC estimate of logical failure rate at p_max
         """
         return sum([node.count / self.root.count for node in self.marked])
     
@@ -286,10 +301,12 @@ class Tree:
     def root_leaf_var(self):
         """Variance of root leaf rate
         
+        see Eq. C12 in paper
+        
         Returns
         -------
         float
-            Variance of direct MC estimate of logical failure rate
+            Variance of direct MC estimate of logical failure rate at p_max
         """
         return math.Wilson_var(self.root_leaf_rate, self.root.count)
     
@@ -299,6 +316,7 @@ class Tree:
         For `Variable` return its `rate`, for `Constant` return a corresponding
         value from the `constants` dict, for `Delta` return the cutoff error, i.e.
         1 - sum(constants) in a level
+        
         
         Parameters
         ----------
@@ -321,15 +339,19 @@ class Tree:
             if node.const_val:
                 return node.const_val
             else:
+                # see Eq. 2 in paper
                 return self.constants[node.parent.circuit_id][node.name]
         elif type(node) == Delta:
             
             if node.parent.count == 0:
                 if node.value:
+                    # see App. B4 case (III) in paper
                     return node.value
                 else:
+                    # see Fig. 20c in paper
                     return self.L * (1 - self.constants[self.M0_index[0]][self.M0_index[1]])
             else: 
+                # see Eq. 16 in paper
                 acc = 1.0
                 for n in node.siblings:
                     acc -= self.constants[node.parent.circuit_id][n.name]
@@ -343,6 +365,8 @@ class Tree:
         We sum over all subsets in a path. In multi-parameter case we sum over all weights first.
         Note: When there is a circuit in the path which was set `ff_deterministic` by the user, all qubits
         have been reset before execution and the path weight must only be calculated until this node
+        
+        w_{tot} = \sum_i{w_i} in paper 
         
         Parameters
         ----------
@@ -363,6 +387,8 @@ class Tree:
     def path_prod(self, nodeA, nodeB):
         """Product of node values from `nodeA` to `nodeB`
         
+        Used e.g. in Eq. 12 in paper
+        
         Parameters
         ----------
         nodeA : Constant, Variable or Delta
@@ -378,6 +404,8 @@ class Tree:
 
     def path_var(self, node, zero_leaf=False):
         """Variance of path from `root` to `node`
+        
+        See Alg. 2 in App. C in paper
         
         Parameters
         ----------
@@ -403,6 +431,8 @@ class Tree:
     def subtree_sum(self, node, leaves):
         """Sum of paths from `node` to `leaves`
         
+        Used e.g. in Eq. C9 in paper
+        
         Parameters
         ----------
         node : Variable, Constant or Delta
@@ -422,7 +452,9 @@ class Tree:
         return acc
     
     def var(self, mode=1):
-        """Variance of tree (see Eq. 18 and 19 in paper)
+        """Variance of tree 
+        
+        See Eq. 18, Eq. 19 and Alg. 3 in paper
         
         Parameters
         ----------
@@ -442,7 +474,8 @@ class Tree:
         else:
             raise Exception(f"Unknown mode {mode}")
         
-        ix_nodes = set() # Intersection nodes
+        # see Fig. 22 in paper
+        ix_nodes = set() # Intersection nodes, in paper "overlap" nodes
         for (nodeA, nodeB) in it.combinations(leaves, 2):
             common_nodes = list(n1 for n1,n2 in zip(nodeA.path, nodeB.path) if n1 == n2)
             if len(common_nodes) > 0 and not common_nodes[-1].is_root:
@@ -482,14 +515,15 @@ class Tree:
             else:
                 raise Exception(f"Node {ix_node.name} of type {type(ix_node)} shouldn't be common.")
             
-
             acc += cov
             
         return acc
 
     @property
     def delta(self):
-        """Cutoff error of tree (see Eq. 16 in paper)
+        """Cutoff error of tree 
+        
+        See Eq. B2 and Fig. 1c in paper
         
         Returns
         -------

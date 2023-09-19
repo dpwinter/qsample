@@ -224,7 +224,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./sampler.experimental.html" class="sidebar-item-text sidebar-link">ERV Subset Sampler</a>
+  <a href="./sampler.experimental.html" class="sidebar-item-text sidebar-link">ERU Subset Sampler</a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -257,6 +257,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <li><a href="#getting-started" id="toc-getting-started" class="nav-link" data-scroll-target="#getting-started">Getting started</a></li>
   <li><a href="#more-things-to-explore" id="toc-more-things-to-explore" class="nav-link" data-scroll-target="#more-things-to-explore">More things to explore</a></li>
   <li><a href="#contribute" id="toc-contribute" class="nav-link" data-scroll-target="#contribute">Contribute</a></li>
+  <li><a href="#cite-as" id="toc-cite-as" class="nav-link" data-scroll-target="#cite-as">Cite as</a></li>
   <li><a href="#team" id="toc-team" class="nav-link" data-scroll-target="#team">Team</a></li>
   </ul>
 <div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/dpwinter/qsample/tree/master/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
@@ -310,11 +311,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <section id="getting-started" class="level2">
 <h2 class="anchored" data-anchor-id="getting-started">Getting started</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> qsample <span class="im">as</span> qs  <span class="co"># import qsample</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt  <span class="co"># import matplotlib for visualization of results</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> qsample <span class="im">as</span> qs</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt  <span class="co"># for visualization of results</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>First, we need to define a quantum protocol of which we would like to know the logical error rate. In <code>qsample</code> a protocol is represented as a graph of quantum <a href="https://dpwinter.github.io/qsample/circuit.html#circuit"><code>Circuit</code></a>s as nodes and transition <code>checks</code> (to be checked at samplingt ime) as edges.</p>
-<p>Example: To sample logical error rates of an error-corrected quantum state teleportation protocol, we define the teleportation circuit which sends the state of the first to the third qubit.</p>
+<p>First, we need to define a quantum protocol of which we would like to know the logical error rate. In <code>qsample</code> a protocol is represented as a graph of quantum <code>Circuits</code> as nodes and boolean transition <code>checks</code> between them. Each <code>check</code> is evaluated at runtime to determined the next circuit to choose, thus simulation of non-deterministic protocols is possible.</p>
+<p>As an example, let’s sample the logical error rates of an error-corrected quantum state teleportation protocol. We define the teleportation circuit <code>teleport</code> which sends the state the first qubit is in, here <span class="math inline">\(|0\rangle\)</span>, to the third qubit.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>teleport <span class="op">=</span> qs.Circuit([{<span class="st">"init"</span>: {<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>}},</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>                       {<span class="st">"H"</span>: {<span class="dv">1</span>}},</span>
@@ -328,17 +329,17 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p><img src="index_files/figure-html/cell-3-output-1.svg" class="img-fluid"></p>
 </div>
 </div>
-<p>Additionally, we need a circuit to (perfectly) measure the third qubit after running <code>teleport</code>. If the outcome of this measurement is 0 (corresponding to the initially prepared <span class="math inline">\(|0\rangle\)</span> state of qubit 1) the teleportation succeded. If the outcome is 1 however, we want to count a logical failure of this protocol. Let’s create a circuit for this measurement and let’s assume we can perform this measurement without noise.</p>
+<p>Additionally, we need a circuit to (perfectly) measure the third qubit after running <code>teleport</code> to verify if the teleportation was successful. If the outcome of this measurement is 0 (corresponding to the initially prepared <span class="math inline">\(|0\rangle\)</span> state of qubit 1) the teleportation succeded. If the outcome is 1 it (logically) failed, we thus want to increment a logical fail counter. Let’s create a circuit for this measurement and let’s assume we can perform this measurement without noise.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>meas <span class="op">=</span> qs.Circuit([{<span class="st">"measure"</span>: {<span class="dv">2</span>}}], noisy<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>meas <span class="op">=</span> qs.Circuit([{<span class="st">"measure"</span>: {<span class="dv">2</span>}}], noisy<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Between the <code>teleport</code> and <code>meas</code> circuits apply a correction to qubit 3 conditioned on the measurement outcome (syndrome) of the teleportation circuit. We define the lookup function <code>lut</code></p>
+<p>Between the <code>teleport</code> and <code>meas</code> circuits apply a correction to qubit 3 conditioned on the measurement outcome (syndrome) of the teleportation circuit. We define the lookup function <a href="https://dpwinter.github.io/qsample/examples.html#lut"><code>lut</code></a> as follows</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> lut(syn):</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    op <span class="op">=</span> {<span class="dv">0</span>: <span class="st">'I'</span>, <span class="dv">1</span>: <span class="st">'X'</span>, <span class="dv">2</span>: <span class="st">'Z'</span>, <span class="dv">3</span>: <span class="st">'Y'</span>}[syn]</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> qs.Circuit([{op: {<span class="dv">2</span>}}], noisy<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Finally, define the circuit sequence and transition logic together within a <a href="https://dpwinter.github.io/qsample/protocol.html#protocol"><code>Protocol</code></a> object. Note that protocols must always commence with a unique <em>START</em> node and terminate at a unique <em>FAIL</em> node, where the latter expresses a logical failure event.</p>
+<p>Finally, define the circuit sequence and transition logic together within a <a href="https://dpwinter.github.io/qsample/protocol.html#protocol"><code>Protocol</code></a> object. Note that protocols must always commence with a unique <em>START</em> node and terminate at a (not necessarily unique) <em>FAIL</em> node, where the latter expresses a logical failure event.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>tele_proto <span class="op">=</span> qs.Protocol(check_functions<span class="op">=</span>{<span class="st">'lut'</span>: lut})</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>tele_proto.add_nodes_from([<span class="st">'tele'</span>, <span class="st">'meas'</span>], circuits<span class="op">=</span>[teleport, meas])</span>
@@ -352,51 +353,51 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p><img src="index_files/figure-html/cell-6-output-1.png" class="img-fluid"></p>
 </div>
 </div>
-<p>Notice that we do not define any initial circuit for the correction <em>COR</em> but pass our lookup function to the <code>check_functions</code> dictionary, which makes it accessible inside the <code>check</code> transition statements (edges) between circuits. This way we can dynamically insert circuits into the protocol at execution time.</p>
-<p>After the protocol has been defined we can repeatedly execute (i.e.&nbsp;sample) it in the presence of incoherent noise. Let’s say we are interested in the logical error rates for physical error rates on all 1- and 2-qubit gates of <span class="math inline">\(p_{phy}=10^{-5}, \dots, 10^{-1}\)</span>, and <span class="math inline">\(0.5\)</span>. The corresponding noise model is called <a href="https://dpwinter.github.io/qsample/noise.html#e1"><code>E1</code></a> in qsample. The groups of all 1- and 2-qubit gates are indexed by the key <em>q</em> in <a href="https://dpwinter.github.io/qsample/noise.html#e1"><code>E1</code></a>. Other noise models (and their parameters) are described in the documentation.</p>
+<p>Notice that we do not define any initial circuit for the correction <em>COR</em> but pass our lookup function to the <code>check_functions</code> dictionary, which makes it accessible inside the <code>check</code> transition statements between circuits. This way we can also dynamically inject correction circuits into the protocol at execution time.</p>
+<p>After the protocol has been defined we can repeatedly execute (i.e.&nbsp;sample) it in the presence of incoherent noise. Let’s say we are interested in the logical error rates of all 1- and 2-qubit gates and measurements subject to physical errors with physical error rates <span class="math inline">\(p_{phy}=10^{-5}, \dots, 10^{-1}\)</span>, and <span class="math inline">\(0.5\)</span>. The corresponding noise model is called <a href="https://dpwinter.github.io/qsample/noise.html#e1_1"><code>E1_1</code></a> in qsample. The groups of all 1- and 2-qubit gates are indexed by the key <em>q</em> in <a href="https://dpwinter.github.io/qsample/noise.html#e1_1"><code>E1_1</code></a>. Other noise models (and their parameters) are described in the documentation.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>err_model <span class="op">=</span> qs.noise.E1</span>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>err_model <span class="op">=</span> qs.noise.E1_1</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>err_params <span class="op">=</span> {<span class="st">'q'</span>: [<span class="fl">1e-5</span>, <span class="fl">1e-4</span>, <span class="fl">1e-3</span>, <span class="fl">1e-2</span>, <span class="fl">1e-1</span>, <span class="fl">0.5</span>]}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>We are ready to sample. As our protocol only contains Clifford gates let’s choose the <a href="https://dpwinter.github.io/qsample/sim.stabilizer.html#stabilizersimulator"><code>StabilizerSimulator</code></a>, as well as the <a href="https://dpwinter.github.io/qsample/callbacks.html#plotstats"><code>PlotStats</code></a> callback for plotting the resulting logical error rate as function of <span class="math inline">\(p_{phy}\)</span>.</p>
+<p>We are ready to sample. As our protocol only contains Clifford gates let’s choose the <a href="https://dpwinter.github.io/qsample/sim.stabilizer.html#stabilizersimulator"><code>StabilizerSimulator</code></a>, as well as the <a href="https://dpwinter.github.io/qsample/callbacks.html#plotstats"><code>PlotStats</code></a> callback for plotting the resulting logical error rate as function of our chosen <span class="math inline">\(p_{phy}\)</span>. For now, let’s use our <em>inefficient</em> sampler, <a href="https://dpwinter.github.io/qsample/sampler.direct.html#directsampler"><code>DirectSampler</code></a>, which executes <code>n_shots</code> naive Monte Carlo samples at each physical error rate.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>sam <span class="op">=</span> qs.DirectSampler(protocol<span class="op">=</span>tele_proto, simulator<span class="op">=</span>qs.StabilizerSimulator, err_model<span class="op">=</span>err_model, err_params<span class="op">=</span>err_params)</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>sam.run(n_shots<span class="op">=</span><span class="dv">20000</span>, callbacks<span class="op">=</span>[qs.callbacks.PlotStats()])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"8979f721b4414d5b8c652c506b4a91fb","version_major":2,"version_minor":0}
+{"model_id":"fae2552315d1466480d72df8bc0b346e","version_major":2,"version_minor":0}
 </script>
 </div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"8ab2817cc12d4ad595bc2a3844e5763e","version_major":2,"version_minor":0}
+{"model_id":"1cebac147ee34931a60b7ed8d1572d68","version_major":2,"version_minor":0}
 </script>
 </div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"5ca0b5dc7aa548ffaa961b0aaf41d8dd","version_major":2,"version_minor":0}
+{"model_id":"c561915ea03c4c47aac72a2afe049d96","version_major":2,"version_minor":0}
 </script>
 </div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"c2944607a68947338d77f8f5e6e80c0f","version_major":2,"version_minor":0}
+{"model_id":"5bbf4d1144594bde8c31eef2413a07ab","version_major":2,"version_minor":0}
 </script>
 </div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"edfd5530f3324e1eb25ca0e98622f137","version_major":2,"version_minor":0}
+{"model_id":"38b2246e4a3d473f9482e3968d158ab5","version_major":2,"version_minor":0}
 </script>
 </div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"9cd166f24d1a4a579bf7ae55c8100269","version_major":2,"version_minor":0}
+{"model_id":"5f288543b17b41db9056ef9eb88c94ab","version_major":2,"version_minor":0}
 </script>
 </div>
 <div class="cell-output cell-output-display">
 <p><img src="index_files/figure-html/cell-8-output-7.png" class="img-fluid"></p>
 </div>
 </div>
-<p>Notice, that at low error rates <a href="https://dpwinter.github.io/qsample/sampler.direct.html#directsampler"><code>DirectSampler</code></a> performs badly, i.e.&nbsp;the error bars become very large, as most of the time the protocol is executed error free and, consequently, logical errors are measured infrequently. In this regime it is much more efficient to use an importance sampling strategy to avoid fault-free protocol execution and instead put more emphasis on execution with at least one fault happening. This approach is implemented in the <a href="https://dpwinter.github.io/qsample/sampler.subset.html#subsetsampler"><code>SubsetSampler</code></a> class. We only need to specify <strong>two additional parameter</strong> <code>p_max</code> which specifies the <span class="math inline">\(p_{phy}\)</span> at which sampling takes place, and <code>L</code>, the length of the longest possible fault-free path. The parameter <code>p_max</code> must be chosen experimentally by repeated sampling and observing which subsets have the largest impact on the failure rate. We must always choose a value such that the subset occurence probability has an exponentially falling shape. Only in this case are the scaling of the sampler results valid. Below we see that for the teleportation circuit <code>p_max</code>-values of 0.01 and 0.1 are still okay, while 0.3 would be problematic. For more information refer to the linked publication.</p>
+<p>Notice, that at low error rates <a href="https://dpwinter.github.io/qsample/sampler.direct.html#directsampler"><code>DirectSampler</code></a> performs badly, i.e.&nbsp;the error bars become very large, as most of the time the protocol is executed error free and, consequently, logical errors are measured infrequently. In this regime it is much more efficient to use an importance sampling strategy to avoid fault-free protocol execution and instead put more emphasis on execution with at least one physical error, i.e.&nbsp;<em>fault</em>, happening. This approach is implemented in the <a href="https://dpwinter.github.io/qsample/sampler.subset.html#subsetsampler"><code>SubsetSampler</code></a> class. We only need to specify <strong>two additional parameters</strong>: <code>p_max</code> which specifies the <span class="math inline">\(p_{phy}\)</span> at which sampling takes place, and <code>L</code>, the length of the longest possible fault-free path. We choose the parameter <code>p_max</code> experimentally by repeated sampling and observing which subsets have the largest impact on the failure rate. We always choose a value such that the subset occurence probability has an exponentially falling shape. Below we see that for the teleportation circuit <code>p_max</code>-values of 0.01 and 0.1 are still okay, while 0.3 could be problematic. For more information refer to the linked publication.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> p_phy <span class="kw">in</span> [<span class="fl">0.01</span>, <span class="fl">0.1</span>, <span class="fl">0.3</span>]:</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    Aws <span class="op">=</span> qs.math.subset_probs(teleport, err_model(), p_phy)</span>
@@ -421,7 +422,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>ss_sam.run(<span class="dv">1000</span>, callbacks<span class="op">=</span>[qs.callbacks.PlotStats()])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"5433fec120cf4c25b193760e0615ead3","version_major":2,"version_minor":0}
+{"model_id":"efb43c9c86a74e76b23423ed81f63fe4","version_major":2,"version_minor":0}
 </script>
 </div>
 <div class="cell-output cell-output-display">
@@ -470,9 +471,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li>Feel free to submit your feature request via github issues</li>
 </ul>
 </section>
+<section id="cite-as" class="level2">
+<h2 class="anchored" data-anchor-id="cite-as">Cite as</h2>
+<pre><code>@misc{qsample,
+    author = {Winter, Don and Heu{\ss}en, Sascha},
+    title = {qsample},
+    year = {2023},
+    publisher = {GitHub},
+    journal = {GitHub repository},
+    howpublished = {\url{https://github.com/dpwinter/qsample}}
+}</code></pre>
+</section>
 <section id="team" class="level2">
 <h2 class="anchored" data-anchor-id="team">Team</h2>
-<p><code>qsample</code> was developed by Don Winter in collaboration with Sascha Heußen under supervision of Prof.&nbsp;Dr.&nbsp;Markus Müller.</p>
+<p><code>qsample</code> was developed by Don Winter in collaboration with Sascha Heußen under supervision of Manuel Rispler and Markus Müller.</p>
 
 
 </section>

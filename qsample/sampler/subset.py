@@ -72,6 +72,8 @@ class SubsetSampler:
     def stats(self, err_params=None):
         """Calculate statistics of sample tree wrt `err_params`
         
+        See Eq. 12, Eq. 17, Eq. 18 and Eq. 19 in paper
+        
         Parameters
         ----------
         err_params : dict or None
@@ -90,7 +92,6 @@ class SubsetSampler:
         self.tree.constants = _constants
         return np.broadcast_arrays(p_L, np.sqrt(var), p_L+delta, np.sqrt(var_up))
         
-    
     def save(self, path):
         utils.save(self, path)
         
@@ -98,6 +99,8 @@ class SubsetSampler:
         """Choose a subset for `circuit`, based on current `tnode`
         
         Choice is based on subset occurence probability (Aws).
+        
+        See App. C3a in paper
         
         Parameters
         ----------
@@ -151,7 +154,7 @@ class SubsetSampler:
                 if path_weight == 0:
                     tnode.invariant = True # Nodes along weight-0 path have no variance
                     
-                try: # set circuit node invariant if there is only one protocol transition from parent to it
+                try: # set circuit node invariant if only one transition from parent defined in protocol
                     tparent = tnode.parent.parent.name
                     if len(list(self.protocol.successors(tparent))) == 1:
                         tnode.invariant = True
@@ -168,8 +171,9 @@ class SubsetSampler:
                         tnode.count += 1
                     else:
                         
-                        # circuit node
-                        if self.protocol.fault_tolerant and self.tree.path_weight(tnode) == 0: # Case IV
+                        # Circuit node
+                        # See App. B4 Case (IV)
+                        if self.protocol.fault_tolerant and self.tree.path_weight(tnode) == 0:
                             for virt_sskey in [sskey for sskey in self.tree.constants[circuit.id].keys() if sum(sskey) == 1]:
                                 ss_node = self.tree.add(name=virt_sskey, parent=tnode, node_type=Constant)
                                 # expand circuits and subsets for each virtual subset
@@ -192,9 +196,10 @@ class SubsetSampler:
                         tnode = self.tree.add(name=subset, parent=tnode, node_type=Constant)
                         tnode.count += 1
                         
-                        # subset node
+                        # Subset node
                         path_weight = self.tree.path_weight(tnode)
-                        if path_weight == 0: # Case I
+                        # See App. B4 Case (I)
+                        if path_weight == 0:
                             pass
                         else:
                             if self.protocol.fault_tolerant:
@@ -202,16 +207,17 @@ class SubsetSampler:
                             else:
                                 smallest_failure_exponent = 1
                             
-                            if self.protocol.fault_tolerant and path_weight == 1: # case III
+                            # See App. B4 Case (III)
+                            if self.protocol.fault_tolerant and path_weight == 1:
                                 delta_value = None
-                            elif path_weight >= smallest_failure_exponent: # case II
+                            # See App. B4 Case (II)
+                            elif path_weight >= smallest_failure_exponent:
                                 delta_value = 1
                             # add virtual circuit and its delta
         
                             for vcirc_name in self.protocol.successors(pnode):
                                 circuit_ = self.protocol.get_circuit(vcirc_name)
 
-                                # if other_circuit.noisy:
                                 if circuit_:
                                     tnode_ = self.tree.add(name=vcirc_name, parent=tnode, node_type=Variable, circuit_id=circuit_.id)
                                     delta_ = self.tree.add(name='δ', node_type=Delta, parent=tnode_)

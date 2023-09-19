@@ -24,19 +24,21 @@ qsample
 ## Getting started
 
 ``` python
-import qsample as qs  # import qsample
-import matplotlib.pyplot as plt  # import matplotlib for visualization of results
+import qsample as qs
+import matplotlib.pyplot as plt  # for visualization of results
 ```
 
 First, we need to define a quantum protocol of which we would like to
 know the logical error rate. In `qsample` a protocol is represented as a
-graph of quantum
-[`Circuit`](https://dpwinter.github.io/qsample/circuit.html#circuit)s as
-nodes and transition `checks` (to be checked at samplingt ime) as edges.
+graph of quantum `Circuits` as nodes and boolean transition `checks`
+between them. Each `check` is evaluated at runtime to determined the
+next circuit to choose, thus simulation of non-deterministic protocols
+is possible.
 
-Example: To sample logical error rates of an error-corrected quantum
-state teleportation protocol, we define the teleportation circuit which
-sends the state of the first to the third qubit.
+As an example, let’s sample the logical error rates of an
+error-corrected quantum state teleportation protocol. We define the
+teleportation circuit `teleport` which sends the state the first qubit
+is in, here $|0\rangle$, to the third qubit.
 
 ``` python
 teleport = qs.Circuit([{"init": {0, 1, 2}},
@@ -52,20 +54,21 @@ teleport.draw()
 ![](index_files/figure-commonmark/cell-3-output-1.svg)
 
 Additionally, we need a circuit to (perfectly) measure the third qubit
-after running `teleport`. If the outcome of this measurement is 0
-(corresponding to the initially prepared $|0\rangle$ state of qubit 1)
-the teleportation succeded. If the outcome is 1 however, we want to
-count a logical failure of this protocol. Let’s create a circuit for
-this measurement and let’s assume we can perform this measurement
-without noise.
+after running `teleport` to verify if the teleportation was successful.
+If the outcome of this measurement is 0 (corresponding to the initially
+prepared $|0\rangle$ state of qubit 1) the teleportation succeded. If
+the outcome is 1 it (logically) failed, we thus want to increment a
+logical fail counter. Let’s create a circuit for this measurement and
+let’s assume we can perform this measurement without noise.
 
 ``` python
-meas = qs.Circuit([{"measure": {2}}], noisy=False)
+meas = qs.Circuit([{"measure": {2}}], noisy=True)
 ```
 
 Between the `teleport` and `meas` circuits apply a correction to qubit 3
 conditioned on the measurement outcome (syndrome) of the teleportation
-circuit. We define the lookup function `lut`
+circuit. We define the lookup function
+[`lut`](https://dpwinter.github.io/qsample/examples.html#lut) as follows
 
 ``` python
 def lut(syn):
@@ -77,8 +80,8 @@ Finally, define the circuit sequence and transition logic together
 within a
 [`Protocol`](https://dpwinter.github.io/qsample/protocol.html#protocol)
 object. Note that protocols must always commence with a unique *START*
-node and terminate at a unique *FAIL* node, where the latter expresses a
-logical failure event.
+node and terminate at a (not necessarily unique) *FAIL* node, where the
+latter expresses a logical failure event.
 
 ``` python
 tele_proto = qs.Protocol(check_functions={'lut': lut})
@@ -96,21 +99,22 @@ tele_proto.draw(figsize=(8,5))
 Notice that we do not define any initial circuit for the correction
 *COR* but pass our lookup function to the `check_functions` dictionary,
 which makes it accessible inside the `check` transition statements
-(edges) between circuits. This way we can dynamically insert circuits
-into the protocol at execution time.
+between circuits. This way we can also dynamically inject correction
+circuits into the protocol at execution time.
 
 After the protocol has been defined we can repeatedly execute
 (i.e. sample) it in the presence of incoherent noise. Let’s say we are
-interested in the logical error rates for physical error rates on all 1-
-and 2-qubit gates of $p_{phy}=10^{-5}, \dots, 10^{-1}$, and $0.5$. The
-corresponding noise model is called
-[`E1`](https://dpwinter.github.io/qsample/noise.html#e1) in qsample. The
-groups of all 1- and 2-qubit gates are indexed by the key *q* in
-[`E1`](https://dpwinter.github.io/qsample/noise.html#e1). Other noise
-models (and their parameters) are described in the documentation.
+interested in the logical error rates of all 1- and 2-qubit gates and
+measurements subject to physical errors with physical error rates
+$p_{phy}=10^{-5}, \dots, 10^{-1}$, and $0.5$. The corresponding noise
+model is called
+[`E1_1`](https://dpwinter.github.io/qsample/noise.html#e1_1) in qsample.
+The groups of all 1- and 2-qubit gates are indexed by the key *q* in
+[`E1_1`](https://dpwinter.github.io/qsample/noise.html#e1_1). Other
+noise models (and their parameters) are described in the documentation.
 
 ``` python
-err_model = qs.noise.E1
+err_model = qs.noise.E1_1
 err_params = {'q': [1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 0.5]}
 ```
 
@@ -120,7 +124,10 @@ let’s choose the
 as well as the
 [`PlotStats`](https://dpwinter.github.io/qsample/callbacks.html#plotstats)
 callback for plotting the resulting logical error rate as function of
-$p_{phy}$.
+our chosen $p_{phy}$. For now, let’s use our *inefficient* sampler,
+[`DirectSampler`](https://dpwinter.github.io/qsample/sampler.direct.html#directsampler),
+which executes `n_shots` naive Monte Carlo samples at each physical
+error rate.
 
 ``` python
 sam = qs.DirectSampler(protocol=tele_proto, simulator=qs.StabilizerSimulator, err_model=err_model, err_params=err_params)
@@ -148,18 +155,18 @@ time the protocol is executed error free and, consequently, logical
 errors are measured infrequently. In this regime it is much more
 efficient to use an importance sampling strategy to avoid fault-free
 protocol execution and instead put more emphasis on execution with at
-least one fault happening. This approach is implemented in the
+least one physical error, i.e. *fault*, happening. This approach is
+implemented in the
 [`SubsetSampler`](https://dpwinter.github.io/qsample/sampler.subset.html#subsetsampler)
-class. We only need to specify **two additional parameter** `p_max`
+class. We only need to specify **two additional parameters**: `p_max`
 which specifies the $p_{phy}$ at which sampling takes place, and `L`,
-the length of the longest possible fault-free path. The parameter
-`p_max` must be chosen experimentally by repeated sampling and observing
-which subsets have the largest impact on the failure rate. We must
-always choose a value such that the subset occurence probability has an
-exponentially falling shape. Only in this case are the scaling of the
-sampler results valid. Below we see that for the teleportation circuit
-`p_max`-values of 0.01 and 0.1 are still okay, while 0.3 would be
-problematic. For more information refer to the linked publication.
+the length of the longest possible fault-free path. We choose the
+parameter `p_max` experimentally by repeated sampling and observing
+which subsets have the largest impact on the failure rate. We always
+choose a value such that the subset occurence probability has an
+exponentially falling shape. Below we see that for the teleportation
+circuit `p_max`-values of 0.01 and 0.1 are still okay, while 0.3 could
+be problematic. For more information refer to the linked publication.
 
 ``` python
 for p_phy in [0.01, 0.1, 0.3]:
@@ -248,7 +255,18 @@ plt.legend();
 
 - Feel free to submit your feature request via github issues
 
+## Cite as
+
+    @misc{qsample,
+        author = {Winter, Don and Heu{\ss}en, Sascha},
+        title = {qsample},
+        year = {2023},
+        publisher = {GitHub},
+        journal = {GitHub repository},
+        howpublished = {\url{https://github.com/dpwinter/qsample}}
+    }
+
 ## Team
 
 `qsample` was developed by Don Winter in collaboration with Sascha
-Heußen under supervision of Prof. Dr. Markus Müller.
+Heußen under supervision of Manuel Rispler and Markus Müller.

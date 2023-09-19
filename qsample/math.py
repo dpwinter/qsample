@@ -37,6 +37,8 @@ def binom(k, n, p):
     >> binom(k=[1,2], n=[3,4], p=0.1)
     [0.243 , 0.0486]
     
+    see Eq. 2 in paper
+    
     Parameters
     ----------
     n : int or list of int
@@ -61,6 +63,8 @@ def joint_binom(k, n, p):
     
     `joint_binom(k,n,p)`=`binom(k[0],n[0],p[0])`×...×`binom(k[-1],n[-1],p[-1])`
     
+    see Eq. 26 in paper
+    
     Example
     -------
     >> joint_binom(k=[1,1], n=[2,2], p=[0.5,0.5])
@@ -84,7 +88,7 @@ def joint_binom(k, n, p):
 
 # %% ../nbs/01_math.ipynb 9
 def Wilson_var(p, N):
-    """Wilson estimator of binomial variance (see Eq. C12 in paper)
+    """Wilson estimator of binomial variance
     
     The formula for the Wilson interval is:
     
@@ -93,6 +97,8 @@ def Wilson_var(p, N):
     we can extract the var (z=1) as:
     
         Var(p) = (CI/2)^2 = (npq + 0.25) / (1 + n)^2
+        
+    see Eq. C12 in paper
     
     Parameters
     ----------
@@ -110,7 +116,9 @@ def Wilson_var(p, N):
 
 # %% ../nbs/01_math.ipynb 10
 def Wald_var(p, N):
-    """Wald estimation of binomial variance (see Eq. C11 in paper)
+    """Wald estimation of binomial variance
+    
+    see Eq. C11 in paper
     
     Parameters
     ----------
@@ -172,7 +180,7 @@ def cartesian_product(list_of_sets):
 def subset_probs(circuit, error_model, prob):
     """Calculate occurence probability of subsets in `circuit` with physical
     error rate `prob`. `error_model` defines how the circuit is to be 
-    partitioned before occurence probabilities are calculated. (see Eq. 2 in paper)
+    partitioned before occurence probabilities are calculated.
     
     Example
     -------

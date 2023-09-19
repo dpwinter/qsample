@@ -70,6 +70,8 @@ class DirectSampler:
     def stats(self, idx=None):
         """Calculate sampling statistics
         
+        See Eq. 1 and C12 in paper
+        
         Returns
         -------
         tuple
@@ -82,7 +84,7 @@ class DirectSampler:
         return p_L, np.sqrt(v_L)
             
     def run(self, n_shots, callbacks=[]):
-        """Execute n_shots of subset sampling
+        """Execute n_shots of direct Monte Carlo sampling
         
         Parameters
         ----------

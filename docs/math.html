@@ -219,7 +219,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./sampler.experimental.html" class="sidebar-item-text sidebar-link">ERV Subset Sampler</a>
+  <a href="./sampler.experimental.html" class="sidebar-item-text sidebar-link">ERU Subset Sampler</a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -317,8 +317,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </tr>
 </tbody>
 </table>
+<pre><code>/home/dw/.local/lib/python3.10/site-packages/fastcore/docscrape.py:225: UserWarning: Unknown section Example
+  else: warn(msg)</code></pre>
 <hr>
-<p><a href="https://github.com/dpwinter/qsample/tree/master/blob/master/qsample/math.py#L34" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/dpwinter/qsample/tree/master/blob/master/qsample/math.py#L32" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="binom" class="level3">
 <h3 class="anchored" data-anchor-id="binom">binom</h3>
@@ -363,7 +365,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </tbody>
 </table>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>test_close(binom(k<span class="op">=</span>[<span class="dv">1</span>,<span class="dv">2</span>], n<span class="op">=</span>[<span class="dv">3</span>,<span class="dv">4</span>], p<span class="op">=</span><span class="fl">0.1</span>), [<span class="fl">0.243</span> , <span class="fl">0.0486</span>], eps<span class="op">=</span><span class="fl">1e-05</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>test_close(binom(k<span class="op">=</span>[<span class="dv">1</span>,<span class="dv">2</span>], n<span class="op">=</span>[<span class="dv">3</span>,<span class="dv">4</span>], p<span class="op">=</span><span class="fl">0.1</span>), [<span class="fl">0.243</span> , <span class="fl">0.0486</span>], eps<span class="op">=</span><span class="fl">1e-05</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <hr>
 <p><a href="https://github.com/dpwinter/qsample/tree/master/blob/master/qsample/math.py#L60" target="_blank" style="float:right; font-size:smaller">source</a></p>
@@ -375,6 +377,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </blockquote>
 <p>Product of independent binomial distributions with parameters <code>k</code>, <code>n</code> and <code>p</code> (can be list of lists), i.e.:</p>
 <p><code>joint_binom(k,n,p)</code>=<code>binom(k[0],n[0],p[0])</code>×…×<code>binom(k[-1],n[-1],p[-1])</code></p>
+<p>see Eq. 26 in paper</p>
 <table class="table">
 <thead>
 <tr class="header">
@@ -407,22 +410,23 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </tbody>
 </table>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>test_close(joint_binom(k<span class="op">=</span>[<span class="dv">1</span>,<span class="dv">2</span>], n<span class="op">=</span>[<span class="dv">3</span>,<span class="dv">4</span>], p<span class="op">=</span>[<span class="fl">0.1</span>,<span class="fl">0.2</span>]), binom(k<span class="op">=</span><span class="dv">1</span>,n<span class="op">=</span><span class="dv">3</span>,p<span class="op">=</span><span class="fl">0.1</span>) <span class="op">*</span> binom(k<span class="op">=</span><span class="dv">2</span>,n<span class="op">=</span><span class="dv">4</span>,p<span class="op">=</span><span class="fl">0.2</span>))</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>test_close(joint_binom(k<span class="op">=</span>[<span class="dv">1</span>,<span class="dv">2</span>], n<span class="op">=</span>[<span class="dv">2</span>,<span class="dv">3</span>], p<span class="op">=</span>[[<span class="fl">0.1</span>,<span class="fl">0.2</span>],[<span class="fl">.3</span>,<span class="fl">.4</span>]]), [binom(<span class="dv">1</span>,<span class="dv">2</span>,<span class="fl">0.1</span>)<span class="op">*</span>binom(<span class="dv">2</span>,<span class="dv">3</span>,<span class="fl">0.2</span>), binom(<span class="dv">1</span>,<span class="dv">2</span>,<span class="fl">0.3</span>)<span class="op">*</span>binom(<span class="dv">2</span>,<span class="dv">3</span>,<span class="fl">0.4</span>)])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>test_close(joint_binom(k<span class="op">=</span>[<span class="dv">1</span>,<span class="dv">2</span>], n<span class="op">=</span>[<span class="dv">3</span>,<span class="dv">4</span>], p<span class="op">=</span>[<span class="fl">0.1</span>,<span class="fl">0.2</span>]), binom(k<span class="op">=</span><span class="dv">1</span>,n<span class="op">=</span><span class="dv">3</span>,p<span class="op">=</span><span class="fl">0.1</span>) <span class="op">*</span> binom(k<span class="op">=</span><span class="dv">2</span>,n<span class="op">=</span><span class="dv">4</span>,p<span class="op">=</span><span class="fl">0.2</span>))</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>test_close(joint_binom(k<span class="op">=</span>[<span class="dv">1</span>,<span class="dv">2</span>], n<span class="op">=</span>[<span class="dv">2</span>,<span class="dv">3</span>], p<span class="op">=</span>[[<span class="fl">0.1</span>,<span class="fl">0.2</span>],[<span class="fl">.3</span>,<span class="fl">.4</span>]]), [binom(<span class="dv">1</span>,<span class="dv">2</span>,<span class="fl">0.1</span>)<span class="op">*</span>binom(<span class="dv">2</span>,<span class="dv">3</span>,<span class="fl">0.2</span>), binom(<span class="dv">1</span>,<span class="dv">2</span>,<span class="fl">0.3</span>)<span class="op">*</span>binom(<span class="dv">2</span>,<span class="dv">3</span>,<span class="fl">0.4</span>)])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <hr>
-<p><a href="https://github.com/dpwinter/qsample/tree/master/blob/master/qsample/math.py#L86" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/dpwinter/qsample/tree/master/blob/master/qsample/math.py#L90" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="wilson_var" class="level3">
 <h3 class="anchored" data-anchor-id="wilson_var">Wilson_var</h3>
 <blockquote class="blockquote">
 <pre><code> Wilson_var (p, N)</code></pre>
 </blockquote>
-<p>Wilson estimator of binomial variance (see Eq. C12 in paper)</p>
+<p>Wilson estimator of binomial variance</p>
 <p>The formula for the Wilson interval is:</p>
 <pre><code>CI = p+z^2/(2n) \pm z\sqrt{pq/n + z^2/(4n^2)}/(1 + z^2/n)</code></pre>
 <p>we can extract the var (z=1) as:</p>
 <pre><code>Var(p) = (CI/2)^2 = (npq + 0.25) / (1 + n)^2</code></pre>
+<p>see Eq. C12 in paper</p>
 <table class="table">
 <thead>
 <tr class="header">
@@ -450,14 +454,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </tbody>
 </table>
 <hr>
-<p><a href="https://github.com/dpwinter/qsample/tree/master/blob/master/qsample/math.py#L112" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/dpwinter/qsample/tree/master/blob/master/qsample/math.py#L118" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="wald_var" class="level3">
 <h3 class="anchored" data-anchor-id="wald_var">Wald_var</h3>
 <blockquote class="blockquote">
 <pre><code> Wald_var (p, N)</code></pre>
 </blockquote>
-<p>Wald estimation of binomial variance (see Eq. C11 in paper)</p>
+<p>Wald estimation of binomial variance</p>
+<p>see Eq. C11 in paper</p>
 <table class="table">
 <thead>
 <tr class="header">
@@ -485,7 +490,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </tbody>
 </table>
 <hr>
-<p><a href="https://github.com/dpwinter/qsample/tree/master/blob/master/qsample/math.py#L130" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/dpwinter/qsample/tree/master/blob/master/qsample/math.py#L138" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="subset_cards" class="level3">
 <h3 class="anchored" data-anchor-id="subset_cards">subset_cards</h3>
@@ -520,11 +525,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </tbody>
 </table>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span>(subset_cards({<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>}) <span class="op">==</span> {<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>})</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span>(subset_cards({(<span class="dv">0</span>,<span class="dv">0</span>), (<span class="dv">0</span>,<span class="dv">1</span>), (<span class="dv">0</span>,<span class="dv">2</span>)}) <span class="op">==</span> {<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span>(subset_cards({<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>}) <span class="op">==</span> {<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>})</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span>(subset_cards({(<span class="dv">0</span>,<span class="dv">0</span>), (<span class="dv">0</span>,<span class="dv">1</span>), (<span class="dv">0</span>,<span class="dv">2</span>)}) <span class="op">==</span> {<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <hr>
-<p><a href="https://github.com/dpwinter/qsample/tree/master/blob/master/qsample/math.py#L151" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/dpwinter/qsample/tree/master/blob/master/qsample/math.py#L159" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="cartesian_product" class="level3">
 <h3 class="anchored" data-anchor-id="cartesian_product">cartesian_product</h3>
@@ -559,17 +564,17 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </tbody>
 </table>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span>(cartesian_product([{<span class="dv">1</span>,<span class="dv">2</span>},{<span class="dv">3</span>,<span class="dv">4</span>}]) <span class="op">==</span> [(<span class="dv">1</span>,<span class="dv">3</span>), (<span class="dv">1</span>,<span class="dv">4</span>), (<span class="dv">2</span>,<span class="dv">3</span>), (<span class="dv">2</span>,<span class="dv">4</span>)])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span>(cartesian_product([{<span class="dv">1</span>,<span class="dv">2</span>},{<span class="dv">3</span>,<span class="dv">4</span>}]) <span class="op">==</span> [(<span class="dv">1</span>,<span class="dv">3</span>), (<span class="dv">1</span>,<span class="dv">4</span>), (<span class="dv">2</span>,<span class="dv">3</span>), (<span class="dv">2</span>,<span class="dv">4</span>)])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <hr>
-<p><a href="https://github.com/dpwinter/qsample/tree/master/blob/master/qsample/math.py#L172" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<p><a href="https://github.com/dpwinter/qsample/tree/master/blob/master/qsample/math.py#L180" target="_blank" style="float:right; font-size:smaller">source</a></p>
 </section>
 <section id="subset_probs" class="level3">
 <h3 class="anchored" data-anchor-id="subset_probs">subset_probs</h3>
 <blockquote class="blockquote">
 <pre><code> subset_probs (circuit, error_model, prob)</code></pre>
 </blockquote>
-<p>Calculate occurence probability of subsets in <code>circuit</code> with physical error rate <code>prob</code>. <code>error_model</code> defines how the circuit is to be partitioned before occurence probabilities are calculated. (see Eq. 2 in paper)</p>
+<p>Calculate occurence probability of subsets in <code>circuit</code> with physical error rate <code>prob</code>. <code>error_model</code> defines how the circuit is to be partitioned before occurence probabilities are calculated.</p>
 <table class="table">
 <colgroup>
 <col style="width: 9%">

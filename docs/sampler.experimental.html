@@ -6,9 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="Sampler class for (experimental) ERV subset Monte Carlo sampling">
+<meta name="description" content="Sampler class for (experimental) ERU subset Monte Carlo sampling">
 
-<title>qsample - ERV Subset Sampler</title>
+<title>qsample - ERU Subset Sampler</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -62,11 +62,11 @@ ul.task-list li input[type="checkbox"] {
 
 
 <link rel="stylesheet" href="styles.css">
-<meta property="og:title" content="qsample - ERV Subset Sampler">
-<meta property="og:description" content="Sampler class for (experimental) ERV subset Monte Carlo sampling">
+<meta property="og:title" content="qsample - ERU Subset Sampler">
+<meta property="og:description" content="Sampler class for (experimental) ERU subset Monte Carlo sampling">
 <meta property="og:site-name" content="qsample">
-<meta name="twitter:title" content="qsample - ERV Subset Sampler">
-<meta name="twitter:description" content="Sampler class for (experimental) ERV subset Monte Carlo sampling">
+<meta name="twitter:title" content="qsample - ERU Subset Sampler">
+<meta name="twitter:description" content="Sampler class for (experimental) ERU subset Monte Carlo sampling">
 <meta name="twitter:card" content="summary">
 </head>
 
@@ -86,7 +86,7 @@ ul.task-list li input[type="checkbox"] {
     </nav>
   <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
     <div class="container-fluid d-flex justify-content-between">
-      <h1 class="quarto-secondary-nav-title">ERV Subset Sampler</h1>
+      <h1 class="quarto-secondary-nav-title">ERU Subset Sampler</h1>
       <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
         <i class="bi bi-chevron-right"></i>
       </button>
@@ -156,7 +156,7 @@ ul.task-list li input[type="checkbox"] {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./sampler.experimental.html" class="sidebar-item-text sidebar-link active">ERV Subset Sampler</a>
+  <a href="./sampler.experimental.html" class="sidebar-item-text sidebar-link active">ERU Subset Sampler</a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -183,7 +183,7 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#subsetsamplererv" id="toc-subsetsamplererv" class="nav-link active" data-scroll-target="#subsetsamplererv">SubsetSamplerERV</a></li>
+  <li><a href="#subsetsamplereru" id="toc-subsetsamplereru" class="nav-link active" data-scroll-target="#subsetsamplereru">SubsetSamplerERU</a></li>
   </ul>
 <div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/dpwinter/qsample/tree/master/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
@@ -192,12 +192,12 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title d-none d-lg-block">ERV Subset Sampler</h1>
+<h1 class="title d-none d-lg-block">ERU Subset Sampler</h1>
 </div>
 
 <div>
   <div class="description">
-    Sampler class for (experimental) ERV subset Monte Carlo sampling
+    Sampler class for (experimental) ERU subset Monte Carlo sampling
   </div>
 </div>
 
@@ -217,17 +217,15 @@ ul.task-list li input[type="checkbox"] {
   else: warn(msg)</code></pre>
 <hr>
 <p><a href="https://github.com/dpwinter/qsample/tree/master/blob/master/qsample/sampler/experimental.py#L13" target="_blank" style="float:right; font-size:smaller">source</a></p>
-<section id="subsetsamplererv" class="level3">
-<h3 class="anchored" data-anchor-id="subsetsamplererv">SubsetSamplerERV</h3>
+<section id="subsetsamplereru" class="level3">
+<h3 class="anchored" data-anchor-id="subsetsamplereru">SubsetSamplerERU</h3>
 <blockquote class="blockquote">
-<pre><code> SubsetSamplerERV (protocol, simulator, p_max, err_model, err_params=None,
+<pre><code> SubsetSamplerERU (protocol, simulator, p_max, err_model, err_params=None,
                    k=1, L=1)</code></pre>
 </blockquote>
-<p>Subset sampler implementing ERV sampling technique</p>
-<p>from qsample.examples import ghz1, ghz3, ghz_stab, ftsteane, flagstab, steane0, tele from qsample.sim.stabilizer import StabilizerSimulator as CHP from qsample.noise import E1 import qsample.callbacks as cb</p>
-<p>sample_range = np.logspace(-5,0,11) err_params = {‘q’: sample_range} p_max = {‘q’: 1e-3}</p>
-<p>ss_sam = SubsetSamplerERV(protocol=steane0, simulator=CHP, p_max=p_max, err_model=E1, err_params=err_params) ss_sam.run(3, callbacks=[])#cb.PrintERVPerShot()]) # ss_sam.run(100, callbacks=[cb.PlotStats()])</p>
-<p>ss_sam.tree.draw(verbose=True)</p>
+<p>Subset sampler implementing ERU sampling technique</p>
+<p>WORK IN EXPERIMENTAL STATE</p>
+<p>See App. C3b in paper</p>
 
 
 </section>
