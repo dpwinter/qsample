@@ -287,30 +287,26 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <section id="ghz-state-preparation" class="level2">
 <h2 class="anchored" data-anchor-id="ghz-state-preparation">1. GHZ state preparation</h2>
 <p>See sections 1C and 3B in paper</p>
-</section>
-<section id="deterministic-fault-tolerant-preparation-of-steane-code-state" class="level2">
-<h2 class="anchored" data-anchor-id="deterministic-fault-tolerant-preparation-of-steane-code-state">2. Deterministic fault-tolerant preparation of Steane code state</h2>
-<p>See section 3C in paper</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Sampling parameters</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>sample_range <span class="op">=</span> np.logspace(<span class="op">-</span><span class="dv">3</span>,<span class="op">-</span><span class="dv">1</span>,<span class="dv">5</span>)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>err_params <span class="op">=</span> {<span class="st">'q1'</span>: sample_range<span class="op">/</span><span class="dv">10</span>, <span class="st">'q2'</span>: sample_range}</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>err_model <span class="op">=</span> qs.noise.S2</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>sample_range <span class="op">=</span> np.logspace(<span class="op">-</span><span class="dv">3</span>,<span class="dv">0</span>,<span class="dv">5</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>err_params <span class="op">=</span> {<span class="st">'q'</span>: sample_range}</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>err_model <span class="op">=</span> qs.noise.S1</span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>CHP <span class="op">=</span> qs.StabilizerSimulator</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>p_max <span class="op">=</span> {<span class="st">'q1'</span>: <span class="fl">1e-3</span>, <span class="st">'q2'</span>: <span class="fl">1e-2</span>}</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>p_max <span class="op">=</span> {<span class="st">'q'</span>: <span class="fl">1e-2</span>}</span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Direct MC sampling</span></span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"--- Direct MC sampling ---"</span>)</span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>mc_sam <span class="op">=</span> qs.DirectSampler(steane0, CHP, err_params<span class="op">=</span>err_params, err_model<span class="op">=</span>err_model)</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>mc_sam.run(<span class="dv">20000</span>)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>mc_sam <span class="op">=</span> qs.DirectSampler(ghz1, CHP, err_params<span class="op">=</span>err_params, err_model<span class="op">=</span>err_model)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>mc_sam.run(<span class="dv">20000</span>) <span class="co"># Needs 20k * len(sample_range) samples</span></span>
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"--- Subset sampling ---"</span>)</span>
 <span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>ss_sam <span class="op">=</span> qs.SubsetSampler(steane0, CHP,  p_max<span class="op">=</span>p_max, err_model<span class="op">=</span>err_model, err_params<span class="op">=</span>err_params, L<span class="op">=</span><span class="dv">3</span>)</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>ss_sam.run(<span class="dv">2000</span>)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>ss_sam <span class="op">=</span> qs.SubsetSampler(protocol<span class="op">=</span>ghz1, simulator<span class="op">=</span>CHP,  p_max<span class="op">=</span>p_max, err_model<span class="op">=</span>err_model, err_params<span class="op">=</span>err_params, L<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>ss_sam.run(<span class="dv">10000</span>) <span class="co"># Needs only 10k samples</span></span>
 <span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot results</span></span>
 <span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
@@ -324,6 +320,86 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>plt.fill_between(sample_range, p_L_up<span class="op">-</span>ss_std_up, p_L_up<span class="op">+</span>ss_std_up, alpha<span class="op">=</span><span class="fl">0.2</span>)</span>
 <span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'$p_L$'</span>)</span>
 <span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'$p$'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>--- Direct MC sampling ---</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"5ea801ea53054f05b8b74b1fec152f80","version_major":2,"version_minor":0}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"564566931f5d41d39c2836fab4cedddc","version_major":2,"version_minor":0}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"6ce44e237b124d6cb638e74f0a9dc4c2","version_major":2,"version_minor":0}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"1bfd7f3f147f4d2c9d25720e067a52c8","version_major":2,"version_minor":0}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"e82882ce4c47478c927029238688302c","version_major":2,"version_minor":0}
+</script>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>--- Subset sampling ---</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"05baf1c96bc742de89bbc5e2f5843969","version_major":2,"version_minor":0}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<pre><code>Text(0.5, 0, '$p$')</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="09_examples_files/figure-html/cell-4-output-10.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="deterministic-fault-tolerant-preparation-of-steane-code-state" class="level2">
+<h2 class="anchored" data-anchor-id="deterministic-fault-tolerant-preparation-of-steane-code-state">2. Deterministic fault-tolerant preparation of Steane code state</h2>
+<p>See section 3C in paper</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Sampling parameters</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>sample_range <span class="op">=</span> np.logspace(<span class="op">-</span><span class="dv">3</span>,<span class="op">-</span><span class="dv">1</span>,<span class="dv">5</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>err_params <span class="op">=</span> {<span class="st">'q1'</span>: sample_range<span class="op">/</span><span class="dv">10</span>, <span class="st">'q2'</span>: sample_range}</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>err_model <span class="op">=</span> qs.noise.S2</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>CHP <span class="op">=</span> qs.StabilizerSimulator</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>p_max <span class="op">=</span> {<span class="st">'q1'</span>: <span class="fl">1e-3</span>, <span class="st">'q2'</span>: <span class="fl">1e-2</span>}</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Direct MC sampling</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"--- Direct MC sampling ---"</span>)</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>mc_sam <span class="op">=</span> qs.DirectSampler(steane0, CHP, err_params<span class="op">=</span>err_params, err_model<span class="op">=</span>err_model)</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>mc_sam.run(<span class="dv">20000</span>)</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"--- Subset sampling ---"</span>)</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>ss_sam <span class="op">=</span> qs.SubsetSampler(steane0, CHP,  p_max<span class="op">=</span>p_max, err_model<span class="op">=</span>err_model, err_params<span class="op">=</span>err_params, L<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>ss_sam.run(<span class="dv">2000</span>)</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot results</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>p_L, std <span class="op">=</span> mc_sam.stats()</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>p_L_low, ss_std_low, p_L_up, ss_std_up <span class="op">=</span> ss_sam.stats()</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>plt.errorbar(sample_range, p_L, fmt<span class="op">=</span><span class="st">'--'</span>, c<span class="op">=</span><span class="st">"black"</span>, yerr<span class="op">=</span>std, label<span class="op">=</span><span class="st">"Direct MC"</span>)</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>plt.loglog(sample_range, p_L_low, label<span class="op">=</span><span class="st">'SS low'</span>)</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>plt.fill_between(sample_range, p_L_low<span class="op">-</span>ss_std_low, p_L_low<span class="op">+</span>ss_std_low, alpha<span class="op">=</span><span class="fl">0.2</span>)</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>plt.loglog(sample_range, p_L_up, label<span class="op">=</span><span class="st">'SS low'</span>)</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>plt.fill_between(sample_range, p_L_up<span class="op">-</span>ss_std_up, p_L_up<span class="op">+</span>ss_std_up, alpha<span class="op">=</span><span class="fl">0.2</span>)</span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'$p_L$'</span>)</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'$p$'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>--- Direct MC sampling ---</code></pre>
 </div>
@@ -372,39 +448,39 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2 class="anchored" data-anchor-id="flag-ft-stabilizer-0rangle_l-measurement">3. Flag-FT stabilizer <span class="math inline">\(|0\rangle_L\)</span> measurement</h2>
 <p>See section 3D in paper</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Sampling parameters</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># sample_range = np.logspace(-4,-1,7)</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>sample_range <span class="op">=</span> np.logspace(<span class="op">-</span><span class="dv">3</span>,<span class="dv">0</span>,<span class="dv">5</span>)</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>err_params <span class="op">=</span> {<span class="st">'q'</span>: sample_range}</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>err_model <span class="op">=</span> qs.noise.S1</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>CHP <span class="op">=</span> qs.StabilizerSimulator</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>p_max <span class="op">=</span> {<span class="st">'q'</span>: <span class="fl">1e-2</span>}</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Direct MC sampling</span></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"--- Direct MC sampling ---"</span>)</span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>mc_sam <span class="op">=</span> qs.DirectSampler(flagstab, CHP, err_params<span class="op">=</span>err_params, err_model<span class="op">=</span>err_model)</span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>mc_sam.run(<span class="dv">10000</span>)</span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"--- Subset sampling ---"</span>)</span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>ss_sam <span class="op">=</span> qs.SubsetSampler(flagstab, CHP,  p_max<span class="op">=</span>p_max, err_model<span class="op">=</span>err_model, err_params<span class="op">=</span>err_params, L<span class="op">=</span><span class="dv">8</span>)</span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>ss_sam.run(<span class="dv">10000</span>)</span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot results</span></span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>p_L, std <span class="op">=</span> mc_sam.stats()</span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>p_L_low, ss_std_low, p_L_up, ss_std_up <span class="op">=</span> ss_sam.stats()</span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>plt.errorbar(sample_range, p_L, fmt<span class="op">=</span><span class="st">'--'</span>, c<span class="op">=</span><span class="st">"black"</span>, yerr<span class="op">=</span>std, label<span class="op">=</span><span class="st">"Direct MC"</span>)</span>
-<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>plt.loglog(sample_range, p_L_low, label<span class="op">=</span><span class="st">'SS low'</span>)</span>
-<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>plt.fill_between(sample_range, p_L_low<span class="op">-</span>ss_std_low, p_L_low<span class="op">+</span>ss_std_low, alpha<span class="op">=</span><span class="fl">0.2</span>)</span>
-<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>plt.loglog(sample_range, p_L_up, label<span class="op">=</span><span class="st">'SS low'</span>)</span>
-<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>plt.fill_between(sample_range, p_L_up<span class="op">-</span>ss_std_up, p_L_up<span class="op">+</span>ss_std_up, alpha<span class="op">=</span><span class="fl">0.2</span>)</span>
-<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'$p_L$'</span>)</span>
-<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'$p$'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Sampling parameters</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co"># sample_range = np.logspace(-4,-1,7)</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>sample_range <span class="op">=</span> np.logspace(<span class="op">-</span><span class="dv">3</span>,<span class="dv">0</span>,<span class="dv">5</span>)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>err_params <span class="op">=</span> {<span class="st">'q'</span>: sample_range}</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>err_model <span class="op">=</span> qs.noise.S1</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>CHP <span class="op">=</span> qs.StabilizerSimulator</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>p_max <span class="op">=</span> {<span class="st">'q'</span>: <span class="fl">1e-2</span>}</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Direct MC sampling</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"--- Direct MC sampling ---"</span>)</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>mc_sam <span class="op">=</span> qs.DirectSampler(flagstab, CHP, err_params<span class="op">=</span>err_params, err_model<span class="op">=</span>err_model)</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>mc_sam.run(<span class="dv">10000</span>)</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"--- Subset sampling ---"</span>)</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>ss_sam <span class="op">=</span> qs.SubsetSampler(flagstab, CHP,  p_max<span class="op">=</span>p_max, err_model<span class="op">=</span>err_model, err_params<span class="op">=</span>err_params, L<span class="op">=</span><span class="dv">8</span>)</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>ss_sam.run(<span class="dv">10000</span>)</span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot results</span></span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>p_L, std <span class="op">=</span> mc_sam.stats()</span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>p_L_low, ss_std_low, p_L_up, ss_std_up <span class="op">=</span> ss_sam.stats()</span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>plt.errorbar(sample_range, p_L, fmt<span class="op">=</span><span class="st">'--'</span>, c<span class="op">=</span><span class="st">"black"</span>, yerr<span class="op">=</span>std, label<span class="op">=</span><span class="st">"Direct MC"</span>)</span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>plt.loglog(sample_range, p_L_low, label<span class="op">=</span><span class="st">'SS low'</span>)</span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>plt.fill_between(sample_range, p_L_low<span class="op">-</span>ss_std_low, p_L_low<span class="op">+</span>ss_std_low, alpha<span class="op">=</span><span class="fl">0.2</span>)</span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>plt.loglog(sample_range, p_L_up, label<span class="op">=</span><span class="st">'SS low'</span>)</span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>plt.fill_between(sample_range, p_L_up<span class="op">-</span>ss_std_up, p_L_up<span class="op">+</span>ss_std_up, alpha<span class="op">=</span><span class="fl">0.2</span>)</span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'$p_L$'</span>)</span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'$p$'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>--- Direct MC sampling ---</code></pre>
 </div>
