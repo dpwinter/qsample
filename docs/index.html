@@ -333,7 +333,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>meas <span class="op">=</span> qs.Circuit([{<span class="st">"measure"</span>: {<span class="dv">2</span>}}], noisy<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Between the <code>teleport</code> and <code>meas</code> circuits apply a correction to qubit 3 conditioned on the measurement outcome (syndrome) of the teleportation circuit. We define the lookup function <a href="https://dpwinter.github.io/qsample/examples.html#lut"><code>lut</code></a> as follows</p>
+<p>Between the <code>teleport</code> and <code>meas</code> circuits apply a correction to qubit 3 conditioned on the measurement outcome (syndrome) of the teleportation circuit. We define the lookup function <code>lut</code> as follows</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> lut(syn):</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    op <span class="op">=</span> {<span class="dv">0</span>: <span class="st">'I'</span>, <span class="dv">1</span>: <span class="st">'X'</span>, <span class="dv">2</span>: <span class="st">'Z'</span>, <span class="dv">3</span>: <span class="st">'Y'</span>}[syn]</span>

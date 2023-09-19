@@ -67,8 +67,7 @@ meas = qs.Circuit([{"measure": {2}}], noisy=True)
 
 Between the `teleport` and `meas` circuits apply a correction to qubit 3
 conditioned on the measurement outcome (syndrome) of the teleportation
-circuit. We define the lookup function
-[`lut`](https://dpwinter.github.io/qsample/examples.html#lut) as follows
+circuit. We define the lookup function `lut` as follows
 
 ``` python
 def lut(syn):
