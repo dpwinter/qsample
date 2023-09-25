@@ -256,13 +256,13 @@ plt.legend();
 
 ## Cite as
 
-    @misc{qsample,
-        author = {Winter, Don and Heu{\ss}en, Sascha},
-        title = {qsample},
-        year = {2023},
-        publisher = {GitHub},
-        journal = {GitHub repository},
-        howpublished = {\url{https://github.com/dpwinter/qsample}}
+    @misc{heussen2023dynamical,
+          title={Dynamical subset sampling of quantum error correcting protocols}, 
+          author={Sascha Heu{\ss}en and Don Winter and Manuel Rispler and Markus M\"{u}ller},
+          year={2023},
+          eprint={2309.12774},
+          archivePrefix={arXiv},
+          primaryClass={quant-ph}
     }
 
 ## Team
