@@ -165,7 +165,8 @@ which subsets have the largest impact on the failure rate. We always
 choose a value such that the subset occurence probability has an
 exponentially falling shape. Below we see that for the teleportation
 circuit `p_max`-values of 0.01 and 0.1 are still okay, while 0.3 could
-be problematic. For more information refer to the linked publication.
+be problematic. For more information refer to
+https://arxiv.org/abs/2309.12774.
 
 ``` python
 for p_phy in [0.01, 0.1, 0.3]:
