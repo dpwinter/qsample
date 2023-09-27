@@ -37,8 +37,10 @@ is possible.
 
 As an example, let’s sample the logical error rates of an
 error-corrected quantum state teleportation protocol. We define the
-teleportation circuit `teleport` which sends the state the first qubit
-is in, here $|0\rangle$, to the third qubit.
+teleportation circuit `teleport` which sends the state of the first
+qubit, here $|0\rangle$, to the third qubit. Additionally, we want to
+use measurements of first and second qubit at the end of the circuit to
+drive a correction on qubit 3 before we measure it.
 
 ``` python
 teleport = qs.Circuit([{"init": {0, 1, 2}},
@@ -53,21 +55,23 @@ teleport.draw()
 
 ![](index_files/figure-commonmark/cell-3-output-1.svg)
 
-Additionally, we need a circuit to (perfectly) measure the third qubit
-after running `teleport` to verify if the teleportation was successful.
-If the outcome of this measurement is 0 (corresponding to the initially
-prepared $|0\rangle$ state of qubit 1) the teleportation succeded. If
-the outcome is 1 it (logically) failed, we thus want to increment a
-logical fail counter. Let’s create a circuit for this measurement and
-let’s assume we can perform this measurement without noise.
+Thus, we also need a circuit to measure the third qubit to verify if the
+teleportation was successful. If the outcome of this measurement is 0
+(corresponding to the initially prepared $|0\rangle$ state of qubit 1,
+the teleportation succeded. If the outcome is 1 it (logically) failed.
+Let’s additionally assume there is some noise on the measurement
+readout.
 
 ``` python
 meas = qs.Circuit([{"measure": {2}}], noisy=True)
 ```
 
 Between the `teleport` and `meas` circuits apply a correction to qubit 3
-conditioned on the measurement outcome (syndrome) of the teleportation
-circuit. We define the lookup function `lut` as follows
+conditioned on the measurement outcomes (of qubits 1 and 2) of the
+teleportation circuit. We map each possible measurement outcome (integer
+representation of bit string in order of measurement) to a corresponding
+correction on qubit 3 by defining the lookup function `lut`. We assume
+the correction itself to be noiseless here.
 
 ``` python
 def lut(syn):
@@ -96,7 +100,7 @@ tele_proto.draw(figsize=(8,5))
 ![](index_files/figure-commonmark/cell-6-output-1.png)
 
 Notice that we do not define any initial circuit for the correction
-*COR* but pass our lookup function to the `check_functions` dictionary,
+`COR` but pass our lookup function to the `check_functions` dictionary,
 which makes it accessible inside the `check` transition statements
 between circuits. This way we can also dynamically inject correction
 circuits into the protocol at execution time.
@@ -108,7 +112,8 @@ measurements subject to physical errors with physical error rates
 $p_{phy}=10^{-5}, \dots, 10^{-1}$, and $0.5$. The corresponding noise
 model is called
 [`E1_1`](https://dpwinter.github.io/qsample/noise.html#e1_1) in qsample.
-The groups of all 1- and 2-qubit gates are indexed by the key *q* in
+The groups of all 1- and 2-qubit gates and measurements are indexed by
+the key *q* in
 [`E1_1`](https://dpwinter.github.io/qsample/noise.html#e1_1). Other
 noise models (and their parameters) are described in the documentation.
 
@@ -209,12 +214,10 @@ ss_sam.tree.draw(verbose=True)
 
 ![](index_files/figure-commonmark/cell-11-output-1.png)
 
-We see that only the teleportation protocol has fault weight subsets,
-while the *meas* and *COR* circuits are noise-free (i.e. they only have
-the 0-subset). The leaf nodes *FAIL* and *None* represent logical
-failure and successful teleportation events, respectively. $\delta$
-represents the missing subsets which have not been sampled and which
-result in the upper bound on the failure rate.
+The leaf nodes *FAIL* and *None* represent logical failure and
+successful teleportation events, respectively. $\delta$ represents the
+missing subsets which have not been sampled and which result in the
+upper bound on the failure rate.
 
 Finally, let’s compare the results of
 [`DirectSampler`](https://dpwinter.github.io/qsample/sampler.direct.html#directsampler)
@@ -256,6 +259,17 @@ plt.legend();
 - Feel free to submit your feature request via github issues
 
 ## Cite as
+
+    @misc{qsample,
+        author = {Winter, Don and Heu{\ss}en, Sascha},
+        title = {qsample},
+        year = {2023},
+        publisher = {GitHub},
+        journal = {GitHub repository},
+        howpublished = {\url{https://github.com/dpwinter/qsample}}
+    }
+
+and
 
     @misc{heussen2023dynamical,
           title={Dynamical subset sampling of quantum error correcting protocols}, 
