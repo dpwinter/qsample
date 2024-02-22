@@ -271,13 +271,16 @@ plt.legend();
 
 and
 
-    @misc{heussen2023dynamical,
-          title={Dynamical subset sampling of quantum error correcting protocols}, 
-          author={Sascha Heu{\ss}en and Don Winter and Manuel Rispler and Markus M\"{u}ller},
-          year={2023},
-          eprint={2309.12774},
-          archivePrefix={arXiv},
-          primaryClass={quant-ph}
+    @article{heussen2024dynamical,
+      title = {Dynamical subset sampling of quantum error-correcting protocols},
+      author = {Heu{\ss}en, Sascha and Winter, Don and Rispler, Manuel and M\"uller, Markus},
+      journal = {Physical Review Research},
+      volume = {6},
+      issue = {1},
+      pages = {013177},
+      year = {2024},
+      doi = {10.1103/PhysRevResearch.6.013177},
+      url = {https://link.aps.org/doi/10.1103/PhysRevResearch.6.013177}
     }
 
 ## Team
